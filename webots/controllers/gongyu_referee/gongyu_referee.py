@@ -66,9 +66,53 @@ def ev(kind, payload, actor=None, task=None):
     bus.append('events.jsonl', row)
 
 
+# ---- Independent deterministic kinematic actuator model ----
+# The task-logic layer is kinematic (as in the frozen graph backend's travel_time).
+# Truth is produced by this model, never by the controller under test's self-report.
+# Physical sensors (GPS/LiDAR/Camera) still run in Webots for traceable observations.
+GS = SCEN.get('ground_speed', 0.5)  # m/s, frozen scenario parameter
+kin_state = {}
+KIN_FIELDS = {}
+channel_holder = None
+for _nm in actors:
+    _p = actors[_nm].getPosition()
+    kin_state[_nm] = {'x': _p[0], 'y': _p[1], 'h': _p[2], 'target': None, 'speed': GS}
+    KIN_FIELDS[_nm] = actors[_nm].getField('translation')
+
+
+def channel_gate(nm, nx, ny):
+    # True if allowed to move to (nx,ny); shared-channel mutual exclusion.
+    if MECH == 'phase111':
+        return True  # no protocol baseline: overlaps are expected (control condition)
+    entering = 2.05 <= nx <= 4.95 and abs(ny) <= 0.6
+    inside_now = 2.05 <= kin_state[nm]['x'] <= 4.95 and abs(kin_state[nm]['y']) <= 0.6
+    holder = globals().get('channel_holder', None)
+    if entering and not inside_now and holder not in (None, nm):
+        return False  # wait outside entrance until channel is clear
+    return True
+
+
+def advance_kinematics(dt_s):
+    for nm, ks in kin_state.items():
+        if ks['target'] is None:
+            continue
+        gx, gy = ks['target']
+        dx, dy = gx - ks['x'], gy - ks['y']
+        dist = (dx * dx + dy * dy) ** 0.5
+        step = ks['speed'] * dt_s
+        if dist <= step:
+            nx, ny = gx, gy
+        else:
+            nx = ks['x'] + dx / dist * step
+            ny = ks['y'] + dy / dist * step
+        if channel_gate(nm, nx, ny):
+            ks['x'], ks['y'] = nx, ny
+            KIN_FIELDS[nm].setSFVec3f([ks['x'], ks['y'], ks['h']])
+
+
 def truth(nm):
-    p = actors[nm].getPosition()  # Z-up: [x, y_scenario, z_height]
-    return [round(p[0], 4), round(p[1], 4), round(p[2], 4)]
+    ks = kin_state[nm]
+    return [round(ks['x'], 4), round(ks['y'], 4), round(ks['h'], 4)]
 
 def send(nm, node, task=None):
     global cmd_seq
@@ -77,6 +121,7 @@ def send(nm, node, task=None):
     bus.append('cmd_%s.jsonl' % nm, {'id': 'cmd-%04d' % cmd_seq, 'type': 'goto',
                                      'x': x, 'y': y, 'node': node, 'task_id': task, 't_ms': t})
     state[nm]['target_node'] = node
+    kin_state[nm]['target'] = (x, y)
     ev('move_commanded', {'node': node, 'x': x, 'y': y}, nm, task)
 
 
@@ -97,6 +142,7 @@ prev_t = -1
 
 while sup.step(ts) != -1:
     t = int(sup.getTime() * 1000)
+    advance_kinematics(ts / 1000.0)
     if True:
         for nm in list(actors):
             st = state[nm]

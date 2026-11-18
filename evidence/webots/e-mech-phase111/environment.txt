@@ -1,0 +1,5 @@
+run=e-mech-phase111
+scene=web_medium
+platform=amax-cpu-webots-r2025a
+
+webots_exit=0

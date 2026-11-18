@@ -1,0 +1,125 @@
+{
+ "seed": 0,
+ "scene": "web_medium",
+ "mechanism": "release",
+ "adapt": "off",
+ "cost": "low",
+ "report_delay_ms": 1000,
+ "task_completed": {
+  "blue_inspect": {
+   "t_ms": 2016,
+   "deadline_ms": 40000,
+   "on_time": true,
+   "actor": "B3"
+  },
+  "red_inspect": {
+   "t_ms": 2016,
+   "deadline_ms": 10000,
+   "on_time": true,
+   "actor": "R5"
+  },
+  "red3_inspect": {
+   "t_ms": 5664,
+   "deadline_ms": 60000,
+   "on_time": true,
+   "actor": "R3"
+  },
+  "red4_inspect": {
+   "t_ms": 5664,
+   "deadline_ms": 60000,
+   "on_time": true,
+   "actor": "R4"
+  },
+  "red3_report": {
+   "t_ms": 14528,
+   "deadline_ms": 70000,
+   "on_time": true,
+   "actor": "R3"
+  },
+  "red4_report": {
+   "t_ms": 14528,
+   "deadline_ms": 70000,
+   "on_time": true,
+   "actor": "R4"
+  },
+  "red_patrol": {
+   "t_ms": 21312,
+   "deadline_ms": 60000,
+   "on_time": true,
+   "actor": "R5"
+  },
+  "red3_return": {
+   "t_ms": 27040,
+   "deadline_ms": 86000,
+   "on_time": true,
+   "actor": "R3"
+  },
+  "red4_return": {
+   "t_ms": 27040,
+   "deadline_ms": 130000,
+   "on_time": true,
+   "actor": "R4"
+  },
+  "blue1": {
+   "t_ms": 28032,
+   "deadline_ms": 350000,
+   "on_time": true,
+   "actor": "B1"
+  },
+  "blue2": {
+   "t_ms": 28688,
+   "deadline_ms": 350000,
+   "on_time": true,
+   "actor": "B2"
+  },
+  "red2": {
+   "t_ms": 34496,
+   "deadline_ms": 100000,
+   "on_time": true,
+   "actor": "R2"
+  },
+  "red_return": {
+   "t_ms": 40608,
+   "deadline_ms": 180000,
+   "on_time": true,
+   "actor": "R5"
+  },
+  "red1": {
+   "t_ms": 41152,
+   "deadline_ms": 250000,
+   "on_time": true,
+   "actor": "R1"
+  }
+ },
+ "channel_enters": 5,
+ "channel_releases": 5,
+ "accepted_reports": [
+  "rep-B3-2016",
+  "rep-R5-2016",
+  "rep-R3-5664",
+  "rep-R4-5664",
+  "rep-R3-14528",
+  "rep-R4-14528",
+  "rep-R5-21312",
+  "rep-R3-27040",
+  "rep-R4-27040"
+ ],
+ "expired_reports": [],
+ "replan_decisions": [],
+ "violations": [],
+ "on_time": 14,
+ "total": 14,
+ "full_window": false,
+ "wall_seconds": 144.564,
+ "violation_count": 0,
+ "truth_trajectories": {
+  "B1": [],
+  "B2": [],
+  "R1": [],
+  "R2": [],
+  "R3": [],
+  "R4": [],
+  "B3": [],
+  "R5": []
+ }
+}

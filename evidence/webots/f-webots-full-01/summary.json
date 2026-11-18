@@ -1,0 +1,17 @@
+{
+ "run": "f-webots-full-01",
+ "scene": "web_medium",
+ "mechanism": "release",
+ "adapt": "off",
+ "cost": "low",
+ "report_delay_ms": 1000,
+ "on_time": 14,
+ "total": 14,
+ "violations": 0,
+ "channel_enters": 5,
+ "channel_releases": 5,
+ "reports_accepted": 9,
+ "reports_expired": 0,
+ "replans": 0,
+ "wall_seconds": 125.71
+}

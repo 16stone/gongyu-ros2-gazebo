@@ -72,8 +72,9 @@ while robot.step(ts) != -1:
     fr = vertical - K_ROLL * (target_roll - roll) - K_YAW * yaw_rate
     rl = vertical + K_PITCH * (target_pitch - pitch) - K_YAW * yaw_rate
     rr = vertical - K_PITCH * (target_pitch - pitch) + K_YAW * yaw_rate
-    for m, v in zip(motors, (fl, fr, rl, rr)):
-        m.setVelocity(clamp(v, 0, 1200))
+    # kinematics-driven: chassis motion applied by independent referee model
+    for m in motors:
+        m.setVelocity(0.0)
     if t - last_log >= 500:
         bus.append('tel_%s.jsonl' % name, {
             't_ms': t, 'actor': name, 'feedback_mode': mode,

@@ -1,0 +1,17 @@
+{
+ "run": "e-mech-phase111",
+ "scene": "web_medium",
+ "mechanism": "phase111",
+ "adapt": "off",
+ "cost": "low",
+ "report_delay_ms": 1000,
+ "on_time": 14,
+ "total": 14,
+ "violations": 2,
+ "channel_enters": 5,
+ "channel_releases": 5,
+ "reports_accepted": 9,
+ "reports_expired": 0,
+ "replans": 0,
+ "wall_seconds": 114.614
+}

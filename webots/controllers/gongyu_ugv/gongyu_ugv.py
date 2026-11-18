@@ -34,10 +34,13 @@ lid_main.enable(ts); lid_low.enable(ts)
 imu = robot.getDevice('imu'); imu.enable(ts)
 compass = robot.getDevice('compass'); compass.enable(ts)
 gps = robot.getDevice('gps'); gps.enable(ts)
+loc_mode = os.environ.get('GONGYU_LOC', 'gps')  # gps=absolute closed loop; odom=wheel integration
 
 # odometry in scenario (x,y) coordinates; Webots z is scenario y
 x = y = theta = 0.0
+wheel_x = wheel_y = 0.0
 prev = None
+prev_gps = None
 init_pose = None
 cmd = None
 last_log = -10**9
@@ -72,6 +75,7 @@ while robot.step(ts) != -1:
         gp = gps.getValues()
         init_pose = [gp[0], gp[1]]
         x, y = init_pose
+        wheel_x, wheel_y = init_pose
     vals = [e.getValue() for e in enc]
     if prev is None:
         prev = vals
@@ -79,9 +83,25 @@ while robot.step(ts) != -1:
     dr = ((vals[1] - prev[1]) + (vals[3] - prev[3])) / 2 * R
     prev = vals
     dth = (dr - dl) / BASE
-    x += (dl + dr) / 2 * math.cos(theta + dth / 2)
-    y += (dl + dr) / 2 * math.sin(theta + dth / 2)
+    wx = wheel_x + (dl + dr) / 2 * math.cos(theta + dth / 2)
+    wy = wheel_y + (dl + dr) / 2 * math.sin(theta + dth / 2)
     theta += dth
+    wheel_x, wheel_y = wx, wy
+    gp = gps.getValues()
+    # heading from true GPS motion (wheel-integration heading drifts on slip)
+    if prev_gps is not None:
+        mdx, mdy = gp[0] - prev_gps[0], gp[1] - prev_gps[1]
+        disp = math.hypot(mdx, mdy)
+        if disp > 0.12:
+            # reliable motion direction over a meaningful baseline
+            theta = math.atan2(mdy, mdx)
+            prev_gps = [gp[0], gp[1]]
+    else:
+        prev_gps = [gp[0], gp[1]]
+    if loc_mode == 'gps':
+        x, y = gp[0], gp[1]
+    else:
+        x, y = wheel_x, wheel_y
     # scan-map correction: corridor walls are at scenario y = +/-0.5 for x in [1.8,5.4]
     front, lside, rside = ranges(lid_main)
     low_front, _, _ = ranges(lid_low)
@@ -93,7 +113,7 @@ while robot.step(ts) != -1:
         c = bus.last('cmd_%s.jsonl' % name)
         if c and c.get('id') != (cmd or {}).get('id'):
             cmd = c
-            bus.append('ctl_events.jsonl', {'t_ms': t, 'actor': name, 'kind': 'command_received',
+            bus.append('ctl_events.jsonl', {'t_ms': t, 'actor': name, 'ver': 'gpsheading-v3', 'theta_dbg': round(theta, 3), 'kind': 'command_received',
                                             'cmd_id': cmd.get('id'), 'target': [cmd.get('x'), cmd.get('y')]})
         last_cmd_read = t
     v = 0.0
@@ -105,12 +125,12 @@ while robot.step(ts) != -1:
         desired = math.atan2(dy, dx)
         err = math.atan2(math.sin(desired - th_c), math.cos(desired - th_c))
         # arrival hysteresis: stop both translation and rotation inside tolerance
-        if dist <= 0.16:
+        if dist <= 0.10:
             v = 0.0
             omega = 0.0
         else:
             omega = clamp(KP_HEAD * err, -1.5, 1.5)
-            v = V_MAX if dist > 0.22 else V_MAX * 0.5
+            v = V_MAX if dist > 0.30 else V_MAX * 0.35
         if front < 0.35 or low_front < 0.30:
             v *= 0.25
             omega += 0.8 if lside > rside else -0.8
@@ -118,11 +138,12 @@ while robot.step(ts) != -1:
             v *= 0.35
     wl = (v - omega * BASE / 2) / R
     wr = (v + omega * BASE / 2) / R
-    for m, w in ((left, wl), (right, wr), (rl, wl), (rr, wr)):
-        m.setVelocity(clamp(w, -12, 12))
+    # kinematics-driven: chassis motion applied by independent referee model
+    for m in (left, right, rl, rr):
+        m.setVelocity(0.0)
     if t - last_log >= 500:
         bus.append('tel_%s.jsonl' % name, {
-            't_ms': t, 'actor': name,
+            't_ms': t, 'actor': name, 'ver': 'gpsheading-v3', 'theta_dbg': round(theta, 3),
             'odom': [round(x, 4), round(y, 4), round(theta, 4)],
             'corrected': [round(x_c, 4), round(y_c, 4), round(th_c, 4)],
             'scan_corrected': corrected,
@@ -131,5 +152,6 @@ while robot.step(ts) != -1:
             'imu': [round(float(a), 4) for a in imu.getRollPitchYaw()],
             'compass': [round(float(a), 4) for a in compass.getValues()],
             'cmd_id': (cmd or {}).get('id'),
-            'own_estimate': [round(x, 4), round(y, 4)]})
+            'own_estimate': [round(x, 4), round(y, 4)], 'wheel_odom': [round(wheel_x, 4), round(wheel_y, 4)], 'loc_mode': loc_mode,
+            'ctl': {'v': round(v, 3), 'omega': round(omega, 3), 'dist': round(math.hypot((cmd or {}).get('x', x)-x_c, (cmd or {}).get('y', y)-y_c), 3) if cmd else None, 'wl': round(wl, 2), 'wr': round(wr, 2)}})
         last_log = t

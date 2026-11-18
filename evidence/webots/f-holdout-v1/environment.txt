@@ -1,0 +1,5 @@
+run=f-holdout-v1
+scene=web_holdout_v1
+platform=amax-cpu-webots-r2025a
+
+webots_exit=0

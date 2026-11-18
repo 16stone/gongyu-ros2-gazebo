@@ -1,0 +1,17 @@
+{
+ "run": "d-adapt",
+ "scene": "web_medium",
+ "mechanism": "release",
+ "adapt": "on",
+ "cost": "low",
+ "report_delay_ms": 8000,
+ "on_time": 14,
+ "total": 14,
+ "violations": 0,
+ "channel_enters": 5,
+ "channel_releases": 5,
+ "reports_accepted": 0,
+ "reports_expired": 9,
+ "replans": 9,
+ "wall_seconds": 112.691
+}

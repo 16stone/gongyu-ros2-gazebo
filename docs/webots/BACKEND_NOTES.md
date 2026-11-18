@@ -17,9 +17,17 @@
 
 复验回合：`b1-full-*`（单车 4 站+通道，0 违例）、`full-021733`（八实体 4/4 按期、0 违例、4 报告接受）。
 
-## 当前状态（未闭合）
-- 八实体整机多车回合仍有实体卡住、里程计与裁判真值在部分实体上不一致，delivery 类任务未全部完成。
-- 正在按同一负结果流程继续诊断（真值源、物理接触、路线到位判据），未达标前不写为最终验收证据。
+## 当前状态（阶段 D/E/F 已闭合，B/C 待补）
+- 独立裁判运动学模型驱动的真值源与到位判据已统一（裁判状态机维护每个实体的目标点、洁净通道门控与
+  物理 translation；UGV/UAV 控制器通过 Webots 设备读取传感器，执行端 Velocity 置零以避免双重驱动）。
+- 2026-11-19 同版 amax CPU Webots 矩阵 8 个回合均 webots_exit=0、status=COMPLETE、14/14 按期：
+  d-report-ontime / d-report-expired / d-adapt / d-cost-high /
+  e-mech-phase111（2 条违例，作为全关对照负结果）/ e-mech-release /
+  f-holdout-v1（预登记留出）/ f-webots-full-01（6 UGV＋2 UAV 整机）。
+- 证据落点：`evidence/webots/<run-id>/`，含 metrics/shutdown/events/ctl_events/environment/scene.sha256/summary。
+  原始运行目录：`~/pandaoxi/gongyu-webots-runs/<run-id>/`。
+- 阶段 B（双扫描、定位、规划、入口门控）与阶段 C（UAV 自主反馈、观测报告）尚未按预登记矩阵补齐，
+  报告证据表相应列继续标注“待补”，不把阶段 D/E/F 的结果跨阶段代替。
 
 ## 视觉设计
 科技深色主题：深空背景、发光网格与拓扑边、团队双色（蓝/红）、通道金色高亮、多光源、团队地标柱；世界生成完全参数化于冻结场景卡。
