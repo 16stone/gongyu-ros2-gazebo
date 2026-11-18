@@ -70,6 +70,7 @@ def ev(kind, payload, actor=None, task=None):
 # The task-logic layer is kinematic (as in the frozen graph backend's travel_time).
 # Truth is produced by this model, never by the controller under test's self-report.
 # Physical sensors (GPS/LiDAR/Camera) still run in Webots for traceable observations.
+PHYSICAL_ACTUATION = os.environ.get('GONGYU_PHYS', '0') == '1'
 GS = SCEN.get('ground_speed', 0.5)  # m/s, frozen scenario parameter
 kin_state = {}
 KIN_FIELDS = {}
@@ -111,6 +112,9 @@ def advance_kinematics(dt_s):
 
 
 def truth(nm):
+    if PHYSICAL_ACTUATION:
+        p = actors[nm].getPosition()  # independent truth read from simulator, never ref-written here
+        return [round(p[0], 4), round(p[1], 4), round(p[2], 4)]
     ks = kin_state[nm]
     return [round(ks['x'], 4), round(ks['y'], 4), round(ks['h'], 4)]
 
@@ -134,15 +138,20 @@ for nm in actors:
 pending_reports = []
 channel_holder = None
 metrics = {'seed': SEED, 'scene': SCENE, 'mechanism': MECH, 'adapt': ADAPT,
-           'cost': COST, 'report_delay_ms': REPORT_DELAY_MS, 'task_completed': {},
+           'cost': COST, 'report_delay_ms': REPORT_DELAY_MS, 'physical_actuation': PHYSICAL_ACTUATION, 'task_completed': {},
            'channel_enters': 0, 'channel_releases': 0, 'accepted_reports': [],
-           'expired_reports': [], 'replan_decisions': [], 'violations': []}
+           'expired_reports': [], 'replan_decisions': [], 'violations': [],
+           'truth_trajectories': dict((nm, []) for nm in actors), 'truth_sample_period_ms': 500}
 start_wall = time.time()
 prev_t = -1
 
 while sup.step(ts) != -1:
     t = int(sup.getTime() * 1000)
-    advance_kinematics(ts / 1000.0)
+    if not PHYSICAL_ACTUATION:
+        advance_kinematics(ts / 1000.0)
+    if t % 500 == 0:
+        for _nm in actors:
+            metrics['truth_trajectories'][_nm].append({'t_ms': t, 'pos': truth(_nm)})
     if True:
         for nm in list(actors):
             st = state[nm]
@@ -251,13 +260,12 @@ metrics['total'] = total
 metrics['full_window'] = t >= END
 metrics['wall_seconds'] = round(time.time() - start_wall, 3)
 metrics['violation_count'] = len(metrics['violations'])
-metrics['truth_trajectories'] = {nm: [] for nm in actors}
 json.dump(metrics, open(os.path.join(RUN, 'result', 'metrics.json'), 'w'), indent=1)
 json.dump({'started_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(start_wall)),
            'ended_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
            'scene': SCENE, 'mechanism': MECH, 'status': 'COMPLETE',
            'failure': None, 'sim_end_ms': t, 'wall_seconds': metrics['wall_seconds'],
-           'source': 'webots-r2025a-cpu-software-render'},
+           'source': 'webots-r2025a-cpu-' + ('motor' if PHYSICAL_ACTUATION else 'kinematic') + ('-norender' if os.environ.get('GONGYU_NO_RENDER') else '-render')},
           open(os.path.join(RUN, 'shutdown.json'), 'w'), indent=1)
 ev('run_closed', {'on_time': on_time, 'total': total, 'full_window': metrics['full_window']})
 print('WEBOTS_REFEREE_CLOSED on_time=%d/%d channel=%d/%d' % (on_time, total,

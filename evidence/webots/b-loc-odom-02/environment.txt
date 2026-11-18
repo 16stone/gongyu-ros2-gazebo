@@ -1,0 +1,9 @@
+run=b-loc-odom-02
+scene=web_b1_route
+platform=amax-cpu-webots-r2025a
+physical_actuation=0
+loc_mode=odom
+feedback_mode=sensor
+seed=1
+
+webots_exit=0

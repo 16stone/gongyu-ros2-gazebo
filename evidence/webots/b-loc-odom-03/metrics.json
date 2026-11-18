@@ -1,0 +1,90 @@
+{
+ "seed": 2,
+ "scene": "web_b1_route",
+ "mechanism": "release",
+ "adapt": "off",
+ "cost": "low",
+ "report_delay_ms": 1000,
+ "physical_actuation": false,
+ "task_completed": {},
+ "channel_enters": 1,
+ "channel_releases": 1,
+ "accepted_reports": [],
+ "expired_reports": [],
+ "replan_decisions": [],
+ "violations": [],
+ "truth_trajectories": {
+  "B1": [
+   {
+    "t_ms": 2000,
+    "pos": [
+     1,
+     0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 4000,
+    "pos": [
+     1.672,
+     0.0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 6000,
+    "pos": [
+     2,
+     0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 8000,
+    "pos": [
+     2.848,
+     0.0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 10000,
+    "pos": [
+     3.848,
+     0.0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 12000,
+    "pos": [
+     4.848,
+     0.0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 14000,
+    "pos": [
+     5.024,
+     0.0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 16000,
+    "pos": [
+     6,
+     0,
+     0.12
+    ]
+   }
+  ]
+ },
+ "truth_sample_period_ms": 500,
+ "on_time": 0,
+ "total": 0,
+ "full_window": false,
+ "wall_seconds": 2.607,
+ "violation_count": 0
+}

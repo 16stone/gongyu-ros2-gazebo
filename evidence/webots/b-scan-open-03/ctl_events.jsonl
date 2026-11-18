@@ -1,0 +1,5 @@
+{"t_ms":16,"actor":"B1","ver":"gpsheading-v3","theta_dbg":0.0,"kind":"command_received","cmd_id":"cmd-0001","target":[1,0]}
+{"t_ms":2720,"actor":"B1","ver":"gpsheading-v3","theta_dbg":0.0,"kind":"command_received","cmd_id":"cmd-0002","target":[2,0]}
+{"t_ms":6464,"actor":"B1","ver":"gpsheading-v3","theta_dbg":0.0,"kind":"command_received","cmd_id":"cmd-0003","target":[5,0]}
+{"t_ms":13952,"actor":"B1","ver":"gpsheading-v3","theta_dbg":0.0,"kind":"command_received","cmd_id":"cmd-0004","target":[6,0]}
+{"t_ms":17696,"actor":"B1","ver":"gpsheading-v3","theta_dbg":0.0,"kind":"command_received","cmd_id":"cmd-0005","target":[8,2]}

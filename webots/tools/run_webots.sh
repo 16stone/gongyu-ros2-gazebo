@@ -29,11 +29,12 @@ if ! xdpyinfo -display :99 >/dev/null 2>&1; then
   echo "DISPLAY_NOT_READY"; exit 9
 fi
 printf 'run=%s\nscene=%s\nplatform=amax-cpu-webots-r2025a\n' "$RUNID" "$SCENE" > "$RUNROOT/environment.txt"
+printf 'physical_actuation=%s\nloc_mode=%s\nfeedback_mode=%s\nseed=%s\n' "${GONGYU_PHYS:-0}" "${GONGYU_LOC:-gps}" "${GONGYU_FEEDBACK_MODE:-sensor}" "${GONGYU_SEED:-0}" >> "$RUNROOT/environment.txt"
 printf '%s\n' "$*" >> "$RUNROOT/environment.txt"
 sha256sum "$REPO/webots/worlds/$SCENE.wbt" "$REPO/webots/config/scenario_medium.json" > "$RUNROOT/scene.sha256"
 cd "$REPO/webots/worlds"
 set +e
-timeout "${GONGYU_WALL_LIMIT:-1800}" "$WEBOTS/webots" --mode=fast --batch "$SCENE.wbt" >"$RUNROOT/console.log" 2>&1
+timeout "${GONGYU_WALL_LIMIT:-1800}" "$WEBOTS/webots" --mode=fast ${GONGYU_NO_RENDER:+--no-rendering} --batch "$SCENE.wbt" >"$RUNROOT/console.log" 2>&1
 RC=$?
 set -e
 echo "webots_exit=$RC" >> "$RUNROOT/environment.txt"

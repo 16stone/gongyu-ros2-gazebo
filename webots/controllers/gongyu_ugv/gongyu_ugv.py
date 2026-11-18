@@ -35,6 +35,7 @@ imu = robot.getDevice('imu'); imu.enable(ts)
 compass = robot.getDevice('compass'); compass.enable(ts)
 gps = robot.getDevice('gps'); gps.enable(ts)
 loc_mode = os.environ.get('GONGYU_LOC', 'gps')  # gps=absolute closed loop; odom=wheel integration
+physical_actuation = os.environ.get('GONGYU_PHYS', '0') == '1'
 
 # odometry in scenario (x,y) coordinates; Webots z is scenario y
 x = y = theta = 0.0
@@ -87,6 +88,9 @@ while robot.step(ts) != -1:
     wy = wheel_y + (dl + dr) / 2 * math.sin(theta + dth / 2)
     theta += dth
     wheel_x, wheel_y = wx, wy
+    if physical_actuation:
+        # wheel integration drifts when wheels slip; use IMU yaw as heading source
+        theta = imu.getRollPitchYaw()[2]
     gp = gps.getValues()
     # heading from true GPS motion (wheel-integration heading drifts on slip)
     if prev_gps is not None:
@@ -136,11 +140,21 @@ while robot.step(ts) != -1:
             omega += 0.8 if lside > rside else -0.8
         if abs(err) > 1.0:
             v *= 0.35
+    pivot = physical_actuation and abs(err) > 0.6
+    if pivot:
+        v = 0.0                       # no translation while correcting heading
+        omega = clamp(omega, -0.8, 0.8)
     wl = (v - omega * BASE / 2) / R
     wr = (v + omega * BASE / 2) / R
-    # kinematics-driven: chassis motion applied by independent referee model
-    for m in (left, right, rl, rr):
-        m.setVelocity(0.0)
+    if physical_actuation:
+        # translation needs slip compensation; pivot uses raw differential wheel rate
+        gain = 1.0
+        for m, w in ((left, wl), (right, wr), (rl, wl), (rr, wr)):
+            m.setVelocity(clamp(w * gain, -6, 6))
+    else:
+        # kinematics-driven: chassis motion applied by independent referee model
+        for m in (left, right, rl, rr):
+            m.setVelocity(0.0)
     if t - last_log >= 500:
         bus.append('tel_%s.jsonl' % name, {
             't_ms': t, 'actor': name, 'ver': 'gpsheading-v3', 'theta_dbg': round(theta, 3),
@@ -152,6 +166,6 @@ while robot.step(ts) != -1:
             'imu': [round(float(a), 4) for a in imu.getRollPitchYaw()],
             'compass': [round(float(a), 4) for a in compass.getValues()],
             'cmd_id': (cmd or {}).get('id'),
-            'own_estimate': [round(x, 4), round(y, 4)], 'wheel_odom': [round(wheel_x, 4), round(wheel_y, 4)], 'loc_mode': loc_mode,
+            'actuation': 'motor' if physical_actuation else 'kinematic', 'own_estimate': [round(x, 4), round(y, 4)], 'wheel_odom': [round(wheel_x, 4), round(wheel_y, 4)], 'loc_mode': loc_mode,
             'ctl': {'v': round(v, 3), 'omega': round(omega, 3), 'dist': round(math.hypot((cmd or {}).get('x', x)-x_c, (cmd or {}).get('y', y)-y_c), 3) if cmd else None, 'wl': round(wl, 2), 'wr': round(wr, 2)}})
         last_log = t

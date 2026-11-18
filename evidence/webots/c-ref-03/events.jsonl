@@ -1,0 +1,11 @@
+{"t_ms":0,"actor":"B3","kind":"move_commanded","task_id":"blue_inspect","payload":{"node":"F","x":14,"y":8}}
+{"t_ms":16,"actor":"B3","kind":"arrived","task_id":"blue_inspect","payload":{"x":14,"y":8,"distance":0.0}}
+{"t_ms":2016,"actor":"B3","kind":"task_completed","task_id":"blue_inspect","payload":{"deadline_ms":40000,"on_time":true,"slack_s":37.984}}
+{"t_ms":2016,"actor":"B3","kind":"inspection_report_created","task_id":"blue_inspect","payload":{"report_id":"rep-B3-2016","sample_t_ms":2016,"evidence":{"image_signature":576348,"sensor_pose":[14.0,8.0]}}}
+{"t_ms":2016,"actor":"B3","kind":"move_commanded","task_id":null,"payload":{"node":"K","x":10,"y":8}}
+{"t_ms":3024,"actor":"B3","kind":"report_delivery","task_id":"blue_inspect","payload":{"report_id":"rep-B3-2016","sender":"B3","sample_t_ms":2016,"arrive_t_ms":3016,"valid_until":8016,"accepted":true}}
+{"t_ms":3024,"actor":"B2","kind":"opportunity_cost_evaluation","task_id":"blue_inspect","payload":{"report_id":"rep-B3-2016","provider":"B2","gain_s":12,"cost_s":3,"decision":"accept"}}
+{"t_ms":9664,"actor":"B3","kind":"arrived","task_id":null,"payload":{"x":10.176,"y":8.0,"distance":0.176}}
+{"t_ms":11664,"actor":"B3","kind":"move_commanded","task_id":null,"payload":{"node":"H","x":6,"y":8}}
+{"t_ms":19312,"actor":"B3","kind":"arrived","task_id":null,"payload":{"x":6.176,"y":8.0,"distance":0.176}}
+{"t_ms":21312,"actor":null,"kind":"run_closed","task_id":null,"payload":{"on_time":1,"total":1,"full_window":false}}

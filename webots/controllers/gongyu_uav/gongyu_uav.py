@@ -14,6 +14,7 @@ name = robot.getName()
 ts = int(robot.getBasicTimeStep())
 run_dir = os.environ.get('GONGYU_RUN_DIR', '/tmp/gongyu_default')
 mode = os.environ.get('GONGYU_FEEDBACK_MODE', 'sensor')
+physical_actuation = os.environ.get('GONGYU_PHYS', '0') == '1'
 bus = Bus(os.path.join(run_dir, 'bus'))
 
 gps = robot.getDevice('gps'); gps.enable(ts)
@@ -72,12 +73,16 @@ while robot.step(ts) != -1:
     fr = vertical - K_ROLL * (target_roll - roll) - K_YAW * yaw_rate
     rl = vertical + K_PITCH * (target_pitch - pitch) - K_YAW * yaw_rate
     rr = vertical - K_PITCH * (target_pitch - pitch) + K_YAW * yaw_rate
-    # kinematics-driven: chassis motion applied by independent referee model
-    for m in motors:
-        m.setVelocity(0.0)
+    if physical_actuation:
+        for m, v in zip(motors, (fl, fr, rl, rr)):
+            m.setVelocity(clamp(v, 0, 1200))
+    else:
+        # kinematics-driven: chassis motion applied by independent referee model
+        for m in motors:
+            m.setVelocity(0.0)
     if t - last_log >= 500:
         bus.append('tel_%s.jsonl' % name, {
-            't_ms': t, 'actor': name, 'feedback_mode': mode,
+            't_ms': t, 'actor': name, 'feedback_mode': mode, 'actuation': 'motor' if physical_actuation else 'kinematic',
             'sensor_pose': [round(px, 4), round(pz, 4), round(g[2], 4), round(float(a[2]), 4)],
             'gps': [round(float(v), 4) for v in g],
             'imu': [round(float(v), 4) for v in a],

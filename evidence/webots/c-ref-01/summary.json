@@ -1,0 +1,36 @@
+{
+ "run": "c-ref-01",
+ "scene": "web_b3_target",
+ "variant": "c-ref",
+ "actor": "B3",
+ "on_time": 1,
+ "total": 1,
+ "violations": 0,
+ "channel_enters": 0,
+ "channel_releases": 0,
+ "reports_accepted": 1,
+ "reports_expired": 0,
+ "wall_seconds": 3.441,
+ "truth_samples": 10,
+ "analysis": {
+  "own_estimate_rmse_m": null,
+  "wheel_odom_rmse_m": null,
+  "low_scan_hits": 0,
+  "low_scan_first_t_ms": null,
+  "low_scan_min_m": null,
+  "feedback_modes": [
+   "reference"
+  ],
+  "actuation": [
+   "kinematic"
+  ],
+  "truth_match_tolerance_ms": 600,
+  "arrivals": 1,
+  "arrival_events": 3,
+  "sensor_pose_xy_rmse_m": 0.1141,
+  "sensor_pose_samples": 23,
+  "feedback_mode": [
+   "reference"
+  ]
+ }
+}

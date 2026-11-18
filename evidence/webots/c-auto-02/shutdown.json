@@ -1,0 +1,11 @@
+{
+ "started_utc": "2026-11-18T20:04:45Z",
+ "ended_utc": "2026-11-18T20:04:48Z",
+ "scene": "web_b3_target",
+ "mechanism": "release",
+ "status": "COMPLETE",
+ "failure": null,
+ "sim_end_ms": 21312,
+ "wall_seconds": 2.996,
+ "source": "webots-r2025a-cpu-kinematic-norender"
+}

@@ -1,0 +1,29 @@
+{
+ "run": "b-scan-lowobs-01",
+ "scene": "web_b1_lowobs",
+ "variant": "b-scan-lowobs",
+ "actor": "B1",
+ "on_time": 0,
+ "total": 0,
+ "violations": 0,
+ "channel_enters": 1,
+ "channel_releases": 1,
+ "reports_accepted": 0,
+ "reports_expired": 0,
+ "wall_seconds": 2.346,
+ "truth_samples": 8,
+ "analysis": {
+  "own_estimate_rmse_m": 0.0739,
+  "wheel_odom_rmse_m": 2.7635,
+  "low_scan_hits": 2,
+  "low_scan_first_t_ms": 1040,
+  "low_scan_min_m": 0.161,
+  "feedback_modes": [],
+  "actuation": [
+   "kinematic"
+  ],
+  "truth_match_tolerance_ms": 600,
+  "arrivals": null,
+  "arrival_events": 4
+ }
+}

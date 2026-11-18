@@ -17,7 +17,7 @@
 
 复验回合：`b1-full-*`（单车 4 站+通道，0 违例）、`full-021733`（八实体 4/4 按期、0 违例、4 报告接受）。
 
-## 当前状态（阶段 D/E/F 已闭合，B/C 待补）
+## 当前状态（阶段 B/C/D/E/F 均已按矩阵落证据）
 - 独立裁判运动学模型驱动的真值源与到位判据已统一（裁判状态机维护每个实体的目标点、洁净通道门控与
   物理 translation；UGV/UAV 控制器通过 Webots 设备读取传感器，执行端 Velocity 置零以避免双重驱动）。
 - 2026-11-19 同版 amax CPU Webots 矩阵 8 个回合均 webots_exit=0、status=COMPLETE、14/14 按期：
@@ -26,8 +26,29 @@
   f-holdout-v1（预登记留出）/ f-webots-full-01（6 UGV＋2 UAV 整机）。
 - 证据落点：`evidence/webots/<run-id>/`，含 metrics/shutdown/events/ctl_events/environment/scene.sha256/summary。
   原始运行目录：`~/pandaoxi/gongyu-webots-runs/<run-id>/`。
-- 阶段 B（双扫描、定位、规划、入口门控）与阶段 C（UAV 自主反馈、观测报告）尚未按预登记矩阵补齐，
-  报告证据表相应列继续标注“待补”，不把阶段 D/E/F 的结果跨阶段代替。
+- 阶段 B/C 补跑：18 个回合（b-loc-gps / b-loc-odom / b-scan-open / b-scan-lowobs / c-ref / c-auto，
+  每处理 3 个独立重启），全部 webots_exit=0 且关闭回执 COMPLETE，证据在 `evidence/webots/<run-id>/`。
+  ``--no-rendering`` 仅关闭主视图渲染，不改变物理与控制器时钟。
+  - 定位：GPS 闭环自身估计对独立裁判真值的 RMSE 0.074 m，轮式里程计 2.764 m（600 ms 最近时刻配对）。
+  - 双扫描：低矮障碍场景低位扫描命中 2 次，开阔场景 0 次；原始 lidar_low_front 序列在对应回合中可复核。
+  - UAV：c-ref / c-auto 的 `feedback_mode` 分别为 reference / sensor，传感位姿对真值 XY RMSE 0.114 m。
+    当前裁判运动学后端中该开关只改变反馈来源标签，不改变运动，因此**不作为自主飞行效能证据**。
+  - 三次重启的随机种子为 0/1/2，但冻结模型不含随机扰动，结果确定性一致；样本量按“独立重启”登记，
+    不宣称统计方差。
 
 ## 视觉设计
 科技深色主题：深空背景、发光网格与拓扑边、团队双色（蓝/红）、通道金色高亮、多光源、团队地标柱；世界生成完全参数化于冻结场景卡。
+
+
+## 真实电机模式（GONGYU_PHYS=1）的诊断与边界
+
+- 代码开关：`GONGYU_PHYS=1` 时 UGV 四轮与 UAV 四桨由控制器 `setVelocity` 实际驱动，裁判只读
+  `getPosition()` 真值，不再写 `translation`；默认 0 保持既有可复现运动学后端。
+- 负结果链：`phys-smoke-01..03` 定位到**静态地面被误设为动态物理体**（`solid()` 默认 `physics=True`），
+  整车自由落体 z=-19…=-1959 m。修复为静态地面后生成 `*_phys.wbt` 世界。
+- `phys-smoke-04/05` 定位到转弯时轮式航向积分漂移、电机扭矩过大导致车体倾覆；改用 IMU 航向、
+  限制轮速 ±6 rad/s 后，`phys-smoke-06` 单车可驶过入口、到达 W/E 站位并保持直立。
+- `phys-full-01`（带渲染）墙钟 15 min 只推进约 29 s 仿真；`--no-rendering` 后单车 60 s 仿真约 11 s 墙钟，
+  但 8 实体整机 `phys-full-02` 在 ~29 s 处停于 L→O 路段，未形成完整 14/14 回合并已按负结果停止。
+- 结论：**正式整机证据仍使用运动学裁判后端；真实电机模式仅作为已定位并部分修复的实验分支**，
+  报告需明确写出这一能力边界，不得把运动学回合成交为“电机驱动整机”。

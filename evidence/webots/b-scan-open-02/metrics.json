@@ -1,0 +1,129 @@
+{
+ "seed": 1,
+ "scene": "web_b1_open",
+ "mechanism": "release",
+ "adapt": "off",
+ "cost": "low",
+ "report_delay_ms": 1000,
+ "physical_actuation": false,
+ "task_completed": {
+  "blue1": {
+   "t_ms": 24912,
+   "deadline_ms": 350000,
+   "on_time": true,
+   "actor": "B1"
+  }
+ },
+ "channel_enters": 1,
+ "channel_releases": 1,
+ "accepted_reports": [],
+ "expired_reports": [],
+ "replan_decisions": [],
+ "violations": [],
+ "truth_trajectories": {
+  "B1": [
+   {
+    "t_ms": 2000,
+    "pos": [
+     1,
+     0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 4000,
+    "pos": [
+     1.672,
+     0.0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 6000,
+    "pos": [
+     2,
+     0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 8000,
+    "pos": [
+     2.848,
+     0.0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 10000,
+    "pos": [
+     3.848,
+     0.0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 12000,
+    "pos": [
+     4.848,
+     0.0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 14000,
+    "pos": [
+     5.024,
+     0.0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 16000,
+    "pos": [
+     6,
+     0,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 18000,
+    "pos": [
+     6.1414,
+     0.1414,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 20000,
+    "pos": [
+     6.8485,
+     0.8485,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 22000,
+    "pos": [
+     7.5556,
+     1.5556,
+     0.12
+    ]
+   },
+   {
+    "t_ms": 24000,
+    "pos": [
+     8,
+     2,
+     0.12
+    ]
+   }
+  ]
+ },
+ "truth_sample_period_ms": 500,
+ "on_time": 1,
+ "total": 1,
+ "full_window": false,
+ "wall_seconds": 3.823,
+ "violation_count": 0
+}

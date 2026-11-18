@@ -44,7 +44,7 @@ def shape_box(size, app):
     return 'Shape { appearance %s geometry Box { size %s } }' % (app, ' '.join(str(x) for x in size))
 
 
-def solid(name, pos, children, rot=None, physics=True, bounding=None):
+def solid(name, pos, children, rot=None, physics=False, bounding=None):
     r = (' rotation %s' % rot) if rot else ''
     phys = ' physics Physics {}' if physics else ''
     bnd = (' boundingObject %s' % bounding) if bounding else ''
@@ -267,11 +267,16 @@ def world(name, robots, low_obstacle=False, holdout=False):
 
 
 if __name__ == '__main__':
-    world('web_b1_route', [('B1', 'D')], low_obstacle=True)
-    world('web_b1_lowobs', [('B1', 'D')], low_obstacle=True)
-    world('web_b3_target', [('B3', 'F')])
-    world('web_medium', UGV + UAV)
-    world('web_holdout_v1', UGV + UAV, holdout=True)
-    world('web_d4', [('B1', 'D'), ('B2', 'O'), ('R3', 'N0'), ('B3', 'F')])
-    world('web_smoke', [('B1', 'D')], low_obstacle=True)
-    print('WORLDS_GENERATED')
+    # Static scenery must have physics disabled; otherwise the floor itself falls
+    # and every robot free-falls through it (root cause found in phys-probe-01).
+    suffix = os.environ.get('GONGYU_WORLD_SUFFIX', '')
+    def gen(name, *a, **kw):
+        return world(name + suffix, *a, **kw)
+    gen('web_b1_route', [('B1', 'D')], low_obstacle=True)
+    gen('web_b1_lowobs', [('B1', 'D')], low_obstacle=True)
+    gen('web_b3_target', [('B3', 'F')])
+    gen('web_medium', UGV + UAV)
+    gen('web_holdout_v1', UGV + UAV, holdout=True)
+    gen('web_d4', [('B1', 'D'), ('B2', 'O'), ('R3', 'N0'), ('B3', 'F')])
+    gen('web_smoke', [('B1', 'D')], low_obstacle=True)
+    print('WORLDS_GENERATED suffix=' + suffix)

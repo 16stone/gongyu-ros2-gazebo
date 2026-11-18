@@ -1,0 +1,9 @@
+run=c-ref-03
+scene=web_b3_target
+platform=amax-cpu-webots-r2025a
+physical_actuation=0
+loc_mode=gps
+feedback_mode=reference
+seed=2
+
+webots_exit=0

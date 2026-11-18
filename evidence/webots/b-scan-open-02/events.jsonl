@@ -1,0 +1,16 @@
+{"t_ms":0,"actor":"B1","kind":"move_commanded","task_id":null,"payload":{"node":"D","x":1,"y":0}}
+{"t_ms":656,"actor":"B1","kind":"arrived","task_id":null,"payload":{"x":0.828,"y":0.0,"distance":0.172}}
+{"t_ms":2656,"actor":"B1","kind":"move_commanded","task_id":null,"payload":{"node":"W","x":2,"y":0}}
+{"t_ms":4304,"actor":"B1","kind":"arrived","task_id":null,"payload":{"x":1.824,"y":0.0,"distance":0.176}}
+{"t_ms":6304,"actor":"B1","kind":"reservation_granted","task_id":null,"payload":{"start":6304,"end":54304,"slot_id":"B1_2","direction":"W->E"}}
+{"t_ms":6304,"actor":"B1","kind":"move_commanded","task_id":null,"payload":{"node":"E","x":5,"y":0}}
+{"t_ms":6416,"actor":"B1","kind":"channel_enter","task_id":null,"payload":{"x":2.056,"y":0.0,"slot":"B1_1"}}
+{"t_ms":11952,"actor":"B1","kind":"arrived","task_id":null,"payload":{"x":4.824,"y":0.0,"distance":0.176}}
+{"t_ms":12208,"actor":"B1","kind":"channel_cleared","task_id":null,"payload":{"x":4.952,"y":0.0,"clearance_time":12208}}
+{"t_ms":12208,"actor":"B1","kind":"channel_release_recomputed","task_id":null,"payload":{"release_time":12208,"nominal_end":54416,"early_seconds":42.208}}
+{"t_ms":13952,"actor":"B1","kind":"move_commanded","task_id":null,"payload":{"node":"L","x":6,"y":0}}
+{"t_ms":15600,"actor":"B1","kind":"arrived","task_id":null,"payload":{"x":5.824,"y":0.0,"distance":0.176}}
+{"t_ms":17600,"actor":"B1","kind":"move_commanded","task_id":"blue1","payload":{"node":"O","x":8,"y":2}}
+{"t_ms":22912,"actor":"B1","kind":"arrived","task_id":"blue1","payload":{"x":7.8781,"y":1.8781,"distance":0.1724}}
+{"t_ms":24912,"actor":"B1","kind":"task_completed","task_id":"blue1","payload":{"deadline_ms":350000,"on_time":true,"slack_s":325.088}}
+{"t_ms":24912,"actor":null,"kind":"run_closed","task_id":null,"payload":{"on_time":1,"total":1,"full_window":false}}

@@ -1,0 +1,29 @@
+{
+ "run": "b-scan-open-01",
+ "scene": "web_b1_open",
+ "variant": "b-scan-open",
+ "actor": "B1",
+ "on_time": 1,
+ "total": 1,
+ "violations": 0,
+ "channel_enters": 1,
+ "channel_releases": 1,
+ "reports_accepted": 0,
+ "reports_expired": 0,
+ "wall_seconds": 4.151,
+ "truth_samples": 12,
+ "analysis": {
+  "own_estimate_rmse_m": 0.0969,
+  "wheel_odom_rmse_m": 4.4214,
+  "low_scan_hits": 0,
+  "low_scan_first_t_ms": null,
+  "low_scan_min_m": 9.9,
+  "feedback_modes": [],
+  "actuation": [
+   "kinematic"
+  ],
+  "truth_match_tolerance_ms": 600,
+  "arrivals": 1,
+  "arrival_events": 5
+ }
+}
