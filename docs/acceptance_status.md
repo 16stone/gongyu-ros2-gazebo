@@ -14,3 +14,9 @@
 ## 复现入口
 `webots/tools/run_webots.sh <scene> <run-id>`；默认运动学后端，`GONGYU_PHYS=1` 切真实电机实验，
 `GONGYU_NO_RENDER=1` 关闭主视图渲染。回执写入 `~/pandaoxi/gongyu-webots-runs/<run-id>/`，摘要提交到 `evidence/webots/<run-id>/`。
+
+## 干净目录复核（2026-11-19）
+
+- 从提交 `f5c6e50` 全新检出到 `~/pandaoxi/gongyu_v10_verify_clean`：26 个 `evidence/webots/<run-id>` 目录齐备。
+- 报告 `SHA256SUMS` 两项均 OK；演示页内嵌 JSON 解析成功（8 实体、153 事件、14/14 指标）。
+- 以新运行 ID `verify-repro-01` 从干净检出复跑 `web_b1_route`（关闭渲染），与 `b-loc-gps-01` 的场景、按期数、总数、违例数、通道进入/释放数逐项一致。
