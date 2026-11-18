@@ -1,0 +1,168 @@
+{
+  "revision": "phase105-970e3b0b4e976290",
+  "commit_state": "content-addressed portable tree; no git commit claimed",
+  "baseline_revision": "phase102-c13a56827f1cb3f3",
+  "baseline_archive": "source_c13a56827f1cb3f3.zip",
+  "baseline_archive_sha256": "12cf47e58206a506569a5f3bb2f50db0e076c1ca5d2fc93b4b00075d907c5777",
+  "changed_files": {
+    "added": [
+      "gongyu/learning.py",
+      "gongyu/thresholds.py",
+      "tests/test_berth_capacity.py",
+      "tests/test_relay_threshold.py",
+      "tests/test_stale_plan_delivery.py"
+    ],
+    "modified": [
+      "freeze_g2.py",
+      "gongyu/adaptive.py",
+      "gongyu/communication.py",
+      "gongyu/m2.py",
+      "gongyu/patrol.py",
+      "gongyu/planning.py",
+      "gongyu/policies.py",
+      "gongyu/world.py",
+      "tests/test_m2.py",
+      "tests/test_planning.py"
+    ],
+    "removed": []
+  },
+  "archive": "source_970e3b0b4e976290.zip",
+  "archive_sha256": "89474821793f7d792c8ecf7f691fda8efb4d81074fc1ee458c85920bfb4789d1",
+  "tracked_source_files": 187,
+  "manifest_sha256": "970e3b0b4e976290bc5d958501a4c76437a2710731de1dec2fe42923a833ca21",
+  "scope": "Four switchable mechanism layers (delayed/lossy channel, central versus peer-to-peer arbitration, UCB1 decision learning, response-threshold role selection) plus the patrol, scale and single-agent metric instrumentation. Registered cards introduce no new keys and the defaults stay off, so the eight physical cells and the eighteen graph cells described elsewhere in this package are produced by the same rules as before.",
+  "anchors": {
+    "unit_suite": {
+      "command": "python -m unittest discover -s tests -v",
+      "cwd": "03_工程源码/当前源码",
+      "returncode": 0,
+      "status": "OK",
+      "ran": 265,
+      "seconds": 153.046,
+      "skipped": 2,
+      "skip_reasons": [
+        "Linux process groups",
+        "Linux signals and process groups"
+      ],
+      "note": "The two skips are platform bound to this Windows host and are reported by the runner, not hidden. Every other case has to pass for the anchor to hold."
+    },
+    "registered_card_fingerprints": {
+      "command": "python 验证/registered_card_fingerprint.py --source 03_工程源码/当前源码 --out registered_cards_phase105.json --compare 验证/registered_cards_post_repair.json --receipt 注册卡片可关闭层无漂移回执.json",
+      "receipt": "注册卡片可关闭层无漂移回执.json",
+      "log": "registered_card_fingerprint.log",
+      "compared_against": "验证/registered_cards_post_repair.json",
+      "cards": 31,
+      "event_stream_identical_cards": 31,
+      "drift_cards": [],
+      "status": "OUTCOMES_HELD",
+      "combined_sha256": "ca7711c975cc8673be87b8a25be064aa7b9c78d13b4de69af4ed090b313a9899"
+    },
+    "graph_baseline_guard": {
+      "command": "python 验证/graph_baseline_guard.py --source 03_工程源码/当前源码 --matrix .../phase99_scene_release --baseline 验证/graph_baseline_phase105_pre.json --limit 18",
+      "receipt": "graph_baseline_guard.json",
+      "status": "PASS",
+      "baseline_cases": 18,
+      "drift_cases": []
+    },
+    "phase107_unit_suite": {
+      "command": "python -m unittest discover -s tests",
+      "cwd": "03_工程源码/当前源码",
+      "returncode": 0,
+      "status": "OK",
+      "ran": 271,
+      "skipped": 2,
+      "seconds": 167.52,
+      "note": "Re-run after the entity-private task isolation fix: the original 265 cases plus 6 new isolation cases, same two platform-bound skips, zero failures. Run with a PyYAML-capable interpreter; the shipped verifier documents the bounded degradation when PyYAML is absent."
+    }
+  },
+  "generated_at_utc": "2026-11-05T21:02:56.379311+00:00",
+  "phase107_delta": {
+    "added": [
+      "gongyu/isolation.py",
+      "gongyu/runtime.py",
+      "gongyu/private_card.py",
+      "distributed/__init__.py",
+      "distributed/run_episode.py",
+      "ros/distributed_nodes.py",
+      "tests/test_private_task_card.py"
+    ],
+    "modified": [
+      "gongyu/run.py",
+      "gongyu/world.py",
+      "gongyu/m2.py",
+      "gongyu/policies.py"
+    ],
+    "delivery_label": "phase105 physical-verification baseline + phase107 runtime and deployment extension + entity-private task isolation",
+    "note": "revision 字段仍是 phase105 冻结标签，也是 phase105_live_rerun 回执引用的那个标签；phase107 的增量只增加运行时与部署层，并把一处全局读取改成向仲裁者提问。十组用例的事件流摘要在改动前后逐条相同，因此冻结标签所指的行为没有变化。",
+    "verification_boundary": {
+      "gazebo_eight_unit_rerun": "completed on the phase105 baseline only; the phase107 delta was NOT re-run on Gazebo",
+      "phase107_evidence": [
+        "graph model",
+        "discrete physical replay",
+        "one process per entity",
+        "unit suite",
+        "ten-case event-stream equivalence"
+      ],
+      "ros2_topic_graph": "plan only (--plan); not executed on this host"
+    },
+    "isolation_fix": {
+      "defect": "Referee._brief() sent the full scene card to every entity process and EntityScope.READABLE exposed card, so a unit could read a competitor's task deadline from static configuration without receiving any message.",
+      "change": "gongyu/private_card.py splits public map configuration from the unit's private task sheet; EntityScope.card now serves a redacted brief in strict topologies; Referee._brief(actor) builds a per-unit brief from world.local_assignments[actor]. The referee keeps the original card for validation and metrics.",
+      "public_parameters": "World.view() shared_blue_plan.air_inspection_deadline_ms is the task-book's published inspection window; it carries no peer task status, progress or private deadline. Decision deadlines come from view.own_tasks.",
+      "tests": "tests/test_private_task_card.py (6 cases): visible deadlines == own task set for every entity, public configuration unchanged, per-process briefs differ, controller programs unchanged.",
+      "equivalence": {
+        "receipt": "验证/graph_baseline_phase107_post3.json",
+        "against": "验证/graph_baseline_phase107_pre.json",
+        "cases": 10,
+        "digest_mismatches": 0
+      },
+      "verification": {
+        "unit_suite": "271 cases, 2 platform skips, 0 failures (265 original + 6 isolation cases)",
+        "three_way_equivalence": "centralised / strictly isolated / one process per entity: 0 mismatches",
+        "link_cost_30_runs": "re-run reproduced identical numeric results; degraded multi-process 4/6 on-time, 0 violations",
+        "three_backend_matrix_15_cells": "re-run reproduced identical numeric results; four switch configs 14/14 on all three backends, channel-stress row 13/14 on graph and distributed, 14/14 on physical replay",
+        "adversary_audit": "101 conditions re-read, rectangle / length saturation / release peak / two-sided invariants all hold, verdict PASS",
+        "chart_binding_note": "The three chart-data receipts were re-run to prove numeric identity and then restored byte-for-byte, because 07_报告源文件/图表数据/runtime_boundary.source.json binds their SHA256 to figure 17. No figure, PDF, DOCX or QA receipt was rebuilt."
+      }
+    },
+    "equivalence": {
+      "receipt": "验证/graph_baseline_phase107_post2.json",
+      "against": "验证/graph_baseline_phase107_pre.json",
+      "cases": 10,
+      "digest_mismatches": 0
+    },
+    "topology": {
+      "backends": [
+        "graph",
+        "physical",
+        "distributed"
+      ],
+      "mechanism_matrix": "验证/run_phase107_mechanisms.py",
+      "link_cost": "验证/run_phase107_runtime.py",
+      "ros_entry": "ros/distributed_nodes.py --plan (not run: no ROS 2 on this machine)"
+    }
+  },
+  "delivery_label": "phase105 物理验证基线 + phase107 运行时与部署扩展 + 实体私有任务隔离 + phase110 默认关闭的能力补齐层",
+  "phase110_delta": {
+    "summary": "新增三个默认关闭、可逐项打开的能力层（机载观测+估计、双进程真实链路测量与标定回放、多机多数派共识），并在 Ubuntu 24.04 WSL 的 ROS 2 Jazzy/Nav2/Gazebo Sim 8 上用当前交付源码重跑登记单元。默认登记卡行为不变：能力层不设开关时不参与运行链路。",
+    "added": [
+      "gongyu/onboard_sensing.py",
+      "gongyu/real_link.py",
+      "gongyu/consensus.py",
+      "tests/test_phase110_capabilities.py"
+    ],
+    "modified": [
+      "ros/fleet_episode.py (新增 --feedback-mode truth|sensed 与机载估计快照通路)",
+      "ros/fleet_runner.py (透传 feedback-mode 给 fleet_episode)"
+    ],
+    "default_off": "登记卡未设 onboard_sensing 键时仍走原真值通路；real_link/consensus 仅由离线脚本 gongyu/run.py 与验证脚本引用，不进入 ros 驱动导入链。",
+    "unit_tests_added": 13,
+    "live_rerun": {
+      "environment": "Ubuntu 24.04 WSL, ROS 2 Jazzy, Nav2, Gazebo Sim 8.15.0",
+      "scope": "覆盖 1/8 登记单元达到 COMPLETE（phase98_shifted_independent，truth 模式，14/14 按期、0 违例）；另有 phase97 复跑复现历史 B2 导航中止（11/14），phase98 的 sensed 模式探针未取得 COMPLETE（起飞就绪超时）。",
+      "receipt": "05_复现说明/本轮验证脚本/phase110_live_receipt.json",
+      "note": "COMPLETE 的 phase98 单元同时验证了 phase107 隔离改动未破坏整机、phase110 能力层默认关闭时不影响既有通路；未达到 COMPLETE 的单元仍以 phase105 基线回执为准。"
+    },
+    "boundary": "sensed 模式在 Gazebo 层的驱动接线尚未完成（起飞就绪判定在估计态下未获 COMPLETE），如实记为未通过；回环 UDP 不是无线电、共识未替换默认仲裁、参数扫描是重标定而非新算法，全部负结果原样保留。"
+  }
+}

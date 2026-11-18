@@ -1,0 +1,789 @@
+{
+  "id": "phase97_short_adversarial",
+  "version": "G2-D-clearance-development-v2.1",
+  "backend": "graph",
+  "units": "integer_ms_and_meters",
+  "step_ms": 100,
+  "end_ms": 400000,
+  "tau_ms": 6000,
+  "message_delay_ms": 1000,
+  "seed": 0,
+  "ground_speed": 0.5,
+  "air_speed": 1.0,
+  "channel_gap_ms": 2000,
+  "service_ms": 2000,
+  "blue_deadline_ms": 90000,
+  "red_channel_enabled": true,
+  "reservation_grace_ms": 2000,
+  "nodes": {
+    "L": [
+      6,
+      0
+    ],
+    "E": [
+      5,
+      0
+    ],
+    "W": [
+      2,
+      0
+    ],
+    "D": [
+      1,
+      0
+    ],
+    "J": [
+      6,
+      2
+    ],
+    "O": [
+      8,
+      2
+    ],
+    "F": [
+      14,
+      8
+    ],
+    "K": [
+      10,
+      8
+    ],
+    "H": [
+      6,
+      8
+    ],
+    "F_R": [
+      14,
+      -8
+    ],
+    "K_R": [
+      10,
+      -8
+    ],
+    "H_R": [
+      6,
+      -8
+    ],
+    "N0": [
+      8,
+      -3
+    ],
+    "PN": [
+      9,
+      -3
+    ],
+    "RN": [
+      12,
+      -5
+    ],
+    "S0": [
+      8,
+      -13
+    ],
+    "PS": [
+      9,
+      -13
+    ],
+    "RS": [
+      12,
+      -11
+    ]
+  },
+  "edges": [
+    [
+      "L",
+      "E",
+      1,
+      "ground"
+    ],
+    [
+      "E",
+      "W",
+      3,
+      "ground"
+    ],
+    [
+      "W",
+      "D",
+      1,
+      "ground"
+    ],
+    [
+      "O",
+      "J",
+      2,
+      "ground"
+    ],
+    [
+      "J",
+      "L",
+      2,
+      "ground"
+    ],
+    [
+      "L",
+      "D",
+      12.0,
+      "ground"
+    ],
+    [
+      "F",
+      "K",
+      4,
+      "air"
+    ],
+    [
+      "K",
+      "H",
+      4,
+      "air"
+    ],
+    [
+      "F_R",
+      "K_R",
+      4,
+      "air"
+    ],
+    [
+      "K_R",
+      "H_R",
+      4,
+      "air"
+    ],
+    [
+      "N0",
+      "PN",
+      1,
+      "ground"
+    ],
+    [
+      "PN",
+      "RN",
+      3.605551275463989,
+      "ground"
+    ],
+    [
+      "S0",
+      "PS",
+      1,
+      "ground"
+    ],
+    [
+      "PS",
+      "RS",
+      3.605551275463989,
+      "ground"
+    ]
+  ],
+  "radio_edges": [
+    [
+      "J",
+      "L"
+    ],
+    [
+      "K",
+      "L"
+    ],
+    [
+      "H",
+      "L"
+    ],
+    [
+      "K_R",
+      "red_station"
+    ]
+  ],
+  "observation_nodes": [
+    "O",
+    "H"
+  ],
+  "berth_capacity": {
+    "L": 2,
+    "E": 2,
+    "W": 2,
+    "D": 6,
+    "J": 2,
+    "O": 2,
+    "F": 1,
+    "K": 1,
+    "H": 1,
+    "F_R": 1,
+    "K_R": 1,
+    "H_R": 1,
+    "N0": 1,
+    "PN": 1,
+    "RN": 1,
+    "S0": 1,
+    "PS": 1,
+    "RS": 1
+  },
+  "fleet": {
+    "B1": {
+      "mode": "ground",
+      "node": "D",
+      "role": "transport"
+    },
+    "B2": {
+      "mode": "ground",
+      "node": "O",
+      "role": "observe"
+    },
+    "B3": {
+      "mode": "air",
+      "node": "F",
+      "role": "inspect"
+    },
+    "R1": {
+      "mode": "ground",
+      "node": "E",
+      "role": "transport"
+    },
+    "R2": {
+      "mode": "ground",
+      "node": "E",
+      "role": "transport"
+    },
+    "R5": {
+      "mode": "air",
+      "node": "F_R",
+      "role": "inspect"
+    },
+    "R3": {
+      "mode": "ground",
+      "node": "N0",
+      "role": "inspect_and_relay",
+      "payload_interface": false
+    },
+    "R4": {
+      "mode": "ground",
+      "node": "S0",
+      "role": "inspect_and_relay",
+      "payload_interface": false
+    }
+  },
+  "cargo": {
+    "blue1": "device",
+    "blue2": "device",
+    "red1": "red_device",
+    "red2": "red_device"
+  },
+  "tasks": [
+    {
+      "id": "blue1",
+      "team": "B",
+      "kind": "delivery",
+      "deadline_ms": 350000
+    },
+    {
+      "id": "blue2",
+      "team": "B",
+      "kind": "delivery",
+      "deadline_ms": 350000
+    },
+    {
+      "id": "blue_inspect",
+      "team": "B",
+      "kind": "inspection",
+      "deadline_ms": 40000,
+      "actor": "B3",
+      "region": "F",
+      "mode": "air"
+    },
+    {
+      "id": "red1",
+      "team": "R",
+      "kind": "delivery",
+      "deadline_ms": 250000,
+      "release_ms": 120000
+    },
+    {
+      "id": "red2",
+      "team": "R",
+      "kind": "delivery",
+      "deadline_ms": 100000
+    },
+    {
+      "id": "red_inspect",
+      "team": "R",
+      "kind": "report_delivery",
+      "deadline_ms": 10000,
+      "actor": "R5",
+      "region": "F_R",
+      "mode": "air"
+    },
+    {
+      "id": "red_patrol",
+      "team": "R",
+      "kind": "report_delivery",
+      "deadline_ms": 60000,
+      "actor": "R5",
+      "region": "H_R",
+      "mode": "air"
+    },
+    {
+      "id": "red_return",
+      "team": "R",
+      "kind": "inspection",
+      "deadline_ms": 180000,
+      "actor": "R5",
+      "region": "F_R",
+      "mode": "air"
+    },
+    {
+      "id": "red3_inspect",
+      "team": "R",
+      "kind": "inspection",
+      "deadline_ms": 60000,
+      "actor": "R3",
+      "region": "PN",
+      "mode": "ground"
+    },
+    {
+      "id": "red3_report",
+      "team": "R",
+      "kind": "report_delivery",
+      "deadline_ms": 70000,
+      "actor": "R3",
+      "region": "PN",
+      "mode": "ground"
+    },
+    {
+      "id": "red3_return",
+      "team": "R",
+      "kind": "inspection",
+      "deadline_ms": 86000,
+      "actor": "R3",
+      "region": "N0",
+      "mode": "ground"
+    },
+    {
+      "id": "red4_inspect",
+      "team": "R",
+      "kind": "inspection",
+      "deadline_ms": 60000,
+      "actor": "R4",
+      "region": "PS",
+      "mode": "ground"
+    },
+    {
+      "id": "red4_report",
+      "team": "R",
+      "kind": "report_delivery",
+      "deadline_ms": 70000,
+      "actor": "R4",
+      "region": "PS",
+      "mode": "ground"
+    },
+    {
+      "id": "red4_return",
+      "team": "R",
+      "kind": "inspection",
+      "deadline_ms": 130000,
+      "actor": "R4",
+      "region": "S0",
+      "mode": "ground"
+    }
+  ],
+  "task_dependencies": [
+    [
+      "device_report",
+      "blue1"
+    ],
+    [
+      "device_report",
+      "blue2"
+    ]
+  ],
+  "initial_reports": {},
+  "red_release_ms": [
+    150000,
+    0
+  ],
+  "reconnect_period_ms": 12000,
+  "note": "Full six-entity graph prefix. Future directional bookings are real resource grants, not given prior occupancy. R5 performs outward patrol and return tasks. Contract preferences use affected local tasks; no fixed success/refusal outcome. Per-offer delay, when present, is a referee-only disturbance.",
+  "geometry": {
+    "version": "1.0",
+    "device": [
+      8,
+      0,
+      0.8
+    ],
+    "radio_range_m": 9.5,
+    "sensors": {
+      "ground": {
+        "range_m": 3.0,
+        "horizontal_fov_deg": 90.0,
+        "vertical_fov_deg": 60.0
+      },
+      "air": {
+        "range_m": 9.0,
+        "horizontal_fov_deg": 90.0,
+        "vertical_fov_deg": 60.0
+      }
+    },
+    "heights": {
+      "ground": 0.3,
+      "blue_air": 2.5,
+      "red_air": 3.5
+    },
+    "infrastructure": {
+      "entrance": [
+        5,
+        0,
+        0.6
+      ],
+      "red_station": [
+        18,
+        -8,
+        0.3
+      ]
+    },
+    "obstacles": [
+      {
+        "id": "device_screen",
+        "minimum": [
+          6.9,
+          -1.2,
+          0.0
+        ],
+        "maximum": [
+          7.1,
+          1.2,
+          1.6
+        ],
+        "visual_opaque": true,
+        "radio_opaque": true
+      },
+      {
+        "id": "optical_screen",
+        "minimum": [
+          8.9,
+          2.0,
+          0.0
+        ],
+        "maximum": [
+          9.1,
+          6.0,
+          5.0
+        ],
+        "visual_opaque": true,
+        "radio_opaque": false
+      }
+    ],
+    "edge_polylines": {
+      "D>L": [
+        [
+          1,
+          0,
+          0.3
+        ],
+        [
+          1,
+          -3.5,
+          0.3
+        ],
+        [
+          6,
+          -3.5,
+          0.3
+        ],
+        [
+          6,
+          0,
+          0.3
+        ]
+      ]
+    },
+    "communication_policy": "stationary_waypoint_contacts",
+    "note": "Uniform range and ray-box occlusion; opacity/ranges are frozen design assumptions. Two-second observation includes sensor aiming; no claim of calibrated optics, propagation or aiming dynamics."
+  },
+  "online_replanning": true,
+  "m2": {
+    "enabled": true,
+    "service_enabled": true,
+    "blue_future_ms": 160000,
+    "red_future_ms": 150000,
+    "status_max_age_ms": 6000,
+    "red_radio_window_end_ms": 140000
+  },
+  "physical_berths": {
+    "L": [
+      [
+        6.05,
+        0.0
+      ],
+      [
+        6.05,
+        0.8
+      ]
+    ],
+    "E": [
+      [
+        5.25,
+        -0.95
+      ],
+      [
+        5.25,
+        0.95
+      ]
+    ],
+    "W": [
+      [
+        1.8,
+        -0.95
+      ],
+      [
+        1.8,
+        0.95
+      ]
+    ],
+    "D": [
+      [
+        0.5,
+        0.0
+      ],
+      [
+        -0.8,
+        -1.3
+      ],
+      [
+        0.9,
+        -2.0
+      ],
+      [
+        -0.7,
+        1.5
+      ],
+      [
+        -2.6,
+        -1.3
+      ],
+      [
+        -2.5,
+        1.5
+      ]
+    ],
+    "J": [
+      [
+        6.0,
+        1.6
+      ],
+      [
+        6.0,
+        2.4
+      ]
+    ],
+    "O": [
+      [
+        8.0,
+        1.6
+      ],
+      [
+        8.0,
+        2.4
+      ]
+    ],
+    "F": [
+      [
+        14.0,
+        8.0
+      ]
+    ],
+    "K": [
+      [
+        10.0,
+        8.0
+      ]
+    ],
+    "H": [
+      [
+        6.0,
+        8.0
+      ]
+    ],
+    "F_R": [
+      [
+        14.0,
+        -8.0
+      ]
+    ],
+    "K_R": [
+      [
+        10.0,
+        -8.0
+      ]
+    ],
+    "H_R": [
+      [
+        6.0,
+        -8.0
+      ]
+    ],
+    "N0": [
+      [
+        8.0,
+        -3.0
+      ]
+    ],
+    "PN": [
+      [
+        9.0,
+        -3.0
+      ]
+    ],
+    "RN": [
+      [
+        12.0,
+        -5.0
+      ]
+    ],
+    "S0": [
+      [
+        8.0,
+        -13.0
+      ]
+    ],
+    "PS": [
+      [
+        9.0,
+        -13.0
+      ]
+    ],
+    "RS": [
+      [
+        12.0,
+        -11.0
+      ]
+    ]
+  },
+  "physical_berth_tolerance_m": 0.1,
+  "physical_channel_clear_width_m": 1.0,
+  "physical_contact_hold_ms": 6000,
+  "physical_departure_clearance_m": 3.0,
+  "physical_note": "Registered route geometry and own release variation; identical constraints and inputs across target modes.",
+  "travel_time_ms": {
+    "L>E": 18000,
+    "E>L": 18000,
+    "E>W": 48000,
+    "W>E": 48000,
+    "W>D": 24000,
+    "D>W": 24000,
+    "O>J": 18000,
+    "J>O": 18000,
+    "J>L": 18000,
+    "L>J": 18000,
+    "L>D": 70000,
+    "D>L": 70000,
+    "F>K": 12000,
+    "K>F": 12000,
+    "K>H": 12000,
+    "H>K": 12000,
+    "F_R>K_R": 12000,
+    "K_R>F_R": 12000,
+    "K_R>H_R": 12000,
+    "H_R>K_R": 12000,
+    "N0>PN": 12000,
+    "PN>N0": 12000,
+    "PN>RN": 26000,
+    "RN>PN": 26000,
+    "S0>PS": 12000,
+    "PS>S0": 12000,
+    "PS>RS": 26000,
+    "RS>PS": 26000
+  },
+  "protocol_margin_ms": 4000,
+  "departure_clearance_ms": 12000,
+  "physical_timing_basis": {
+    "run": "phase17_fleet_v1",
+    "source_revision": "3f118bcc421ee72fdf23b31e98c91eb740b5bd3c",
+    "observed_completed_ms": {
+      "D>W": 13148,
+      "O>J": 13792,
+      "E>W": 36744,
+      "W>D": 10490,
+      "W>E": 41174,
+      "E>L": 9050,
+      "J>L": 10372,
+      "four_meter_air_max": 10806
+    },
+    "status": "Conservative design estimates informed by completed transitions; not statistical upper bounds.",
+    "geometry_revision": "v2 changes W berths to y+/-.95 and centerline route point to(2,0); timing/deadlines unchanged from v1. Prior measured transitions are reference data, not measurements of this revised geometry.",
+    "egress_revision": "v3 holds a ground follower on the same directed edge until fresh predecessor feedback is3m from the follower source berth, or the preceding move actually completes. This moves the predecessor beyond the2.5m peer obstacle-marking influence with allowance; source claim release at.55m alone is insufficient. Graph backend uses public12s as a conservative local-exit estimate, not a physical release timer. phase18_fleet_v2 first L departure cleared.55m after3652ms; roughly another1.65m/.26m/s plus margin motivates12s. Other travel estimates and deadlines unchanged.",
+    "unmeasured": "Reverse directions borrow paired estimates; L-D bypass70s is an unvalidated design estimate from12m/.26m/s plus turning/settling allowance.",
+    "deadline_basis": "Red1 estimate48+24+2=74s within100s; red2 booking at50 plus74=124s within160s. Blue350s covers approximately166s approach plus next air contact/protocol and70s bypass with margin. Air inspection estimated12+6+12+2=32s within40s.",
+    "controls": "Frozen before this physical development run, equal across policies; tau6s, capabilities, speeds, sensing and protection are unchanged. Historical deadlines and failures remain recorded.",
+    "M2_development": "Phase21 graph exploration exposed insufficient second-report support; phase22 combines external first report with existing own-team support, without altering tau, capabilities or communication.",
+    "M2_unmeasured": "K_R-H_R borrows paired4m air12s estimate. No physical M2 travel measurements or outcome guarantee.",
+    "M2_task_basis": "R2 independently starts0. Two future directional48s slots160/210s separated by2s gap. Red1 channel+exit+service74s gives284s from own late slot or234s from early slot; own deadline250s lies between. R5 completes outward patrol, independently holds radio window to140s and returns by180s (estimated166s). Blue350s and all hard report rules retained.",
+    "M2_scope": "Development card, not an untuned holdout; parameters informed by prior M1 physical timing and phase21 graph exploration. Strong autonomous cancellation/rebooking counterbaseline must be retained.",
+    "D_approach_revision": "After phase38 failure: FIFO final D approach, retained across E>W>D until actual arrival dwell; D parking spacing1.35m. Old tasks, deadlines, speeds and nominal edge estimates unchanged. Additional movement/queue time is uncalibrated; this is development, not an untuned holdout or a GPU-only comparison.",
+    "D_clearance_revision": "After preserved phase44 west-exit blockage: keep parked D peers away from exit(2,0); first four slots at(.5,0),(-.8,-1.3),(.9,-2),(-.7,1.5), with two spare slots farther west. Physical W>D only uses waypoint(1.8,1.5); abstract geometry/edge lengths and D>W remain unchanged. Actual parking is included in generated bounds. Task deadlines, speed, safety, report rules and nominal time estimates retained, new physical travel/queue time uncalibrated. Development trial, not holdout or GPU-only comparison. Phase45 invalid abstract-route card was rejected before mission; v2.1 separates physical staging."
+  },
+  "g2": {
+    "manual_inspection_reports": true,
+    "relay_enabled": true,
+    "patrols": {
+      "R3": {
+        "start": "N0",
+        "site": "PN",
+        "relay": "RN",
+        "inspection_task": "red3_inspect",
+        "report_task": "red3_report",
+        "return_task": "red3_return"
+      },
+      "R4": {
+        "start": "S0",
+        "site": "PS",
+        "relay": "RS",
+        "inspection_task": "red4_inspect",
+        "report_task": "red4_report",
+        "return_task": "red4_return"
+      }
+    },
+    "status_max_age_ms": 6000,
+    "reports_from": {
+      "red3_inspect": "red3_report",
+      "red4_inspect": "red4_report"
+    }
+  },
+  "g2_basis": "Development estimates only:1m ground12s and sqrt(13)m ground26s including turning/settling. R3/R4 inspect, transmit their own report and return; only real received offers can substitute for R5 carrying its report toK_R. Red station18,-8 is the same in all G2 references. Different task denominators prohibit an entity-count-only success-rate claim.",
+  "physical_arrival_mutex_nodes": [
+    "D"
+  ],
+  "physical_delivery_waypoint": [
+    1.8,
+    1.5,
+    0.3
+  ],
+  "target_mode": "adversarial",
+  "target_constraints": {
+    "movement_budget_ms": {
+      "R1": 160000,
+      "R2": 160000,
+      "R5": 120000,
+      "R3": 160000,
+      "R4": 160000
+    },
+    "minimum_on_time_deliveries": {
+      "R1": 1,
+      "R2": 1
+    },
+    "observation_period_ms": 1000,
+    "observation_max_age_ms": 2000,
+    "observation_nodes": [
+      "E",
+      "L"
+    ]
+  },
+  "physical_channel_west_alignment": [
+    1.6,
+    0.0,
+    0.3
+  ],
+  "physical_continuous_channel": true,
+  "physical_channel_east_alignment": [
+    5.4,
+    0.0,
+    0.3
+  ]
+}

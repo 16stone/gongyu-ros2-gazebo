@@ -1,0 +1,14 @@
+__pycache__/
+.worktrees/
+ros/models/*
+!ros/models/X3_UAV_v4/
+ros/models/X3_UAV_v4/*
+!ros/models/X3_UAV_v4/meshes/
+ros/models/X3_UAV_v4/meshes/*
+!ros/models/X3_UAV_v4/meshes/x3.dae
+!ros/models/X3_UAV_v4/meshes/x3.png
+!ros/models/X3_UAV_v4/meshes/propeller_cw.dae
+!ros/models/X3_UAV_v4/meshes/propeller_ccw.dae
+evidence/*/
+!evidence/setup/
+evidence/setup/*.txt

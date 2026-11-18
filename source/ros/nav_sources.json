@@ -1,0 +1,57 @@
+{
+  "reference_root": "/mnt/c/Users/ZhuanZ/Documents/ChatGPT/\u65e0\u4eba\u7cfb\u7edf\u5bfc\u8bba/02_\u53c2\u8003\u6587\u6863/\u4f18\u5316\u62d3\u5c55_20261027/source",
+  "reused": "robot platform/URDF and Nav2 parameter template only; no mission controller",
+  "boxes": [
+    [
+      "west_wall",
+      -3.0,
+      0.5,
+      0.2,
+      9.0,
+      1.5
+    ],
+    [
+      "east_wall",
+      7.0,
+      0.5,
+      0.2,
+      9.0,
+      1.5
+    ],
+    [
+      "south_wall",
+      2.0,
+      -4.0,
+      10.0,
+      0.2,
+      1.5
+    ],
+    [
+      "north_wall",
+      2.0,
+      5.0,
+      10.0,
+      0.2,
+      1.5
+    ],
+    [
+      "detour_box",
+      2.0,
+      2.0,
+      0.8,
+      1.4,
+      1.0
+    ]
+  ],
+  "map_origin": [
+    -3.2,
+    -4.2
+  ],
+  "map_resolution": 0.05,
+  "source_sha256": {
+    "/mnt/c/Users/ZhuanZ/Documents/ChatGPT/\u65e0\u4eba\u7cfb\u7edf\u5bfc\u8bba/02_\u53c2\u8003\u6587\u6863/\u4f18\u5316\u62d3\u5c55_20261027/source/assets/robots/waffle_robot1.sdf": "f75258197454f2819dee16c5cc33d48cc28324d973562593ed88f7a7369af765",
+    "/mnt/c/Users/ZhuanZ/Documents/ChatGPT/\u65e0\u4eba\u7cfb\u7edf\u5bfc\u8bba/02_\u53c2\u8003\u6587\u6863/\u4f18\u5316\u62d3\u5c55_20261027/source/assets/robots/waffle_peer.urdf": "2782bb7c708cc1def9b8c739a923ae91d2ec64e644cf756b02c97be4a120d9d1",
+    "/mnt/c/Users/ZhuanZ/Documents/ChatGPT/\u65e0\u4eba\u7cfb\u7edf\u5bfc\u8bba/02_\u53c2\u8003\u6587\u6863/\u4f18\u5316\u62d3\u5c55_20261027/source/configs/nav2_robot1.yaml": "19a86fc781ba742af4224a5cc1f374738741168db6fba005a54265109d4d27f5",
+    "/opt/ros/jazzy/opt/gz_sim_vendor/share/gz/gz-sim8/worlds/diff_drive.sdf": "6d6a182ed978681656cf8ffa24b62fe102ec14459e7d2d2fa205cfb299a17375"
+  }
+}

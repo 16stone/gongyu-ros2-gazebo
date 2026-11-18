@@ -1,0 +1,145 @@
+{
+  "bounds": [
+    -5,
+    -15,
+    20,
+    11
+  ],
+  "obstacles": [
+    {
+      "id": "device_screen",
+      "minimum": [
+        6.9,
+        -0.19999999999999996,
+        0.0
+      ],
+      "maximum": [
+        7.1,
+        2.2,
+        1.6
+      ],
+      "visual_opaque": true,
+      "radio_opaque": true
+    },
+    {
+      "id": "optical_screen",
+      "minimum": [
+        8.9,
+        3.0,
+        0.0
+      ],
+      "maximum": [
+        9.1,
+        7.0,
+        5.0
+      ],
+      "visual_opaque": true,
+      "radio_opaque": false
+    }
+  ],
+  "scenario_sha256": "de137b7ea2c344c8950fe4fed20aa75e003239928fce338338444e7a9fd1e87f",
+  "physical_boxes": [
+    [
+      [
+        6.9,
+        -0.19999999999999996,
+        0.0
+      ],
+      [
+        7.1,
+        2.2,
+        1.6
+      ]
+    ],
+    [
+      [
+        8.9,
+        3.0,
+        0.0
+      ],
+      [
+        9.1,
+        7.0,
+        5.0
+      ]
+    ],
+    [
+      [
+        -5.15,
+        -15.15,
+        0
+      ],
+      [
+        -5,
+        11.15,
+        1
+      ]
+    ],
+    [
+      [
+        20,
+        -15.15,
+        0
+      ],
+      [
+        20.15,
+        11.15,
+        1
+      ]
+    ],
+    [
+      [
+        -5,
+        -15.15,
+        0
+      ],
+      [
+        20,
+        -15,
+        1
+      ]
+    ],
+    [
+      [
+        -5,
+        11,
+        0
+      ],
+      [
+        20,
+        11.15,
+        1
+      ]
+    ],
+    [
+      [
+        2.35,
+        0.35000000000000003,
+        0
+      ],
+      [
+        4.65,
+        0.5,
+        1.2
+      ]
+    ],
+    [
+      [
+        2.35,
+        1.5,
+        0
+      ],
+      [
+        4.65,
+        1.65,
+        1.2
+      ]
+    ]
+  ],
+  "limits": [
+    "explicit physical berths require the PhysicalWorld destination allocator; no motion validation yet",
+    "aircraft start on ground and must take off before mission clock starts",
+    "physical narrow walls added; motion times require shared recalibration",
+    "visual/RF opacity still evaluated by abstract mission geometry"
+  ]
+}

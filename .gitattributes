@@ -1,0 +1,5 @@
+* text=auto eol=lf
+source/** -text
+scenes/** -text
+evidence/** -text
+PROJECT.SHA256 -text

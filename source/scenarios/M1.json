@@ -1,0 +1,254 @@
+{
+  "id": "M1",
+  "version": "1.1-graph",
+  "backend": "graph",
+  "units": "integer_ms_and_meters",
+  "step_ms": 100,
+  "end_ms": 120000,
+  "tau_ms": 6000,
+  "message_delay_ms": 1000,
+  "seed": 0,
+  "ground_speed": 0.5,
+  "air_speed": 1.0,
+  "channel_gap_ms": 2000,
+  "service_ms": 2000,
+  "blue_deadline_ms": 90000,
+  "red_channel_enabled": true,
+  "reservation_grace_ms": 2000,
+  "nodes": {
+    "L": [
+      6,
+      0
+    ],
+    "E": [
+      5,
+      0
+    ],
+    "W": [
+      2,
+      0
+    ],
+    "D": [
+      1,
+      0
+    ],
+    "J": [
+      6,
+      2
+    ],
+    "O": [
+      8,
+      2
+    ],
+    "F": [
+      14,
+      8
+    ],
+    "K": [
+      10,
+      8
+    ],
+    "H": [
+      6,
+      8
+    ],
+    "F_R": [
+      14,
+      -8
+    ],
+    "K_R": [
+      10,
+      -8
+    ]
+  },
+  "edges": [
+    [
+      "L",
+      "E",
+      1,
+      "ground"
+    ],
+    [
+      "E",
+      "W",
+      3,
+      "ground"
+    ],
+    [
+      "W",
+      "D",
+      1,
+      "ground"
+    ],
+    [
+      "O",
+      "J",
+      2,
+      "ground"
+    ],
+    [
+      "J",
+      "L",
+      2,
+      "ground"
+    ],
+    [
+      "L",
+      "D",
+      12,
+      "ground"
+    ],
+    [
+      "F",
+      "K",
+      4,
+      "air"
+    ],
+    [
+      "K",
+      "H",
+      4,
+      "air"
+    ],
+    [
+      "F_R",
+      "K_R",
+      4,
+      "air"
+    ]
+  ],
+  "radio_edges": [
+    [
+      "J",
+      "L"
+    ],
+    [
+      "K",
+      "L"
+    ],
+    [
+      "H",
+      "L"
+    ],
+    [
+      "K_R",
+      "red_station"
+    ]
+  ],
+  "observation_nodes": [
+    "O",
+    "H"
+  ],
+  "berth_capacity": {
+    "L": 2,
+    "E": 2,
+    "W": 2,
+    "D": 6,
+    "J": 2,
+    "O": 2,
+    "F": 1,
+    "K": 1,
+    "H": 1,
+    "F_R": 1,
+    "K_R": 1
+  },
+  "fleet": {
+    "B1": {
+      "mode": "ground",
+      "node": "D",
+      "role": "transport"
+    },
+    "B2": {
+      "mode": "ground",
+      "node": "O",
+      "role": "observe"
+    },
+    "B3": {
+      "mode": "air",
+      "node": "F",
+      "role": "inspect"
+    },
+    "R1": {
+      "mode": "ground",
+      "node": "E",
+      "role": "transport"
+    },
+    "R2": {
+      "mode": "ground",
+      "node": "E",
+      "role": "transport"
+    },
+    "R5": {
+      "mode": "air",
+      "node": "F_R",
+      "role": "inspect"
+    }
+  },
+  "cargo": {
+    "blue1": "device",
+    "blue2": "device",
+    "red1": "red_device",
+    "red2": "red_device"
+  },
+  "tasks": [
+    {
+      "id": "blue1",
+      "team": "B",
+      "kind": "delivery",
+      "deadline_ms": 90000
+    },
+    {
+      "id": "blue2",
+      "team": "B",
+      "kind": "delivery",
+      "deadline_ms": 90000
+    },
+    {
+      "id": "blue_inspect",
+      "team": "B",
+      "kind": "inspection",
+      "deadline_ms": 30000,
+      "actor": "B3",
+      "region": "F",
+      "mode": "air"
+    },
+    {
+      "id": "red1",
+      "team": "R",
+      "kind": "delivery",
+      "deadline_ms": 12000
+    },
+    {
+      "id": "red2",
+      "team": "R",
+      "kind": "delivery",
+      "deadline_ms": 20000
+    },
+    {
+      "id": "red_inspect",
+      "team": "R",
+      "kind": "report_delivery",
+      "deadline_ms": 10000,
+      "actor": "R5",
+      "region": "F_R",
+      "mode": "air"
+    }
+  ],
+  "task_dependencies": [
+    [
+      "device_report",
+      "blue1"
+    ],
+    [
+      "device_report",
+      "blue2"
+    ]
+  ],
+  "initial_reports": {},
+  "red_release_ms": [
+    0,
+    8000
+  ],
+  "reconnect_period_ms": 12000,
+  "note": "B1 starts at D and traverses C before sampling. B2 observes 6-8s then carries report to J. Explicit graph regions only; geometry/visibility and physical validation pending."
+}

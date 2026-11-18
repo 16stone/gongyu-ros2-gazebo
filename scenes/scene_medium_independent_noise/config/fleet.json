@@ -1,0 +1,74 @@
+[
+  {
+    "id": "B1",
+    "mode": "ground",
+    "initial_xyz": [
+      0.5,
+      0.0,
+      0.01
+    ]
+  },
+  {
+    "id": "B2",
+    "mode": "ground",
+    "initial_xyz": [
+      8.0,
+      1.6,
+      0.01
+    ]
+  },
+  {
+    "id": "B3",
+    "mode": "air",
+    "initial_xyz": [
+      14.0,
+      8.0,
+      0.06
+    ]
+  },
+  {
+    "id": "R1",
+    "mode": "ground",
+    "initial_xyz": [
+      5.25,
+      -0.95,
+      0.01
+    ]
+  },
+  {
+    "id": "R2",
+    "mode": "ground",
+    "initial_xyz": [
+      5.25,
+      0.95,
+      0.01
+    ]
+  },
+  {
+    "id": "R5",
+    "mode": "air",
+    "initial_xyz": [
+      14.0,
+      -8.0,
+      0.06
+    ]
+  },
+  {
+    "id": "R3",
+    "mode": "ground",
+    "initial_xyz": [
+      8.0,
+      -3.0,
+      0.01
+    ]
+  },
+  {
+    "id": "R4",
+    "mode": "ground",
+    "initial_xyz": [
+      8.0,
+      -13.0,
+      0.01
+    ]
+  }
+]

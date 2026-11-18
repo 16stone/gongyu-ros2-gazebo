@@ -1,0 +1,9 @@
+# Shared actuator wiring
+
+`gongyu.actuation.MoveDispatcher` owns waypoint queues and completion state by actor and goal token. Pass four independent `Nav2GroundAdapter` instances and an aircraft velocity publisher for each aircraft. Ground intermediate points advance only after that actor's actual Nav2 success; aircraft points use the calibrated position loop. `done(actor, token)` is actuator readiness, not task completion: pass samples and this state to `PhysicalWorld`, which retains the separate position/freshness/dwell gate.
+
+The live outer loop must provide a current six-entity sample snapshot on every tick. Ground map poses must retain the TF sample timestamp and use odometry freshness checks. Air samples must be from that aircraft's own position feedback, with the same simulation time base as `now`. Missing aircraft feedback produces a zero velocity request. A ground failure publishes zero requests for aircraft before raising; the caller must then cancel every active ground goal and ensure aircraft hold or pause simulation before destroying ROS nodes. A zero request alone is not evidence of a stopped vehicle.
+
+For the complete mission driver, initialize four localization/navigation stacks independently, take both aircraft to the card-defined heights before starting the mission clock, then dispatch through `PhysicalWorld.submit_move -> dispatcher.begin`. Keep independent simulator truth out of ground policy feedback. Use the generated physical card and its berths for scene, initial poses and mission backend; apply shared measured movement-time calibration before making policy comparisons.
+
+The R1 integration gate now uses this dispatcher and is the current live regression. Six-entity mixed tests use simulated adapter feedback; they do not establish a six-entity Gazebo mission. The complete multi-entity ROS driver and joint mission execution are still pending.
