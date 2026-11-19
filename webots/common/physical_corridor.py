@@ -38,8 +38,8 @@ TRANSPORT_ROUTES = {
     "B2": (("blue_relay", None), ("east_north", None), ("east_straight", None),
            ("east_gate", None), ("west_gate", None), ("blue_return", "blue2")),
     "R1": (("east_south_start", None), ("east_gate", None), ("east_straight", None),
-           ("east_north", None), ("east_north_upper", None), ("red_turnaround", None),
-           ("east_north_upper", None), ("east_north", None), ("east_straight", None),
+           ("east_north_upper", None), ("red_turnaround", None),
+           ("east_north_upper", None), ("east_straight", None),
            ("east_gate", None), ("west_gate", None), ("west_park", "red1")),
 }
 
