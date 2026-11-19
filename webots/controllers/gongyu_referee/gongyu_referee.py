@@ -71,6 +71,8 @@ def ev(kind, payload, actor=None, task=None):
 # Truth is produced by this model, never by the controller under test's self-report.
 # Physical sensors (GPS/LiDAR/Camera) still run in Webots for traceable observations.
 PHYSICAL_ACTUATION = os.environ.get('GONGYU_PHYS', '0') == '1'
+
+AERIAL = set(n for n in os.environ.get('GONGYU_AERIAL', '').split(',') if n)
 GS = SCEN.get('ground_speed', 0.5)  # m/s, frozen scenario parameter
 kin_state = {}
 KIN_FIELDS = {}
@@ -93,8 +95,10 @@ def channel_gate(nm, nx, ny):
     return True
 
 
-def advance_kinematics(dt_s):
+def advance_kinematics(dt_s, only=None):
     for nm, ks in kin_state.items():
+        if only is not None and nm not in only:
+            continue
         if ks['target'] is None:
             continue
         gx, gy = ks['target']
@@ -142,16 +146,32 @@ metrics = {'seed': SEED, 'scene': SCENE, 'mechanism': MECH, 'adapt': ADAPT,
            'channel_enters': 0, 'channel_releases': 0, 'accepted_reports': [],
            'expired_reports': [], 'replan_decisions': [], 'violations': [],
            'truth_trajectories': dict((nm, []) for nm in actors), 'truth_sample_period_ms': 500}
+TRUTH_ATT = os.environ.get('GONGYU_TRUTH_ATT', '0') == '1'
 start_wall = time.time()
 prev_t = -1
+last_truth_t = -500
 
 while sup.step(ts) != -1:
     t = int(sup.getTime() * 1000)
     if not PHYSICAL_ACTUATION:
         advance_kinematics(ts / 1000.0)
-    if t % 500 == 0:
+    else:
+        # hybrid: the aerial platforms have no rotor model here, so they stay on
+        # the kinematic layer while every ground chassis is motor-driven
+        advance_kinematics(ts / 1000.0, only=AERIAL)
+    if t - last_truth_t >= 500:
+        last_truth_t = t
         for _nm in actors:
             metrics['truth_trajectories'][_nm].append({'t_ms': t, 'pos': truth(_nm)})
+    if TRUTH_ATT and t % 100 == 0:
+        # independent attitude truth: the simulator's own frame, never the controller's
+        rec = {'t_ms': t, 'yaw': {}, 'pos': {}}
+        for _nm, _nd in actors.items():
+            _o = _nd.getOrientation()
+            rec['yaw'][_nm] = round(math.atan2(_o[3], _o[0]), 4)
+            _p = _nd.getPosition()
+            rec['pos'][_nm] = [round(_p[0], 4), round(_p[1], 4)]
+        bus.append('truth_att.jsonl', rec)
     if True:
         for nm in list(actors):
             st = state[nm]
@@ -162,7 +182,19 @@ while sup.step(ts) != -1:
             gx, gy = NODES[node][0], NODES[node][1]
             d = math.hypot(x - gx, y - gy)
             if st['target_node'] != node:
-                send(nm, node, task)
+                hold = False
+                if PHYSICAL_ACTUATION and channel_holder not in (None, nm):
+                    outside = x < 2.05 or x > 4.95
+                    tx = NODES[node][0]
+                    cross = (x < 2.05 and tx > 4.95) or (x > 4.95 and tx < 2.05)
+                    hold = outside and cross
+                if hold:
+                    if st.get('hold_logged') != node:
+                        st['hold_logged'] = node
+                        ev('dispatch_held', {'node': node, 'holder': channel_holder,
+                                             'x': x}, nm, task)
+                else:
+                    send(nm, node, task)
             # channel occupancy from independent truth
             in_channel = 2.05 <= x <= 4.95 and abs(y) <= 0.6
             if in_channel and not st['entered_channel']:
@@ -219,7 +251,10 @@ while sup.step(ts) != -1:
                                                        'direction': 'E->W' if prev_node == 'E' else 'W->E'}, nm, nt)
                         send(nm, nn, nt)
             else:
-                st['arrive_since'] = None
+                # cancel the berth dwell only when the platform clearly leaves the
+                # tolerance band, otherwise steady-state parking error re-arms it forever
+                if d > 0.18 * 1.28:
+                    st['arrive_since'] = None
         for rep in list(pending_reports):
             if t >= rep['deliver_at']:
                 pending_reports.remove(rep)

@@ -1,11 +1,11 @@
 {
- "started_utc": "2026-11-18T19:33:15Z",
- "ended_utc": "2026-11-18T19:35:20Z",
+ "started_utc": "2026-11-19T01:59:16Z",
+ "ended_utc": "2026-11-19T02:01:21Z",
  "scene": "web_medium",
  "mechanism": "release",
  "status": "COMPLETE",
  "failure": null,
  "sim_end_ms": 41152,
- "wall_seconds": 125.71,
- "source": "webots-r2025a-cpu-software-render"
+ "wall_seconds": 124.742,
+ "source": "webots-r2025a-cpu-kinematic-render"
 }

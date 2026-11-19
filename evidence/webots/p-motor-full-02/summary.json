@@ -1,0 +1,23 @@
+{
+ "run": "p-motor-full-02",
+ "source_run": "phys-hybrid-02",
+ "scene": "web_medium_phys",
+ "mechanism": "release",
+ "adapt": "off",
+ "cost": "low",
+ "report_delay_ms": 1000,
+ "physical_actuation": true,
+ "aerial_layer": "kinematic",
+ "on_time": 12,
+ "total": 13,
+ "violations": 5,
+ "channel_enters": 8,
+ "channel_releases": 8,
+ "reports_accepted": 10,
+ "reports_expired": 0,
+ "replans": 0,
+ "wall_seconds": 261.406,
+ "shutdown_status": "COMPLETE",
+ "backend": "webots-r2025a-cpu-motor-norender",
+ "note": "same, tighter arrival precision; 12/13 but 5 channel overlaps from mouth waypoints"
+}

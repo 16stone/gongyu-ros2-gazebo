@@ -1,6 +1,8 @@
 # Webots 实跑后端开发记录（amax CPU / R2025a）
 
 ## 环境
+
+> 执行器层（真实电机）的完整结论、判定性测量与未闭合边界见 `docs/webots/PHYSICAL_LAYER.md`；本文件保留后端搭建与早期缺陷记录。
 - 唯一执行机 amax，Webots R2025a 解压于 `~/pandaoxi/webots`，无 GPU，用 `xvfb_root` 的 Xvfb :99 + `LIBGL_ALWAYS_SOFTWARE=1` + `LD_LIBRARY_PATH` 含 `$WEBOTS/lib/webots`。
 - 运行入口 `webots/tools/run_webots.sh <scene> <run-id>`，新运行 ID、场景 SHA256、原始 bus/events/遥测、metrics、shutdown 关闭回执齐备。
 - 每次运行快速模式（fast + --batch），墙钟为仿真时钟的约 1.5–2.5 倍。

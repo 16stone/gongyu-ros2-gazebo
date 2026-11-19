@@ -1,0 +1,14 @@
+{
+ "run": "p-att-spin-minus",
+ "source_run": "att-m08",
+ "commanded_spin_rad_s": -0.8,
+ "true_yaw_start_rad": 0.0,
+ "true_yaw_total_rad": -6.475,
+ "true_yaw_rate_rad_s": -0.5582,
+ "imu_yaw_start_rad": 0.0,
+ "imu_yaw_total_rad": -6.3046,
+ "imu_yaw_rate_rad_s": -0.5354,
+ "position_drift_m": 0.0012,
+ "samples_true": 30,
+ "samples_imu": 24
+}

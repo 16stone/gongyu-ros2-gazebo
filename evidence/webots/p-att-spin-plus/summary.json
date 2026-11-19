@@ -1,0 +1,6 @@
+{
+ "run": "p-att-spin-plus",
+ "source_run": "att-08",
+ "kind": "attitude sign probe",
+ "note": "commanded spin vs simulator truth vs InertialUnit yaw"
+}

@@ -1,0 +1,23 @@
+{
+ "run": "p-motor-full-01",
+ "source_run": "phys-hybrid-01",
+ "scene": "web_medium_phys",
+ "mechanism": "release",
+ "adapt": "off",
+ "cost": "low",
+ "report_delay_ms": 1000,
+ "physical_actuation": true,
+ "aerial_layer": "kinematic",
+ "on_time": 11,
+ "total": 11,
+ "violations": 0,
+ "channel_enters": 4,
+ "channel_releases": 3,
+ "reports_accepted": 10,
+ "reports_expired": 0,
+ "replans": 0,
+ "wall_seconds": 288.575,
+ "shutdown_status": "COMPLETE",
+ "backend": "webots-r2025a-cpu-motor-norender",
+ "note": "8 entities, 6 chassis motor-driven + 2 aerial kinematic; 11/14, deadlock at the corridor mouth"
+}

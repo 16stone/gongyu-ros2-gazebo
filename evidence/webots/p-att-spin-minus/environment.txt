@@ -1,0 +1,9 @@
+run=att-m08
+scene=web_smoke_phys
+platform=amax-cpu-webots-r2025a
+physical_actuation=1
+loc_mode=gps
+feedback_mode=sensor
+seed=0
+
+webots_exit=0

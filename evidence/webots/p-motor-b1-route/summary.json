@@ -1,0 +1,23 @@
+{
+ "run": "p-motor-b1-route",
+ "source_run": "clear-pass-05",
+ "scene": "web_b1_clear_phys",
+ "mechanism": "release",
+ "adapt": "off",
+ "cost": "low",
+ "report_delay_ms": 1000,
+ "physical_actuation": true,
+ "aerial_layer": "kinematic",
+ "on_time": 1,
+ "total": 1,
+ "violations": 0,
+ "channel_enters": 1,
+ "channel_releases": 1,
+ "reports_accepted": 0,
+ "reports_expired": 0,
+ "replans": 0,
+ "wall_seconds": 9.505,
+ "shutdown_status": "COMPLETE",
+ "backend": "webots-r2025a-cpu-motor-norender",
+ "note": "single UGV, real motors, full route D-W-E-L-O with report delivery"
+}

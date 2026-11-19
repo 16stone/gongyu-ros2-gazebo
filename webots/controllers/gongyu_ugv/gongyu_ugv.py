@@ -53,6 +53,9 @@ cmd = None
 last_log = -10**9
 last_cmd_read = -10**9
 err_sign = 1.0   # latched turn direction for near-180 headings
+stuck_ref = None      # (t_ms, x, y, theta) sample for the mobility supervisor
+stuck_hits = 0
+escape_until = -10**9
 
 
 def clamp(v, a, b):
@@ -108,10 +111,12 @@ while robot.step(ts) != -1:
         # a real chassis turns without translating, so the motion-direction
         # trick below is only valid when the referee moves the platform; here
         # the IMU is the honest yaw source (it is a real gyro integration).
-        # spin-pure-02: omega=+0.8 rad/s gave d(yaw)/dt=-0.66 rad/s, so the
-        # device yaw is clockwise-positive and must be negated to match the
-        # controller's counter-clockwise-positive world heading.
-        theta = -imu.getRollPitchYaw()[2]
+        # att-08 / att-m08: commanded spin +0.8 rad/s produced a true world yaw
+        # rate of +0.558 rad/s and an IMU yaw rate of +0.535 rad/s, so the
+        # InertialUnit is already counter-clockwise-positive and needs no sign
+        # change.  spin-pure-02 seemed to say otherwise only because the
+        # differential formula still had the wheel sides swapped at that time.
+        theta = imu.getRollPitchYaw()[2]
         prev_gps = [gp[0], gp[1]]
     else:
         # heading from true GPS motion (wheel-integration heading drifts on slip)
@@ -172,15 +177,18 @@ while robot.step(ts) != -1:
         # physical mode must reach the node centre: the referee only clears the
         # shared channel once the chassis is past x=4.95, so an early stop at the
         # 0.18 m berth tolerance deadlocks the next dispatch
-        if dist <= (0.10 if physical_actuation else 0.10):
+        if dist <= (0.06 if physical_actuation else 0.10):
             v = 0.0
             omega = 0.0
         else:
             omega = clamp(KP_HEAD * err, -1.5, 1.5)
             if physical_actuation:
                 # linear approach: no overshoot on a heavy chassis, and it still
-                # rolls past the corridor mouth instead of stopping inside it
-                v = clamp(0.45 * dist, 0.12, V_MAX)
+                # rolls past the corridor mouth instead of stopping inside it.
+                # Inside 0.35 m the speed floor drops so the chassis can settle at
+                # 0.06 m, well inside the referee's 0.18 m berth tolerance.
+                floor = 0.06 if dist < 0.35 else 0.12
+                v = clamp(0.45 * dist, floor, V_MAX)
             else:
                 v = V_MAX if dist > 0.30 else V_MAX * 0.35
         if front < 0.35 or low_front < 0.30:
@@ -188,7 +196,31 @@ while robot.step(ts) != -1:
             omega += 0.8 if lside > rside else -0.8
         if abs(err) > 1.0:
             v *= 0.35
-    pivot = physical_actuation and abs(err) > 0.6
+    # --- mobility supervisor (physical branch only) -----------------------------
+    # Three-sector LiDAR cannot see a grazing screen edge or a corner behind the
+    # scan plane, so the chassis can be commanded to move while being physically
+    # blocked.  Watch the independent sensors (GPS displacement, IMU yaw) and back
+    # out with a reverse turn instead of grinding the gearbox against geometry.
+    if physical_actuation:
+        if escape_until > t:
+            v = -0.40
+            omega = 0.8 * (1.0 if err >= 0.0 else -1.0)
+        elif cmd is not None:
+            if stuck_ref is None:
+                stuck_ref = (t, x, y, theta)
+            elif t - stuck_ref[0] >= 900:
+                moved = math.hypot(x - stuck_ref[1], y - stuck_ref[2])
+                dyaw = abs(math.atan2(math.sin(theta - stuck_ref[3]),
+                                      math.cos(theta - stuck_ref[3])))
+                blocked = (abs(v) > 0.05 and moved < 0.03) or \
+                          (abs(v) < 0.05 and abs(omega) > 0.30 and dyaw < 0.03)
+                stuck_hits = stuck_hits + 1 if blocked else 0
+                stuck_ref = (t, x, y, theta)
+                if stuck_hits >= 2:
+                    stuck_hits = 0
+                    stuck_ref = None
+                    escape_until = t + 1400
+    pivot = physical_actuation and abs(err) > 0.6 and escape_until <= t
     if pivot:
         v = 0.0                       # no translation while correcting heading
         omega = clamp(omega, -0.8, 0.8)
@@ -224,5 +256,5 @@ while robot.step(ts) != -1:
             'compass': [round(float(a), 4) for a in compass.getValues()],
             'cmd_id': (cmd or {}).get('id'),
             'actuation': 'motor' if physical_actuation else 'kinematic', 'own_estimate': [round(x, 4), round(y, 4)], 'wheel_odom': [round(wheel_x, 4), round(wheel_y, 4)], 'loc_mode': loc_mode,
-            'ctl': {'v': round(v, 3), 'omega': round(omega, 3), 'dist': round(math.hypot((cmd or {}).get('x', x)-x_c, (cmd or {}).get('y', y)-y_c), 3) if cmd else None, 'wl': round(wl, 2), 'wr': round(wr, 2)}})
+            'enc_raw': [None if a is None else round(a, 3) for a in vals], 'ctl': {'v': round(v, 3), 'omega': round(omega, 3), 'dist': round(math.hypot((cmd or {}).get('x', x)-x_c, (cmd or {}).get('y', y)-y_c), 3) if cmd else None, 'wl': round(wl, 2), 'wr': round(wr, 2)}})
         last_log = t
