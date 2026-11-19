@@ -31,7 +31,7 @@ STAGING = {
 CARRIER_ORDER = ("R2", "B1", "B2", "R1")
 TRANSPORT_ROUTES = {
     "R2": (("east_north_start", None), ("east_gate", None), ("west_gate", None),
-           ("west_turn", None), ("west_pickup", None), ("west_turn", None),
+           ("west_pickup", None),
            ("west_gate", None), ("east_gate", None), ("east_straight", None),
            ("east_park", "red2")),
     "B1": (("blue_source", None), ("west_gate", None), ("east_gate", None),

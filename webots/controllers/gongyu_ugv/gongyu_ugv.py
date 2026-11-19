@@ -137,7 +137,9 @@ while robot.step(ts) != -1:
     front, lside, rside = ranges(lid_main)
     low_front, _, _ = ranges(lid_low)
     x_c, y_c, th_c, corrected = x, y, theta, False
-    if 2.0 < x < 5.2 and min(lside, rside) < 1.0:
+    # A real chassis needs its measured cross-track error for steering.
+    # The legacy snap to the centre line only belongs to the kinematic replay.
+    if not physical_actuation and 2.0 < x < 5.2 and min(lside, rside) < 1.0:
         y_c = 0.0 if abs(y) < 0.45 else y
         corrected = True
     if t - last_cmd_read > 200:
