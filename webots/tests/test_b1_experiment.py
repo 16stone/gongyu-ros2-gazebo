@@ -3,9 +3,11 @@ from pathlib import Path
 import sys
 import unittest
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
 from b1_experiment import (CARD, drive, grid_search, grid_spec, ray_box,
                            wheel_predict, world_point)
+from analyze_b1_experiment import scan_correct
 
 
 class SingleVehicleExperiment(unittest.TestCase):
@@ -25,6 +27,15 @@ class SingleVehicleExperiment(unittest.TestCase):
                     self.assertIn((b[0], a[1]), free)
             self.assertEqual(tuple(world_point(start)), tuple(CARD["start"][:2]))
             self.assertEqual(tuple(world_point(goal)), tuple(CARD["goal"]))
+
+    def test_scan_correction_of_lateral_and_yaw_offset(self):
+        cloud = [(2.65 + i * 0.085 - 3.6 - 0.24, side * 0.55, 0)
+                 for side in (-1, 1) for i in range(25)]
+        (x, y, yaw), count = scan_correct((3.6, 0.08, 0.03), cloud)
+        self.assertEqual(x, 3.6)
+        self.assertGreater(count, 6)
+        self.assertLess(abs(y), 0.02)
+        self.assertLess(abs(yaw), 0.02)
 
     def test_geometry_and_right_side_encoder_sign(self):
         self.assertAlmostEqual(ray_box((0, 0), 0, (2, 3, -1, 1)), 2)
