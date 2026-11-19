@@ -23,6 +23,38 @@ DEF B1 Robot {
     boundingObject Cylinder { height 0.05 radius 0.085 subdivision 20 }
     physics Physics { density 800 }
   }
+} HingeJoint {
+  jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0.17 -0.035 }
+  device [ RotationalMotor { name "right_motor" maxVelocity 12 maxTorque 40 } PositionSensor { name "right_sensor" } ]
+  endPoint Solid {
+    translation 0 0.17 -0.035
+    children [ Shape { appearance PBRAppearance { baseColor 0.050 0.060 0.080 roughness 0.70 metalness 0.40 emissiveColor 0.000 0.000 0.000 emissiveIntensity 1.00 } geometry Cylinder { height 0.05 radius 0.085 subdivision 20 } } ]
+    boundingObject Cylinder { height 0.05 radius 0.085 subdivision 20 }
+    physics Physics { density 800 }
+  }
+} BallJoint {
+  jointParameters BallJointParameters { anchor -0.19 0 -0.085 }
+  endPoint Solid {
+    translation -0.19 0 -0.085
+    children [ Shape { appearance PBRAppearance { baseColor 0.050 0.060 0.080 roughness 0.70 metalness 0.40 emissiveColor 0.000 0.000 0.000 emissiveIntensity 1.00 } geometry Sphere { radius 0.035 } } ]
+    boundingObject Sphere { radius 0.035 }
+    physics Physics { density 300 }
+  }
+} BallJoint {
+  jointParameters BallJointParameters { anchor 0.19 0 -0.085 }
+  endPoint Solid {
+    translation 0.19 0 -0.085
+    children [ Shape { appearance PBRAppearance { baseColor 0.050 0.060 0.080 roughness 0.70 metalness 0.40 emissiveColor 0.000 0.000 0.000 emissiveIntensity 1.00 } geometry Sphere { radius 0.035 } } ]
+    boundingObject Sphere { radius 0.035 }
+    physics Physics { density 300 }
+  }
+} Lidar { name "lidar_main" translation 0.18 0 0.20 horizontalResolution 180 numberOfLayers 1 fieldOfView 6.283185 minRange 0.02 maxRange 3.0 }
+Lidar { name "lidar_low" translation 0.18 0 0.18 horizontalResolution 180 numberOfLayers 1 fieldOfView 6.283185 minRange 0.15 maxRange 1.2 }
+InertialUnit { name "imu" }
+Compass { name "compass" }
+GPS { name "gps" } ]
+  boundingObject Box { size 0.40 0.34 0.14 }
+  physics Physics { density 400 }
 }
 
 DEF B2 Robot {
@@ -37,5 +69,37 @@ DEF B2 Robot {
     boundingObject Cylinder { height 0.05 radius 0.085 subdivision 20 }
     physics Physics { density 800 }
   }
+} HingeJoint {
+  jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0.17 -0.035 }
+  device [ RotationalMotor { name "right_motor" maxVelocity 12 maxTorque 40 } PositionSensor { name "right_sensor" } ]
+  endPoint Solid {
+    translation 0 0.17 -0.035
+    children [ Shape { appearance PBRAppearance { baseColor 0.050 0.060 0.080 roughness 0.70 metalness 0.40 emissiveColor 0.000 0.000 0.000 emissiveIntensity 1.00 } geometry Cylinder { height 0.05 radius 0.085 subdivision 20 } } ]
+    boundingObject Cylinder { height 0.05 radius 0.085 subdivision 20 }
+    physics Physics { density 800 }
+  }
+} BallJoint {
+  jointParameters BallJointParameters { anchor -0.19 0 -0.085 }
+  endPoint Solid {
+    translation -0.19 0 -0.085
+    children [ Shape { appearance PBRAppearance { baseColor 0.050 0.060 0.080 roughness 0.70 metalness 0.40 emissiveColor 0.000 0.000 0.000 emissiveIntensity 1.00 } geometry Sphere { radius 0.035 } } ]
+    boundingObject Sphere { radius 0.035 }
+    physics Physics { density 300 }
+  }
+} BallJoint {
+  jointParameters BallJointParameters { anchor 0.19 0 -0.085 }
+  endPoint Solid {
+    translation 0.19 0 -0.085
+    children [ Shape { appearance PBRAppearance { baseColor 0.050 0.060 0.080 roughness 0.70 metalness 0.40 emissiveColor 0.000 0.000 0.000 emissiveIntensity 1.00 } geometry Sphere { radius 0.035 } } ]
+    boundingObject Sphere { radius 0.035 }
+    physics Physics { density 300 }
+  }
+} Lidar { name "lidar_main" translation 0.18 0 0.20 horizontalResolution 180 numberOfLayers 1 fieldOfView 6.283185 minRange 0.02 maxRange 3.0 }
+Lidar { name "lidar_low" translation 0.18 0 0.18 horizontalResolution 180 numberOfLayers 1 fieldOfView 6.283185 minRange 0.15 maxRange 1.2 }
+InertialUnit { name "imu" }
+Compass { name "compass" }
+GPS { name "gps" } ]
+  boundingObject Box { size 0.40 0.34 0.14 }
+  physics Physics { density 400 }
 }
 Robot { name "corridor_referee" supervisor TRUE controller "course_corridor_referee" }
