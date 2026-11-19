@@ -1,0 +1,150 @@
+#VRML_SIM R2025a utf8
+WorldInfo {
+  title "Gongyu B3 worksite observation"
+  basicTimeStep 16
+  coordinateSystem "ENU"
+  randomSeed 19
+  optimalThreadCount 2
+}
+Viewpoint {
+  orientation 0.79 0.55 0.29 1.35
+  position 4.6 -5 5.7
+}
+Background { skyColor [ 0.3 0.4 0.5 ] }
+DirectionalLight { direction -0.3 0.2 -1 intensity 1.2 }
+DEF FLOOR Solid {
+  translation 1 0 -0.08
+  name "floor"
+  children [
+    Shape {
+      appearance PBRAppearance { baseColor 0.24 0.32 0.39 roughness 1 metalness 0 }
+      geometry Box { size 12 10 0.16 }
+    }
+  ]
+  boundingObject Box { size 12 10 0.16 }
+}
+Solid {
+  name "home stripe"
+  translation 0 0 0.003
+  children [
+    Shape {
+      appearance PBRAppearance { baseColor 0.95 0.78 0.15 roughness 1 metalness 0 }
+      geometry Box { size 0.65 0.65 0.004 }
+    }
+  ]
+}
+Solid {
+  name "worksite panel"
+  translation 2.2 0.8 0.015
+  children [
+    Shape {
+      appearance PBRAppearance { baseColor 0.93 0.93 0.93 roughness 1 metalness 0 }
+      geometry Box { size 0.70 0.70 0.030 }
+    }
+    Pose {
+      translation 0 0 0.021
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.82 0.005 0.75
+            emissiveColor 0.65 0.001 0.55
+            roughness 1
+            metalness 0
+          }
+          geometry Box { size 0.48 0.48 0.010 }
+        }
+      ]
+    }
+  ]
+  boundingObject Box { size 0.70 0.70 0.030 }
+}
+DEF COVER Solid {
+  name "opaque worksite cover"
+  translation 2.2 4 0.32
+  children [
+    Shape {
+      appearance PBRAppearance { baseColor 0.36 0.40 0.43 roughness 1 metalness 0 }
+      geometry Box { size 1.15 1.15 0.12 }
+    }
+  ]
+  boundingObject Box { size 1.15 1.15 0.12 }
+}
+DEF B3 Robot {
+  name "B3"
+  translation 0 0 0.052
+  rotation 0 0 1 0.34906585
+  controller "course_b3"
+  children [
+    Shape {
+      appearance PBRAppearance { baseColor 0.10 0.52 0.92 roughness 0.35 metalness 0.1 }
+      geometry Box { size 0.24 0.16 0.10 }
+    }
+    Pose {
+      rotation 0 0 1 0.785398
+      children [ DEF ARM Shape {
+        appearance PBRAppearance { baseColor 0.12 0.15 0.19 roughness 0.7 metalness 0 }
+        geometry Box { size 0.48 0.027 0.024 }
+      } ]
+    }
+    Pose { rotation 0 0 1 -0.785398 children [ USE ARM ] }
+    Pose {
+      translation 0.15 0.15 0.028
+      children [ DEF ROTOR Shape {
+        appearance PBRAppearance { baseColor 0.22 0.48 0.57 roughness 0.8 metalness 0 }
+        geometry Cylinder { radius 0.075 height 0.010 }
+      } ]
+    }
+    Pose { translation 0.15 -0.15 0.028 children [ USE ROTOR ] }
+    Pose { translation -0.15 0.15 0.028 children [ USE ROTOR ] }
+    Pose { translation -0.15 -0.15 0.028 children [ USE ROTOR ] }
+    Propeller {
+      shaftAxis 0 0 1
+      centerOfThrust 0.15 0.15 0.028
+      thrustConstants 0.000030 0
+      torqueConstants 0.00000054 0
+      device RotationalMotor { name "front left propeller" maxVelocity 360 acceleration 3000 maxTorque 3000 }
+    }
+    Propeller {
+      shaftAxis 0 0 1
+      centerOfThrust 0.15 -0.15 0.028
+      thrustConstants -0.000030 0
+      torqueConstants 0.00000054 0
+      device RotationalMotor { name "front right propeller" maxVelocity 360 acceleration 3000 maxTorque 3000 }
+    }
+    Propeller {
+      shaftAxis 0 0 1
+      centerOfThrust -0.15 0.15 0.028
+      thrustConstants -0.000030 0
+      torqueConstants 0.00000054 0
+      device RotationalMotor { name "rear left propeller" maxVelocity 360 acceleration 3000 maxTorque 3000 }
+    }
+    Propeller {
+      shaftAxis 0 0 1
+      centerOfThrust -0.15 -0.15 0.028
+      thrustConstants 0.000030 0
+      torqueConstants 0.00000054 0
+      device RotationalMotor { name "rear right propeller" maxVelocity 360 acceleration 3000 maxTorque 3000 }
+    }
+    GPS { name "gps" accuracy 0.006 }
+    InertialUnit { name "inertial unit" noise 0.001 }
+    Gyro { name "gyro" resolution 0.001 }
+    Camera {
+      name "camera"
+      translation 0 0 -0.055
+      rotation 0 1 0 1.57079632679
+      width 96
+      height 72
+      fieldOfView 1.0
+      near 0.02
+    }
+    Receiver { name "reference receiver" channel 7 }
+  ]
+  boundingObject Box { size 0.36 0.36 0.10 }
+  physics Physics { density -1 mass 0.42 }
+}
+Robot {
+  name "Phase C referee"
+  supervisor TRUE
+  controller "course_b3_referee"
+  children [ Emitter { name "reference emitter" channel 7 } ]
+}
