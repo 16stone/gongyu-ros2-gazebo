@@ -8,12 +8,15 @@ and authoritative, so the demo now plots exactly what the referee scored.
 """
 import json, math, os
 
-RUN = '/home/liujingzhi/pandaoxi/gongyu-webots-runs/f-webots-full-01'
-EV = '/home/liujingzhi/pandaoxi/gongyu-ros2-gazebo/evidence/webots/f-webots-full-01'
-OUT = '/home/liujingzhi/pandaoxi/gongyu-ros2-gazebo/docs/demo/webots_replay_data.json'
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+RUNS = os.environ.get('GONGYU_RUNS_ROOT', os.path.join(os.path.expanduser('~'),
+                                                       'pandaoxi', 'gongyu-webots-runs'))
+RUN = os.path.join(RUNS, 'f-webots-full-01')
+EV = os.path.join(REPO, 'evidence', 'webots', 'f-webots-full-01')
+OUT = os.path.join(REPO, 'docs', 'demo', 'webots_replay_data.json')
 
 m = json.load(open(EV + '/metrics.json', encoding='utf-8'))
-scen = json.load(open('/home/liujingzhi/pandaoxi/gongyu-ros2-gazebo/webots/config/scenario_medium.json',
+scen = json.load(open(os.path.join(REPO, 'webots', 'config', 'scenario_medium.json'),
                       encoding='utf-8'))
 
 # per-actor controller heading, used only to orient the heading tick

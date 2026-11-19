@@ -6,7 +6,7 @@ the index cannot drift from what was actually run.
 """
 import json, os, glob
 
-R = '/home/liujingzhi/pandaoxi/gongyu-ros2-gazebo'
+R = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 EV = os.path.join(R, 'evidence/webots')
 OUT = os.path.join(R, 'docs/evidence_index.md')
 

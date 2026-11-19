@@ -8,7 +8,7 @@ traces back to that run; nothing is re-simulated or hand-animated.
 import json, math, os, subprocess, sys
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-BASE = '/home/liujingzhi/pandaoxi/gongyu-ros2-gazebo/docs/demo'
+BASE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'demo')
 DATA = os.path.join(BASE, 'webots_replay_data.json')
 OUT = os.path.join(BASE, 'webots_full_run.mp4')
 FONT_CJK = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'

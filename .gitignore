@@ -5,3 +5,9 @@ __pycache__/
 .env
 .env.*
 runs/
+
+# local editor / build leftovers
+*.wbproj
+report_v11/_pass1.*
+.DS_Store
+Thumbs.db

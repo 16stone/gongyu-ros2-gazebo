@@ -9,7 +9,7 @@ import os
 
 from PIL import Image, ImageDraw, ImageFont
 
-REPO = '/home/liujingzhi/pandaoxi/gongyu-ros2-gazebo'
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT = os.path.join(REPO, 'report_v11', 'figures')
 RUN = os.path.join(REPO, 'evidence', 'webots', 'f-webots-full-01')
 FONT = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'

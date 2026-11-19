@@ -17,7 +17,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
-ROOT = '/home/liujingzhi/pandaoxi/gongyu-ros2-gazebo/report_v11'
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BODY = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'body.md')
 STEM = sys.argv[2] if len(sys.argv) > 2 else '潘道熙25361130课程设计报告题目二_v11'
 

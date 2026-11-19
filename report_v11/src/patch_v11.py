@@ -9,7 +9,7 @@ import os
 import re
 import sys
 
-ROOT = '/home/liujingzhi/pandaoxi/gongyu-ros2-gazebo/report_v11'
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'body_v9.md')
 DST = os.path.join(ROOT, 'body.md')
 

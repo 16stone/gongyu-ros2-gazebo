@@ -22,7 +22,7 @@ def environment_for(scene,out):
     # "No GUI" is not "no GPU": GONGYU_HEADLESS already suppresses the GUI in
     # fleet.launch.py and the screenshot service in capture.py.  Dropping the Mesa
     # d3d12 adapter as well forces llvmpipe, which on WSL2 costs roughly 3x wall
-    # time (1593-1830 s vs 548-563 s on amax-pi05 for the same card).  Callers that
+    # time (1593-1830 s vs 548-563 s on the reference x86 host for the same card).  Callers that
     # want a headless round rendered on the local GPU set GONGYU_RENDER_GPU=1;
     # without it this branch is identical to phase123.
     if env.get('GONGYU_HEADLESS') == '1' and env.get('GONGYU_RENDER_GPU') != '1':

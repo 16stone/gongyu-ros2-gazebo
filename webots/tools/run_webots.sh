@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# Run one Webots episode on amax with CPU software rendering, then close the receipt.
+# Run one Webots episode on a headless CPU host, then close the receipt.
+# Paths default to a sibling layout; override any of them through the environment.
 set -euo pipefail
 SCENE=${1:?scene world name}
 RUNID=${2:?new run id}
 shift 2
-REPO=/home/liujingzhi/pandaoxi/gongyu-ros2-gazebo
-WEBOTS=/home/liujingzhi/pandaoxi/webots
-XR=/home/liujingzhi/pandaoxi/xvfb_root
-RUNROOT=/home/liujingzhi/pandaoxi/gongyu-webots-runs/$RUNID
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+WEBOTS=${GONGYU_WEBOTS_HOME:-$HOME/pandaoxi/webots}
+XR=${GONGYU_XVFB_ROOT:-$HOME/pandaoxi/xvfb_root}
+RUNROOT=${GONGYU_RUNS_ROOT:-$HOME/pandaoxi/gongyu-webots-runs}/$RUNID
 if [ -e "$RUNROOT" ]; then echo "RUN_ID_EXISTS: $RUNID"; exit 2; fi
 mkdir -p -m 700 "$RUNROOT"/{bus,result,evidence}
 export LD_LIBRARY_PATH="$XR/usr/lib/x86_64-linux-gnu:$WEBOTS/lib/webots:${LD_LIBRARY_PATH:-}"
