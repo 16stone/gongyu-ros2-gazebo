@@ -1,0 +1,17 @@
+{
+ "started_utc": "2026-11-19T03:38:29Z",
+ "ended_utc": "2026-11-19T03:42:08Z",
+ "scene": "web_holdout_v1_phys",
+ "mechanism": "release",
+ "status": "COMPLETE",
+ "motion_backend": "hybrid",
+ "kinematic_actors": [
+  "B3",
+  "R5"
+ ],
+ "corridor_protocol": "footprint_serial_dispatch",
+ "failure": null,
+ "sim_end_ms": 400000,
+ "wall_seconds": 219.335,
+ "source": "webots-r2025a-cpu-motor-norender"
+}

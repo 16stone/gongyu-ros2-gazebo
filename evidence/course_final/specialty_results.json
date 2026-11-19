@@ -1,0 +1,1507 @@
+{
+  "normal_restarts": [
+    {
+      "seed": 0,
+      "scene": "web_medium_phys",
+      "mechanism": "release",
+      "adapt": "off",
+      "cost": "low",
+      "report_delay_ms": 1000,
+      "physical_actuation": true,
+      "task_completed": {
+        "blue_inspect": {
+          "t_ms": 2016,
+          "deadline_ms": 40000,
+          "on_time": true,
+          "actor": "B3"
+        },
+        "red_inspect": {
+          "t_ms": 2016,
+          "deadline_ms": 10000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red3_inspect": {
+          "t_ms": 6080,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R3"
+        },
+        "red4_inspect": {
+          "t_ms": 6080,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R4"
+        },
+        "red4_report": {
+          "t_ms": 18832,
+          "deadline_ms": 70000,
+          "on_time": true,
+          "actor": "R4"
+        },
+        "red3_report": {
+          "t_ms": 18944,
+          "deadline_ms": 70000,
+          "on_time": true,
+          "actor": "R3"
+        },
+        "red_patrol": {
+          "t_ms": 19680,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red_return": {
+          "t_ms": 37328,
+          "deadline_ms": 180000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red4_return": {
+          "t_ms": 41584,
+          "deadline_ms": 130000,
+          "on_time": true,
+          "actor": "R4"
+        },
+        "red3_return": {
+          "t_ms": 42336,
+          "deadline_ms": 86000,
+          "on_time": true,
+          "actor": "R3"
+        },
+        "red2": {
+          "t_ms": 80096,
+          "deadline_ms": 100000,
+          "on_time": true,
+          "actor": "R2"
+        },
+        "blue1": {
+          "t_ms": 121920,
+          "deadline_ms": 350000,
+          "on_time": true,
+          "actor": "B1"
+        },
+        "red1": {
+          "t_ms": 234544,
+          "deadline_ms": 250000,
+          "on_time": true,
+          "actor": "R1"
+        },
+        "blue2": {
+          "t_ms": 290336,
+          "deadline_ms": 350000,
+          "on_time": true,
+          "actor": "B2"
+        }
+      },
+      "channel_enters": 5,
+      "channel_releases": 5,
+      "accepted_reports": [
+        "rep-B3-2016",
+        "rep-R5-2016",
+        "rep-R3-6080",
+        "rep-R4-6080",
+        "rep-R4-18832",
+        "rep-R3-18944",
+        "rep-R5-19680",
+        "rep-R5-37328",
+        "rep-R4-41584",
+        "rep-R3-42336"
+      ],
+      "expired_reports": [],
+      "replan_decisions": [],
+      "violations": [],
+      "truth_sample_period_ms": 500,
+      "expected_task_ids": [
+        "blue1",
+        "blue2",
+        "blue_inspect",
+        "red1",
+        "red2",
+        "red3_inspect",
+        "red3_report",
+        "red3_return",
+        "red4_inspect",
+        "red4_report",
+        "red4_return",
+        "red_inspect",
+        "red_patrol",
+        "red_return"
+      ],
+      "completed": 14,
+      "on_time": 14,
+      "total": 14,
+      "missing_task_ids": [],
+      "late_task_ids": [],
+      "motion_backend": "hybrid",
+      "kinematic_actors": [
+        "B3",
+        "R5"
+      ],
+      "corridor_protocol": "footprint_serial_dispatch",
+      "blue2_observation_attempts": 1,
+      "blue2_observation_authorized": true,
+      "occupied_at_close": [],
+      "full_window": true,
+      "wall_seconds": 290.408,
+      "violation_count": 0
+    },
+    {
+      "seed": 0,
+      "scene": "web_medium_phys",
+      "mechanism": "release",
+      "adapt": "off",
+      "cost": "low",
+      "report_delay_ms": 1000,
+      "physical_actuation": true,
+      "task_completed": {
+        "blue_inspect": {
+          "t_ms": 2016,
+          "deadline_ms": 40000,
+          "on_time": true,
+          "actor": "B3"
+        },
+        "red_inspect": {
+          "t_ms": 2016,
+          "deadline_ms": 10000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red3_inspect": {
+          "t_ms": 6080,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R3"
+        },
+        "red4_inspect": {
+          "t_ms": 6080,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R4"
+        },
+        "red4_report": {
+          "t_ms": 18832,
+          "deadline_ms": 70000,
+          "on_time": true,
+          "actor": "R4"
+        },
+        "red3_report": {
+          "t_ms": 18944,
+          "deadline_ms": 70000,
+          "on_time": true,
+          "actor": "R3"
+        },
+        "red_patrol": {
+          "t_ms": 19680,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red_return": {
+          "t_ms": 37328,
+          "deadline_ms": 180000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red4_return": {
+          "t_ms": 41584,
+          "deadline_ms": 130000,
+          "on_time": true,
+          "actor": "R4"
+        },
+        "red3_return": {
+          "t_ms": 42336,
+          "deadline_ms": 86000,
+          "on_time": true,
+          "actor": "R3"
+        },
+        "red2": {
+          "t_ms": 80096,
+          "deadline_ms": 100000,
+          "on_time": true,
+          "actor": "R2"
+        },
+        "blue1": {
+          "t_ms": 125392,
+          "deadline_ms": 350000,
+          "on_time": true,
+          "actor": "B1"
+        },
+        "red1": {
+          "t_ms": 239360,
+          "deadline_ms": 250000,
+          "on_time": true,
+          "actor": "R1"
+        },
+        "blue2": {
+          "t_ms": 306112,
+          "deadline_ms": 350000,
+          "on_time": true,
+          "actor": "B2"
+        }
+      },
+      "channel_enters": 5,
+      "channel_releases": 5,
+      "accepted_reports": [
+        "rep-B3-2016",
+        "rep-R5-2016",
+        "rep-R3-6080",
+        "rep-R4-6080",
+        "rep-R4-18832",
+        "rep-R3-18944",
+        "rep-R5-19680",
+        "rep-R5-37328",
+        "rep-R4-41584",
+        "rep-R3-42336"
+      ],
+      "expired_reports": [],
+      "replan_decisions": [],
+      "violations": [],
+      "truth_sample_period_ms": 500,
+      "expected_task_ids": [
+        "blue1",
+        "blue2",
+        "blue_inspect",
+        "red1",
+        "red2",
+        "red3_inspect",
+        "red3_report",
+        "red3_return",
+        "red4_inspect",
+        "red4_report",
+        "red4_return",
+        "red_inspect",
+        "red_patrol",
+        "red_return"
+      ],
+      "completed": 14,
+      "on_time": 14,
+      "total": 14,
+      "missing_task_ids": [],
+      "late_task_ids": [],
+      "motion_backend": "hybrid",
+      "kinematic_actors": [
+        "B3",
+        "R5"
+      ],
+      "corridor_protocol": "footprint_serial_dispatch",
+      "blue2_observation_attempts": 1,
+      "blue2_observation_authorized": true,
+      "occupied_at_close": [],
+      "full_window": true,
+      "wall_seconds": 301.18,
+      "violation_count": 0
+    }
+  ],
+  "observation_refresh": {
+    "0": {
+      "seed": 0,
+      "scene": "web_medium_phys",
+      "mechanism": "release",
+      "adapt": "off",
+      "cost": "low",
+      "report_delay_ms": 1000,
+      "physical_actuation": true,
+      "task_completed": {
+        "blue_inspect": {
+          "t_ms": 2016,
+          "deadline_ms": 40000,
+          "on_time": true,
+          "actor": "B3"
+        },
+        "red_inspect": {
+          "t_ms": 2016,
+          "deadline_ms": 10000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red3_inspect": {
+          "t_ms": 6080,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R3"
+        },
+        "red4_inspect": {
+          "t_ms": 6080,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R4"
+        },
+        "red4_report": {
+          "t_ms": 18832,
+          "deadline_ms": 70000,
+          "on_time": true,
+          "actor": "R4"
+        },
+        "red3_report": {
+          "t_ms": 18944,
+          "deadline_ms": 70000,
+          "on_time": true,
+          "actor": "R3"
+        },
+        "red_patrol": {
+          "t_ms": 19680,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red_return": {
+          "t_ms": 37328,
+          "deadline_ms": 180000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red4_return": {
+          "t_ms": 41584,
+          "deadline_ms": 130000,
+          "on_time": true,
+          "actor": "R4"
+        },
+        "red3_return": {
+          "t_ms": 42336,
+          "deadline_ms": 86000,
+          "on_time": true,
+          "actor": "R3"
+        },
+        "red2": {
+          "t_ms": 80096,
+          "deadline_ms": 100000,
+          "on_time": true,
+          "actor": "R2"
+        },
+        "blue1": {
+          "t_ms": 125392,
+          "deadline_ms": 350000,
+          "on_time": true,
+          "actor": "B1"
+        },
+        "red1": {
+          "t_ms": 239360,
+          "deadline_ms": 250000,
+          "on_time": true,
+          "actor": "R1"
+        }
+      },
+      "channel_enters": 4,
+      "channel_releases": 4,
+      "accepted_reports": [
+        "rep-B3-2016",
+        "rep-R5-2016",
+        "rep-R3-6080",
+        "rep-R4-6080",
+        "rep-R4-18832",
+        "rep-R3-18944",
+        "rep-R5-19680",
+        "rep-R5-37328",
+        "rep-R4-41584",
+        "rep-R3-42336"
+      ],
+      "expired_reports": [],
+      "replan_decisions": [],
+      "violations": [],
+      "truth_sample_period_ms": 500,
+      "expected_task_ids": [
+        "blue1",
+        "blue2",
+        "blue_inspect",
+        "red1",
+        "red2",
+        "red3_inspect",
+        "red3_report",
+        "red3_return",
+        "red4_inspect",
+        "red4_report",
+        "red4_return",
+        "red_inspect",
+        "red_patrol",
+        "red_return"
+      ],
+      "completed": 13,
+      "on_time": 13,
+      "total": 14,
+      "missing_task_ids": [
+        "blue2"
+      ],
+      "late_task_ids": [],
+      "motion_backend": "hybrid",
+      "kinematic_actors": [
+        "B3",
+        "R5"
+      ],
+      "corridor_protocol": "footprint_serial_dispatch",
+      "blue2_observation_retry_on_expiry": false,
+      "blue2_observation_attempts": 1,
+      "blue2_observation_authorized": false,
+      "occupied_at_close": [],
+      "full_window": true,
+      "wall_seconds": 280.722,
+      "violation_count": 0
+    },
+    "1": {
+      "seed": 0,
+      "scene": "web_medium_phys",
+      "mechanism": "release",
+      "adapt": "off",
+      "cost": "low",
+      "report_delay_ms": 1000,
+      "physical_actuation": true,
+      "task_completed": {
+        "blue_inspect": {
+          "t_ms": 2016,
+          "deadline_ms": 40000,
+          "on_time": true,
+          "actor": "B3"
+        },
+        "red_inspect": {
+          "t_ms": 2016,
+          "deadline_ms": 10000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red3_inspect": {
+          "t_ms": 6080,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R3"
+        },
+        "red4_inspect": {
+          "t_ms": 6080,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R4"
+        },
+        "red4_report": {
+          "t_ms": 18832,
+          "deadline_ms": 70000,
+          "on_time": true,
+          "actor": "R4"
+        },
+        "red3_report": {
+          "t_ms": 18944,
+          "deadline_ms": 70000,
+          "on_time": true,
+          "actor": "R3"
+        },
+        "red_patrol": {
+          "t_ms": 19680,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red_return": {
+          "t_ms": 37328,
+          "deadline_ms": 180000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red4_return": {
+          "t_ms": 41584,
+          "deadline_ms": 130000,
+          "on_time": true,
+          "actor": "R4"
+        },
+        "red3_return": {
+          "t_ms": 42336,
+          "deadline_ms": 86000,
+          "on_time": true,
+          "actor": "R3"
+        },
+        "red2": {
+          "t_ms": 80096,
+          "deadline_ms": 100000,
+          "on_time": true,
+          "actor": "R2"
+        },
+        "blue1": {
+          "t_ms": 125392,
+          "deadline_ms": 350000,
+          "on_time": true,
+          "actor": "B1"
+        },
+        "red1": {
+          "t_ms": 239360,
+          "deadline_ms": 250000,
+          "on_time": true,
+          "actor": "R1"
+        },
+        "blue2": {
+          "t_ms": 314240,
+          "deadline_ms": 350000,
+          "on_time": true,
+          "actor": "B2"
+        }
+      },
+      "channel_enters": 5,
+      "channel_releases": 5,
+      "accepted_reports": [
+        "rep-B3-2016",
+        "rep-R5-2016",
+        "rep-R3-6080",
+        "rep-R4-6080",
+        "rep-R4-18832",
+        "rep-R3-18944",
+        "rep-R5-19680",
+        "rep-R5-37328",
+        "rep-R4-41584",
+        "rep-R3-42336"
+      ],
+      "expired_reports": [],
+      "replan_decisions": [],
+      "violations": [],
+      "truth_sample_period_ms": 500,
+      "expected_task_ids": [
+        "blue1",
+        "blue2",
+        "blue_inspect",
+        "red1",
+        "red2",
+        "red3_inspect",
+        "red3_report",
+        "red3_return",
+        "red4_inspect",
+        "red4_report",
+        "red4_return",
+        "red_inspect",
+        "red_patrol",
+        "red_return"
+      ],
+      "completed": 14,
+      "on_time": 14,
+      "total": 14,
+      "missing_task_ids": [],
+      "late_task_ids": [],
+      "motion_backend": "hybrid",
+      "kinematic_actors": [
+        "B3",
+        "R5"
+      ],
+      "corridor_protocol": "footprint_serial_dispatch",
+      "blue2_observation_retry_on_expiry": true,
+      "blue2_observation_attempts": 2,
+      "blue2_observation_authorized": true,
+      "occupied_at_close": [],
+      "full_window": true,
+      "wall_seconds": 292.875,
+      "violation_count": 0
+    }
+  },
+  "two_vehicles": {
+    "0": {
+      "early_release": false,
+      "nominal_clear_ms": 32000,
+      "events": [
+        {
+          "t_ms": 0,
+          "actor": "B1",
+          "kind": "dispatch"
+        },
+        {
+          "t_ms": 592,
+          "actor": "B1",
+          "kind": "enter"
+        },
+        {
+          "t_ms": 7888,
+          "actor": "B1",
+          "kind": "clear"
+        },
+        {
+          "t_ms": 32000,
+          "actor": "B2",
+          "kind": "dispatch"
+        },
+        {
+          "t_ms": 34784,
+          "actor": "B2",
+          "kind": "enter"
+        }
+      ],
+      "arrived_at_ms": {
+        "B1": 14528
+      },
+      "total": 2,
+      "on_time": 1,
+      "full_window": true,
+      "violation_count": 0
+    },
+    "1": {
+      "early_release": true,
+      "nominal_clear_ms": 32000,
+      "events": [
+        {
+          "t_ms": 0,
+          "actor": "B1",
+          "kind": "dispatch"
+        },
+        {
+          "t_ms": 592,
+          "actor": "B1",
+          "kind": "enter"
+        },
+        {
+          "t_ms": 7888,
+          "actor": "B1",
+          "kind": "clear"
+        },
+        {
+          "t_ms": 7888,
+          "actor": "B2",
+          "kind": "dispatch"
+        },
+        {
+          "t_ms": 10320,
+          "actor": "B2",
+          "kind": "enter"
+        },
+        {
+          "t_ms": 17584,
+          "actor": "B2",
+          "kind": "clear"
+        }
+      ],
+      "arrived_at_ms": {
+        "B1": 14528,
+        "B2": 22128
+      },
+      "total": 2,
+      "on_time": 2,
+      "full_window": true,
+      "violation_count": 0
+    }
+  },
+  "b1": {
+    "planner": {
+      "python": "3.10.12",
+      "host": "amax",
+      "layouts": {
+        "open": {
+          "free_cells": 12231,
+          "free_grid_sha256": "1d0ce90d385673652053670412ecb8d866c5e4464f5abe2b89393335b8776264",
+          "start_cell": [
+            20,
+            40
+          ],
+          "goal_cell": [
+            140,
+            56
+          ],
+          "algorithms": {
+            "dijkstra": {
+              "n": 31,
+              "p50_ms": 49.535642,
+              "range_ms": [
+                49.137098,
+                51.36456
+              ],
+              "path_m": 6.331370849898474,
+              "expanded_nodes": 11239
+            },
+            "astar": {
+              "n": 31,
+              "p50_ms": 1.943445,
+              "range_ms": [
+                1.921274,
+                1.975326
+              ],
+              "path_m": 6.331370849898474,
+              "expanded_nodes": 305
+            }
+          }
+        },
+        "narrow": {
+          "free_cells": 9677,
+          "free_grid_sha256": "1a8d14cb2081a28f4b4c363635f4a30a68d5382a7982e2d1bccc9e6bed9e8ab0",
+          "start_cell": [
+            20,
+            40
+          ],
+          "goal_cell": [
+            140,
+            56
+          ],
+          "algorithms": {
+            "dijkstra": {
+              "n": 31,
+              "p50_ms": 37.718082,
+              "range_ms": [
+                37.03973,
+                38.041464
+              ],
+              "path_m": 6.331370849898474,
+              "expanded_nodes": 8652
+            },
+            "astar": {
+              "n": 31,
+              "p50_ms": 1.162348,
+              "range_ms": [
+                1.138694,
+                1.222662
+              ],
+              "path_m": 6.331370849898474,
+              "expanded_nodes": 178
+            }
+          }
+        }
+      }
+    },
+    "runs": [
+      {
+        "id": "b1-coverage-astar-1-01",
+        "layout": "coverage",
+        "algorithm": "astar",
+        "low_scan_used": true,
+        "grid_path_m": 6.331370849898474,
+        "expanded_nodes": 305,
+        "targets": [],
+        "end_reason": "stationary_sample_complete",
+        "t_end_ms": 1024,
+        "actual_path_m": 3.9371739718938606e-16,
+        "minimum_clearance_circle_m": 0.025617393793236243,
+        "first_obstacle_contact": null,
+        "entered": null,
+        "cleared": null,
+        "service_ms": null,
+        "on_time": 0,
+        "total": 0,
+        "full_window": null,
+        "violation_count": 0,
+        "timestamps_matched": 16,
+        "lidars": [
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.02,
+            "max_m": 3.0,
+            "sampling_ms": 16
+          },
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.15,
+            "max_m": 1.2,
+            "sampling_ms": 16
+          }
+        ],
+        "scan_stop_latched": null,
+        "target_returns": {
+          "front": {
+            "main": {
+              "t_ms": 576,
+              "range_m": 0.4600700825961193,
+              "box_range_on_ray_m": 0.4600700825961191,
+              "range_error_m": 2.220446049250313e-16,
+              "bearing_deg": -1.000083443691168,
+              "centroid_bearing_deg": -3.9709511953925087e-16,
+              "bearing_offset_deg": 1.0000834436911676
+            },
+            "low": {
+              "t_ms": 576,
+              "range_m": 0.4600700825961192,
+              "box_range_on_ray_m": 0.4600700825961192,
+              "range_error_m": 0.0,
+              "bearing_deg": -1.0000834436911685,
+              "centroid_bearing_deg": -2.103651534063174e-16,
+              "bearing_offset_deg": 1.0000834436911683
+            }
+          },
+          "rear": {
+            "main": {
+              "t_ms": 576,
+              "range_m": 0.8901356590992184,
+              "box_range_on_ray_m": 0.8901356590992185,
+              "range_error_m": -1.1102230246251565e-16,
+              "bearing_deg": -178.9996787127681,
+              "centroid_bearing_deg": -180.0,
+              "bearing_offset_deg": 1.0003212872319096
+            },
+            "low": null
+          },
+          "left": {
+            "main": {
+              "t_ms": 576,
+              "range_m": 0.700106655017648,
+              "box_range_on_ray_m": 0.700106655017648,
+              "range_error_m": 0.0,
+              "bearing_deg": 91.00011902029021,
+              "centroid_bearing_deg": 90.00000000000001,
+              "bearing_offset_deg": 1.000119020290197
+            },
+            "low": {
+              "t_ms": 576,
+              "range_m": 0.700106655017648,
+              "box_range_on_ray_m": 0.700106655017648,
+              "range_error_m": 0.0,
+              "bearing_deg": 91.00011902029021,
+              "centroid_bearing_deg": 90.0,
+              "bearing_offset_deg": 1.00011902029021
+            }
+          },
+          "right": {
+            "main": {
+              "t_ms": 576,
+              "range_m": 0.6801035927709838,
+              "box_range_on_ray_m": 0.6801035927709838,
+              "range_error_m": 0.0,
+              "bearing_deg": -91.00004682072075,
+              "centroid_bearing_deg": -90.00000000000001,
+              "bearing_offset_deg": 1.000046820720742
+            },
+            "low": {
+              "t_ms": 576,
+              "range_m": 0.6801035927709838,
+              "box_range_on_ray_m": 0.6801035927709838,
+              "range_error_m": 0.0,
+              "bearing_deg": -88.99995317927925,
+              "centroid_bearing_deg": -90.0,
+              "bearing_offset_deg": 1.0000468207207547
+            }
+          },
+          "near": {
+            "main": null,
+            "low": null
+          }
+        }
+      },
+      {
+        "id": "b1-lowobs-astar-0-01",
+        "layout": "lowobs",
+        "algorithm": "astar",
+        "low_scan_used": false,
+        "grid_path_m": 6.331370849898474,
+        "expanded_nodes": 305,
+        "targets": [
+          [
+            6.5,
+            0.8
+          ]
+        ],
+        "end_reason": "obstacle_contact",
+        "t_end_ms": 6896,
+        "actual_path_m": 2.4781042672889573,
+        "minimum_clearance_circle_m": -0.042814630140140975,
+        "first_obstacle_contact": {
+          "t_ms": 6384,
+          "object": "low_crate",
+          "xyz": [
+            2.9550512907377224,
+            0.02776697045576279,
+            0.08119512481595434
+          ],
+          "node_id": 15
+        },
+        "entered": null,
+        "cleared": null,
+        "service_ms": null,
+        "on_time": 0,
+        "total": 1,
+        "full_window": null,
+        "violation_count": 1,
+        "timestamps_matched": 107,
+        "lidars": [
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.02,
+            "max_m": 3.0,
+            "sampling_ms": 16
+          },
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.15,
+            "max_m": 1.2,
+            "sampling_ms": 16
+          }
+        ],
+        "scan_stop_latched": null,
+        "target_returns": {
+          "low_crate": {
+            "main": {
+              "t_ms": 512,
+              "range_m": 2.1923092930468795,
+              "box_range_on_ray_m": 2.096098048525331,
+              "range_error_m": 0.09621124452154861,
+              "bearing_deg": -14.956205864938578,
+              "centroid_bearing_deg": -2.370645449005338,
+              "bearing_offset_deg": 12.58556041593324
+            },
+            "low": {
+              "t_ms": 2880,
+              "range_m": 1.1975674226032267,
+              "box_range_on_ray_m": 1.197564950988084,
+              "range_error_m": 2.471615142773942e-06,
+              "bearing_deg": -10.792479684321028,
+              "centroid_bearing_deg": -15.213280298288973,
+              "bearing_offset_deg": 4.420800613967942
+            }
+          }
+        }
+      },
+      {
+        "id": "b1-lowobs-astar-1-01",
+        "layout": "lowobs",
+        "algorithm": "astar",
+        "low_scan_used": true,
+        "grid_path_m": 6.331370849898474,
+        "expanded_nodes": 305,
+        "targets": [
+          [
+            6.5,
+            0.8
+          ]
+        ],
+        "end_reason": "scan_safe_stop",
+        "t_end_ms": 6496,
+        "actual_path_m": 1.9916966591934706,
+        "minimum_clearance_circle_m": 0.3779851461989713,
+        "first_obstacle_contact": null,
+        "entered": null,
+        "cleared": null,
+        "service_ms": null,
+        "on_time": 0,
+        "total": 1,
+        "full_window": null,
+        "violation_count": 0,
+        "timestamps_matched": 101,
+        "lidars": [
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.02,
+            "max_m": 3.0,
+            "sampling_ms": 16
+          },
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.15,
+            "max_m": 1.2,
+            "sampling_ms": 16
+          }
+        ],
+        "scan_stop_latched": {
+          "kind": "scan_stop_latched",
+          "t_ms": 5472,
+          "source": "low",
+          "distance_m": 0.4199609911646557,
+          "low_scan_used": true
+        },
+        "target_returns": {
+          "low_crate": {
+            "main": {
+              "t_ms": 512,
+              "range_m": 2.1923092930468795,
+              "box_range_on_ray_m": 2.096098048525331,
+              "range_error_m": 0.09621124452154861,
+              "bearing_deg": -14.956205864938578,
+              "centroid_bearing_deg": -2.370645449005338,
+              "bearing_offset_deg": 12.58556041593324
+            },
+            "low": {
+              "t_ms": 2880,
+              "range_m": 1.1975674226032267,
+              "box_range_on_ray_m": 1.197564950988084,
+              "range_error_m": 2.471615142773942e-06,
+              "bearing_deg": -10.792479684321028,
+              "centroid_bearing_deg": -15.213280298288973,
+              "bearing_offset_deg": 4.420800613967942
+            }
+          }
+        }
+      },
+      {
+        "id": "b1-narrow-astar-1-01",
+        "layout": "narrow",
+        "algorithm": "astar",
+        "low_scan_used": true,
+        "grid_path_m": 6.331370849898474,
+        "expanded_nodes": 178,
+        "targets": [
+          [
+            5.4,
+            0.2
+          ],
+          [
+            6.5,
+            0.8
+          ]
+        ],
+        "end_reason": "serviced",
+        "t_end_ms": 17568,
+        "actual_path_m": 6.521666558047918,
+        "minimum_clearance_circle_m": 0.04764153142013772,
+        "first_obstacle_contact": null,
+        "entered": {
+          "t_ms": 4928,
+          "xy": [
+            2.401196337049508,
+            0.07600777342965426
+          ],
+          "yaw_rad": 0.3560292237082328
+        },
+        "cleared": {
+          "t_ms": 13168,
+          "xy": [
+            5.467536502201068,
+            0.22243806670474373
+          ],
+          "yaw_rad": 0.20085799691935824
+        },
+        "service_ms": 17568,
+        "on_time": 1,
+        "total": 1,
+        "full_window": null,
+        "violation_count": 0,
+        "timestamps_matched": 274,
+        "lidars": [
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.02,
+            "max_m": 3.0,
+            "sampling_ms": 16
+          },
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.15,
+            "max_m": 1.2,
+            "sampling_ms": 16
+          }
+        ],
+        "scan_stop_latched": null
+      },
+      {
+        "id": "b1-narrow-dijkstra-1-01",
+        "layout": "narrow",
+        "algorithm": "dijkstra",
+        "low_scan_used": true,
+        "grid_path_m": 6.331370849898474,
+        "expanded_nodes": 8652,
+        "targets": [
+          [
+            5.95,
+            0.25
+          ],
+          [
+            6.5,
+            0.8
+          ]
+        ],
+        "end_reason": "serviced",
+        "t_end_ms": 19056,
+        "actual_path_m": 6.5892744818605165,
+        "minimum_clearance_circle_m": 0.025634706848685573,
+        "first_obstacle_contact": null,
+        "entered": {
+          "t_ms": 4560,
+          "xy": [
+            2.40136212424717,
+            0.04078000692977958
+          ],
+          "yaw_rad": -0.0317676511692218
+        },
+        "cleared": {
+          "t_ms": 13216,
+          "xy": [
+            5.467586022456744,
+            0.2766983335189639
+          ],
+          "yaw_rad": -0.004299964125644855
+        },
+        "service_ms": 19056,
+        "on_time": 1,
+        "total": 1,
+        "full_window": null,
+        "violation_count": 0,
+        "timestamps_matched": 297,
+        "lidars": [
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.02,
+            "max_m": 3.0,
+            "sampling_ms": 16
+          },
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.15,
+            "max_m": 1.2,
+            "sampling_ms": 16
+          }
+        ],
+        "scan_stop_latched": null
+      },
+      {
+        "id": "b1-open-astar-1-01",
+        "layout": "open",
+        "algorithm": "astar",
+        "low_scan_used": true,
+        "grid_path_m": 6.331370849898474,
+        "expanded_nodes": 305,
+        "targets": [
+          [
+            6.5,
+            0.8
+          ]
+        ],
+        "end_reason": "serviced",
+        "t_end_ms": 19920,
+        "actual_path_m": 6.508588706147933,
+        "minimum_clearance_circle_m": null,
+        "first_obstacle_contact": null,
+        "entered": null,
+        "cleared": null,
+        "service_ms": 19920,
+        "on_time": 1,
+        "total": 1,
+        "full_window": null,
+        "violation_count": 0,
+        "timestamps_matched": 311,
+        "lidars": [
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.02,
+            "max_m": 3.0,
+            "sampling_ms": 16
+          },
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.15,
+            "max_m": 1.2,
+            "sampling_ms": 16
+          }
+        ],
+        "scan_stop_latched": null
+      },
+      {
+        "id": "b1-open-dijkstra-1-01",
+        "layout": "open",
+        "algorithm": "dijkstra",
+        "low_scan_used": true,
+        "grid_path_m": 6.331370849898474,
+        "expanded_nodes": 11239,
+        "targets": [
+          [
+            6.5,
+            0.8
+          ]
+        ],
+        "end_reason": "serviced",
+        "t_end_ms": 19920,
+        "actual_path_m": 6.508588706147933,
+        "minimum_clearance_circle_m": null,
+        "first_obstacle_contact": null,
+        "entered": null,
+        "cleared": null,
+        "service_ms": 19920,
+        "on_time": 1,
+        "total": 1,
+        "full_window": null,
+        "violation_count": 0,
+        "timestamps_matched": 311,
+        "lidars": [
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.02,
+            "max_m": 3.0,
+            "sampling_ms": 16
+          },
+          {
+            "count": 180,
+            "fov": 6.283185,
+            "min_m": 0.15,
+            "max_m": 1.2,
+            "sampling_ms": 16
+          }
+        ],
+        "scan_stop_latched": null
+      }
+    ],
+    "localization": {
+      "b1-narrow-astar-1-01": {
+        "all": {
+          "n": 274,
+          "with_wall_matches": 247,
+          "odom_xy_err_m": 0.4718591068349001,
+          "fused_xy_err_m": 0.16664694615227227,
+          "odom_yaw_err_deg": 15.121742594259706,
+          "fused_yaw_err_deg": 7.289450529932095
+        },
+        "approach": {
+          "n": 76,
+          "with_wall_matches": 76,
+          "odom_xy_err_m": 0.2684305600288677,
+          "fused_xy_err_m": 0.13866733482555116,
+          "odom_yaw_err_deg": 16.33521990573807,
+          "fused_yaw_err_deg": 7.4467200577931205
+        },
+        "aisle": {
+          "n": 108,
+          "with_wall_matches": 108,
+          "odom_xy_err_m": 0.47765354036791363,
+          "fused_xy_err_m": 0.22216984082569435,
+          "odom_yaw_err_deg": 14.29271398115855,
+          "fused_yaw_err_deg": 1.6223046699655181
+        },
+        "exit_turn": {
+          "n": 90,
+          "with_wall_matches": 63,
+          "odom_xy_err_m": 0.5858487432269966,
+          "fused_xy_err_m": 0.09528407199899534,
+          "odom_yaw_err_deg": 15.023155963571941,
+          "fused_yaw_err_deg": 10.5728003012712
+        }
+      },
+      "b1-narrow-dijkstra-1-01": {
+        "all": {
+          "n": 297,
+          "with_wall_matches": 290,
+          "odom_xy_err_m": 1.192093660003921,
+          "fused_xy_err_m": 0.2999579396977313,
+          "odom_yaw_err_deg": 17.888014028357215,
+          "fused_yaw_err_deg": 3.34973979657171
+        },
+        "approach": {
+          "n": 71,
+          "with_wall_matches": 71,
+          "odom_xy_err_m": 0.20284850456951753,
+          "fused_xy_err_m": 0.041746213762716367,
+          "odom_yaw_err_deg": 9.880186659202732,
+          "fused_yaw_err_deg": 1.1589354336207927
+        },
+        "aisle": {
+          "n": 125,
+          "with_wall_matches": 125,
+          "odom_xy_err_m": 1.1780637682590689,
+          "fused_xy_err_m": 0.4576549045131256,
+          "odom_yaw_err_deg": 13.099916380012356,
+          "fused_yaw_err_deg": 2.992276093629132
+        },
+        "exit_turn": {
+          "n": 101,
+          "with_wall_matches": 94,
+          "odom_xy_err_m": 1.5595828729610304,
+          "fused_xy_err_m": 0.06431427590659601,
+          "odom_yaw_err_deg": 25.689021849634702,
+          "fused_yaw_err_deg": 4.5793205953916525
+        }
+      }
+    }
+  },
+  "planner_timing": {
+    "planner": {
+      "python": "3.10.12",
+      "host": "amax",
+      "layouts": {
+        "open": {
+          "free_cells": 12231,
+          "free_grid_sha256": "1d0ce90d385673652053670412ecb8d866c5e4464f5abe2b89393335b8776264",
+          "start_cell": [
+            20,
+            40
+          ],
+          "goal_cell": [
+            140,
+            56
+          ],
+          "algorithms": {
+            "dijkstra": {
+              "n": 31,
+              "p50_ms": 51.299585,
+              "range_ms": [
+                49.386364,
+                55.600176
+              ],
+              "path_m": 6.331370849898474,
+              "expanded_nodes": 11239
+            },
+            "astar": {
+              "n": 31,
+              "p50_ms": 1.936624,
+              "range_ms": [
+                1.890568,
+                2.291953
+              ],
+              "path_m": 6.331370849898474,
+              "expanded_nodes": 305
+            }
+          }
+        },
+        "narrow": {
+          "free_cells": 9677,
+          "free_grid_sha256": "1a8d14cb2081a28f4b4c363635f4a30a68d5382a7982e2d1bccc9e6bed9e8ab0",
+          "start_cell": [
+            20,
+            40
+          ],
+          "goal_cell": [
+            140,
+            56
+          ],
+          "algorithms": {
+            "dijkstra": {
+              "n": 31,
+              "p50_ms": 37.296083,
+              "range_ms": [
+                36.83716,
+                39.374735
+              ],
+              "path_m": 6.331370849898474,
+              "expanded_nodes": 8652
+            },
+            "astar": {
+              "n": 31,
+              "p50_ms": 1.150565,
+              "range_ms": [
+                1.1164,
+                1.209436
+              ],
+              "path_m": 6.331370849898474,
+              "expanded_nodes": 178
+            }
+          }
+        }
+      }
+    },
+    "runs": [],
+    "localization": {}
+  },
+  "uav": {
+    "truth": {
+      "on_time": 5,
+      "total": 5,
+      "full_window": true,
+      "violation_count": 0,
+      "flight_events_ms": {
+        "takeoff_reached": 2080,
+        "waypoint_reached": 4752,
+        "hover_complete": 6752,
+        "home_reached": 9408,
+        "landed": 11808
+      },
+      "gps_position_rmse_m": null,
+      "positions_compared": 1749,
+      "position_rmse_m": 0.009326558719619885,
+      "yaw_rmse_rad": 0.0009851521553780366,
+      "hover_samples": 126,
+      "hover_rms_from_waypoint_m": 0.05364021812383141,
+      "hover_max_from_waypoint_m": 0.07575368212733856,
+      "max_altitude_m": 1.9154254648231426,
+      "hover_speed_rms_m_s": 0.07951247620986711,
+      "hover_max_abs_yaw_deg": 0.571428491474955,
+      "non_floor_contact_samples": 0,
+      "frame_count": 13,
+      "marker_pixel_count_range": [
+        529,
+        558
+      ],
+      "reports": 1,
+      "report_sample_ms": 4800,
+      "position_hold_ms": null
+    },
+    "visible": {
+      "on_time": 5,
+      "total": 5,
+      "full_window": true,
+      "violation_count": 0,
+      "flight_events_ms": {
+        "takeoff_reached": 2080,
+        "waypoint_reached": 4736,
+        "hover_complete": 6736,
+        "home_reached": 9376,
+        "landed": 11776
+      },
+      "gps_position_rmse_m": 0.010247263660537423,
+      "positions_compared": 1749,
+      "position_rmse_m": 0.012139339297018029,
+      "yaw_rmse_rad": 0.003123924064500598,
+      "hover_samples": 126,
+      "hover_rms_from_waypoint_m": 0.05348130723656189,
+      "hover_max_from_waypoint_m": 0.07611177328748803,
+      "max_altitude_m": 1.9176013514193722,
+      "hover_speed_rms_m_s": 0.0798283732343608,
+      "hover_max_abs_yaw_deg": 0.5769933935051968,
+      "non_floor_contact_samples": 0,
+      "frame_count": 13,
+      "marker_pixel_count_range": [
+        529,
+        576
+      ],
+      "reports": 1,
+      "report_sample_ms": 4800,
+      "position_hold_ms": null
+    },
+    "occluded": {
+      "on_time": 5,
+      "total": 5,
+      "full_window": true,
+      "violation_count": 0,
+      "flight_events_ms": {
+        "takeoff_reached": 2080,
+        "waypoint_reached": 4736,
+        "hover_complete": 6736,
+        "home_reached": 9376,
+        "landed": 11776
+      },
+      "gps_position_rmse_m": 0.010247263660537423,
+      "positions_compared": 1749,
+      "position_rmse_m": 0.012139339297018029,
+      "yaw_rmse_rad": 0.003123924064500598,
+      "hover_samples": 126,
+      "hover_rms_from_waypoint_m": 0.05348130723656189,
+      "hover_max_from_waypoint_m": 0.07611177328748803,
+      "max_altitude_m": 1.9176013514193722,
+      "hover_speed_rms_m_s": 0.0798283732343608,
+      "hover_max_abs_yaw_deg": 0.5769933935051968,
+      "non_floor_contact_samples": 0,
+      "frame_count": 13,
+      "marker_pixel_count_range": [
+        0,
+        0
+      ],
+      "reports": 0,
+      "report_sample_ms": null,
+      "position_hold_ms": null
+    },
+    "dropout": {
+      "on_time": 5,
+      "total": 5,
+      "full_window": true,
+      "violation_count": 0,
+      "flight_events_ms": {
+        "takeoff_reached": 2080,
+        "waypoint_reached": 5056,
+        "hover_complete": 7056,
+        "home_reached": 9664,
+        "landed": 12096
+      },
+      "gps_position_rmse_m": 0.010219525029159963,
+      "positions_compared": 1718,
+      "position_rmse_m": 0.012291388402065053,
+      "yaw_rmse_rad": 0.0031153659068071863,
+      "hover_samples": 126,
+      "hover_rms_from_waypoint_m": 0.13011774869372048,
+      "hover_max_from_waypoint_m": 0.1751908839898517,
+      "max_altitude_m": 1.9176013514193722,
+      "hover_speed_rms_m_s": 0.12354664504974823,
+      "hover_max_abs_yaw_deg": 0.4605288031006373,
+      "non_floor_contact_samples": 0,
+      "frame_count": 13,
+      "marker_pixel_count_range": [
+        529,
+        576
+      ],
+      "reports": 1,
+      "report_sample_ms": 5120,
+      "position_hold_ms": [
+        4560,
+        5056
+      ]
+    }
+  }
+}
