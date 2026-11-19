@@ -44,6 +44,45 @@ def _fonts(run, eastasia):
     rf.set(qn('w:hAnsi'), LATIN)
 
 
+CODE_FONT = 'Courier New'
+
+
+def _code_font(run, eastasia):
+    """Monospace face for identifiers; keeps CJK in the body face."""
+    run.font.name = CODE_FONT
+    rpr = run._element.get_or_add_rPr()
+    rf = rpr.find(qn('w:rFonts'))
+    if rf is None:
+        rf = OxmlElement('w:rFonts')
+        rpr.insert(0, rf)
+    rf.set(qn('w:eastAsia'), eastasia)
+    rf.set(qn('w:ascii'), CODE_FONT)
+    rf.set(qn('w:hAnsi'), CODE_FONT)
+    rf.set(qn('w:cs'), CODE_FONT)
+
+
+def _emit_runs(p, text, size, bold, font):
+    """Split on **bold** and `code`.  Code loses the delimiters and switches face."""
+    for chunk in re.split(r'(\*\*.+?\*\*|`[^`]+`)', text):
+        if not chunk:
+            continue
+        if len(chunk) > 4 and chunk.startswith('**') and chunk.endswith('**'):
+            run = p.add_run(chunk[2:-2])
+            run.bold = True
+            run.font.size = Pt(size)
+            _fonts(run, font)
+        elif len(chunk) > 2 and chunk.startswith('`') and chunk.endswith('`'):
+            run = p.add_run(chunk[1:-1])
+            run.bold = bold
+            run.font.size = Pt(size - 0.5)
+            _code_font(run, font)
+        else:
+            run = p.add_run(chunk)
+            run.bold = bold
+            run.font.size = Pt(size)
+            _fonts(run, font)
+
+
 def para(doc, text, size=10.5, bold=False, align=None, first_indent=True,
          font=BODY_FONT, space_before=0, space_after=4, line=1.23):
     p = doc.add_paragraph()
@@ -54,14 +93,7 @@ def para(doc, text, size=10.5, bold=False, align=None, first_indent=True,
         p.paragraph_format.first_line_indent = Cm(0.74)
     if align is not None:
         p.alignment = align
-    for i, chunk in enumerate(re.split(r'(\*\*.+?\*\*)', text)):
-        if not chunk:
-            continue
-        strong = chunk.startswith('**') and chunk.endswith('**') and len(chunk) > 4
-        run = p.add_run(chunk[2:-2] if strong else chunk)
-        run.font.size = Pt(size)
-        run.bold = bold or strong
-        _fonts(run, font)
+    _emit_runs(p, text, size, bold, font)
     return p
 
 
@@ -128,14 +160,7 @@ def table(doc, rows, caption=None):
             p.paragraph_format.space_after = Pt(1)
             p.paragraph_format.space_before = Pt(1)
             p.paragraph_format.line_spacing = 1.0
-            for chunk in re.split(r'(\*\*.+?\*\*)', text):
-                if not chunk:
-                    continue
-                strong = chunk.startswith('**') and chunk.endswith('**') and len(chunk) > 4
-                run = p.add_run(chunk[2:-2] if strong else chunk)
-                run.font.size = Pt(8.5)
-                run.bold = strong or ri == 0
-                _fonts(run, BODY_FONT)
+            _emit_runs(p, text, 8.5, ri == 0, BODY_FONT)
             if ri == 0:
                 shade(cell, 'EDF1F5')
     repeat_header(t.rows[0])
