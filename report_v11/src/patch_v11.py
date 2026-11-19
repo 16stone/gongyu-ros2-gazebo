@@ -49,6 +49,22 @@ anchor = '\n# 2 对抗靶场总体设计'
 assert anchor in text
 text = text.replace(anchor, sec15 + anchor, 1)
 
+# ------------------------------------------------- 2b. evidence matrix rows
+row_anchor = "| 独立最小算例复核 | 本次重构时的图模型运行 | 检查核心程序可运行、文件可生成 | 6/6按期，不是Gazebo整机结果 |\n"
+assert row_anchor in text, 'matrix row missing'
+extra = (
+    "| `f-webots-full-01` | Webots R2025a，8 实体独立进程，CPU 软渲染 | 整机主回合：14 任务、通道、报告时效 | 单轮冻结场景，裁判真值判据 |\n"
+    "| `f-holdout-v1` | Webots，预登记留出场景 | 候选方案的留出复验 | 一次复验，不作统计推广 |\n"
+    "| `e-mech-release` / `e-mech-phase111` | Webots，同场景机制配对 | 通道退出规则的开 / 关对照 | 各一轮，差值描述时序关系 |\n"
+    "| `d-report-ontime` / `d-report-expired` / `d-adapt` | Webots，同采样延迟配对 | 报告有效期与动态改派 | 各一轮，正反例成对 |\n"
+    "| `p-motor-b1-route` / `p-motor-full-01` / `p-motor-full-02` | Webots，真实电机 | 执行器层闭合与边界 | 单车闭合；八实体未闭合，见 6.13 |\n"
+)
+text = text.replace(row_anchor, row_anchor + extra, 1)
+note = "\n表 11 的 Webots 行是本文的整机主结果，Gazebo 行是筛选与历史对照；两者不可并列比数值，理由见 1.5 节。\n"
+tail = "主结果只回答冻结配置下发生了什么。对于机制效果，优先使用同版本配对；对于只有历史整机或图模型支持的现象，正文明确降低结论强度。\n"
+assert tail in text
+text = text.replace(tail, tail + note, 1)
+
 # ------------------------------------------------------------------ 3. chapter 6 additions
 new6 = """## 6.12 Webots 整机主结果
 
