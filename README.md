@@ -4,7 +4,7 @@
 
 ## 正式提交版本
 
-**`report_course_final/` 是唯一提交版本**：PDF 与 DOCX 由同一份 [`body.md`](report_course_final/body.md) 生成，45 页 / 23026 汉字 / 45 表 / 16 图，目录页码逐条回填，`SHA256SUMS` 可校验。重建命令为 `python report_course_final/src/build_report.py`（需 python-docx、LibreOffice、poppler）；构建的第一遍产物和系统配置写在临时目录，不落进仓库。
+**`report_course_final/` 是唯一提交版本**：PDF 与 DOCX 由同一份 [`body.md`](report_course_final/body.md) 生成，49 页 / 23008 汉字 / 45 表 / 16 图，目录页码逐条回填，`SHA256SUMS` 可校验。重建命令为 `python report_course_final/src/build_report.py`（需 python-docx、LibreOffice、poppler）；构建的第一遍产物和系统配置写在临时目录，不落进仓库。
 
 报告第 1.4 节给出主版本与四层证据的边界，第 4 章是三组整机实跑，第 7 章是设计复盘，附录 A 是可核对的证据入口，附录 C 是判定性调试记录。`report_v11/` 是 55 页历史扩展稿，只作方案演进记录，**不作为提交版本**。
 
