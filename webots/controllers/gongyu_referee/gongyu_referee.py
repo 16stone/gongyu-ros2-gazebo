@@ -10,6 +10,7 @@ from controller import Supervisor
 sys.path.insert(0, os.environ.get('GONGYU_WEBOTS_COMMON', ''))
 from bus import Bus
 from task_metrics import summarize_tasks
+from observation_gate import ObservationGate
 from physical_corridor import CARRIER_ORDER, STAGING, TRANSPORT_ROUTES, occupies_corridor
 
 RUN = os.environ.get('GONGYU_RUN_DIR', '/tmp/gongyu_default')
@@ -163,6 +164,7 @@ if PHYSICAL_STAGING:
     ev('carrier_granted', {'order': 0}, CARRIER_ORDER[0])
 
 pending_reports = []
+course_gate = ObservationGate(TAU, int(os.environ.get('GONGYU_FIRST_OBSERVATION_DELAY_MS', '1000')))
 channel_holder = None
 metrics = {'seed': SEED, 'scene': SCENE, 'mechanism': MECH, 'adapt': ADAPT,
            'cost': COST, 'report_delay_ms': REPORT_DELAY_MS, 'physical_actuation': PHYSICAL_ACTUATION, 'task_completed': {},
@@ -226,8 +228,17 @@ while sup.step(ts) != -1:
             if st['idx'] >= len(ROUTES[nm]):
                 continue
             node, task = ROUTES[nm][st['idx']]
-            if PHYSICAL_STAGING and nm in CARRIER_ORDER and nm != CARRIER_ORDER[carrier_index]:
-                continue
+            if PHYSICAL_STAGING and nm in CARRIER_ORDER:
+                if nm != CARRIER_ORDER[carrier_index]:
+                    continue
+                if nm == 'R1' and t < TASKS['red1'].get('release_ms', 0):
+                    continue
+                if nm == 'B2' and not course_gate.authorized:
+                    update = course_gate.step(t, bus.last('observation_B3.jsonl'))
+                    if update is not None:
+                        ev(*update, actor=nm, task='blue2')
+                    if not course_gate.authorized:
+                        continue
             x, y, _ = truth(nm)
             gx, gy = NODES[node][0], NODES[node][1]
             d = math.hypot(x - gx, y - gy)
@@ -346,13 +357,16 @@ while sup.step(ts) != -1:
                     ev('opportunity_cost_evaluation', {'report_id': rep['report_id'],
                        'provider': 'B2', 'gain_s': 12, 'cost_s': 3, 'decision': 'accept'}, 'B2', rep['task_id'])
         prev_t = t
-    if t >= END or all(s['idx'] >= len(ROUTES[nm]) for nm, s in state.items()):
+    if t >= END or (not PHYSICAL_STAGING and all(
+            st['idx'] >= len(ROUTES[nm]) for nm, st in state.items())):
         break
 
 metrics.update(summarize_tasks(expected_task_ids, metrics['task_completed']))
 metrics['motion_backend'] = 'hybrid' if PHYSICAL_ACTUATION and AERIAL else 'motor' if PHYSICAL_ACTUATION else 'kinematic'
 metrics['kinematic_actors'] = sorted(AERIAL.intersection(actors)) if PHYSICAL_ACTUATION else sorted(actors)
 metrics['corridor_protocol'] = 'footprint_serial_dispatch' if PHYSICAL_STAGING else 'legacy'
+metrics['blue2_observation_attempts'] = course_gate.attempts
+metrics['blue2_observation_authorized'] = course_gate.authorized
 metrics['occupied_at_close'] = sorted(physical_entered) if PHYSICAL_STAGING else []
 on_time, total = metrics['on_time'], metrics['total']
 metrics['full_window'] = t >= END
