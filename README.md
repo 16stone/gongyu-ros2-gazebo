@@ -4,7 +4,7 @@
 
 ## 正式提交版本
 
-**`report_course_final/` 是唯一提交版本**：PDF 与 DOCX 由同一份 [`body.md`](report_course_final/body.md) 生成，49 页 / 23503 汉字 / 46 表 / 16 图，目录页码逐条回填，`SHA256SUMS` 可校验。重建命令为 `python report_course_final/src/build_report.py`（需 python-docx、LibreOffice、poppler）；构建的第一遍产物和系统配置写在临时目录，不落进仓库。
+**`report_course_final/` 是唯一提交版本**：PDF 与 DOCX 由同一份 [`body.md`](report_course_final/body.md) 生成，45 页 / 23026 汉字 / 45 表 / 16 图，目录页码逐条回填，`SHA256SUMS` 可校验。重建命令为 `python report_course_final/src/build_report.py`（需 python-docx、LibreOffice、poppler）；构建的第一遍产物和系统配置写在临时目录，不落进仓库。
 
 报告第 1.4 节给出主版本与四层证据的边界，第 4 章是三组整机实跑，第 7 章是设计复盘，附录 A 是可核对的证据入口，附录 C 是判定性调试记录。`report_v11/` 是 55 页历史扩展稿，只作方案演进记录，**不作为提交版本**。
 
@@ -20,9 +20,9 @@
 
 ## 已验证的结果
 
-- 正式主版本为**混合后端**：六辆地面车由真实电机驱动，B3 与 R5 留在航点运动学层（本后端无旋翼动力学）；关闭回执记 `motion_backend=hybrid`、`kinematic_actors=["B3","R5"]`。
+- 正式主版本为**混合后端**：六辆地面车由仿真电机驱动，B3 与 R5 留在航点运动学层（本后端无旋翼动力学）；关闭回执记 `motion_backend=hybrid`、`kinematic_actors=["B3","R5"]`。
 - 正常、首份观察延迟、侦察车起点变化三组，以及两次正常复跑，均在 400 s 窗口内完成 14/14 项按期任务，通道进入与清空各 5 次，无车体占用重叠。
-- 同一份过期观察：仅拒收为 13/14 项按期，拒收并主动补采后恢复 14/14；延迟回合 B2 交付 306.1 s → 314.2 s。两车专项中，按实际清空放行比固定 32 s 少等 24.112 s。
+- 首帧同样延迟时，仅拒收过期帧的回合为 13/14，B2 未交付；开启补采后为 14/14，B2 在 314.240 s 交付。正常观察回合的 B2 交付时刻为 306.112 s。两车专项中，按实际清空放行比固定 32 s 少等 24.112 s。
 - [B1 单车专项](docs/webots/B1_PHASE_B.md)：Dijkstra 与 A* 同图对照、四方向回波与近距漏检、低位雷达触发低箱前停车。
 - [多旋翼专项](docs/webots/uav_course.md)：四组单机条件验证起飞、到达、驻留、返场与降落；八实体整场的空中部分为航点运动学。跨车接替未完任务的整场验证仍待完成。
 
