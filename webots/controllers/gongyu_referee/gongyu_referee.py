@@ -9,6 +9,8 @@ from controller import Supervisor
 
 sys.path.insert(0, os.environ.get('GONGYU_WEBOTS_COMMON', ''))
 from bus import Bus
+from task_metrics import summarize_tasks
+from physical_corridor import CARRIER_ORDER, STAGING, TRANSPORT_ROUTES, occupies_corridor
 
 RUN = os.environ.get('GONGYU_RUN_DIR', '/tmp/gongyu_default')
 SCENE = os.environ.get('GONGYU_SCENE', 'web_medium')
@@ -20,6 +22,8 @@ SEED = int(os.environ.get('GONGYU_SEED', '0'))
 SCEN = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'config', 'scenario_medium.json'), encoding='utf-8'))
 NODES = SCEN['nodes']
 TASKS = dict((t['id'], t) for t in SCEN['tasks'])
+PHYSICAL_ACTUATION = os.environ.get('GONGYU_PHYS', '0') == '1'
+PHYSICAL_STAGING = PHYSICAL_ACTUATION and SCENE in {"web_medium_phys", "web_holdout_v1_phys"}
 TAU = SCEN['tau_ms']
 SERVICE = SCEN['service_ms']
 END = int(os.environ.get('GONGYU_END_MS', str(SCEN['end_ms'])))
@@ -43,6 +47,9 @@ elif SCENE == 'web_b3_target':
     ROUTES = {'B3': [('F', 'blue_inspect'), ('K', None), ('H', None)]}
 elif SCENE == 'web_d4':
     ROUTES = {k: ROUTES[k] for k in ('B1', 'B2', 'R3', 'B3')}
+if PHYSICAL_STAGING:
+    NODES = {**NODES, **STAGING}
+    ROUTES.update(TRANSPORT_ROUTES)
 
 sup = Supervisor()
 ts = int(sup.getBasicTimeStep())
@@ -55,6 +62,11 @@ for nm in ROUTES:
     node = sup.getFromDef(nm)
     if node is not None:
         actors[nm] = node
+FULL_SCENES = {"web_medium", "web_medium_phys", "web_holdout_v1", "web_holdout_v1_phys"}
+if SCENE in FULL_SCENES:
+    expected_task_ids = set(TASKS)
+else:
+    expected_task_ids = {task for name in actors for _, task in ROUTES[name] if task in TASKS}
 state = {}
 cmd_seq = 0
 events = []
@@ -70,9 +82,7 @@ def ev(kind, payload, actor=None, task=None):
 # The task-logic layer is kinematic (as in the frozen graph backend's travel_time).
 # Truth is produced by this model, never by the controller under test's self-report.
 # Physical sensors (GPS/LiDAR/Camera) still run in Webots for traceable observations.
-PHYSICAL_ACTUATION = os.environ.get('GONGYU_PHYS', '0') == '1'
-
-AERIAL = set(n for n in os.environ.get('GONGYU_AERIAL', '').split(',') if n)
+AERIAL = set(filter(None, os.environ.get('GONGYU_AERIAL', 'B3,R5' if PHYSICAL_STAGING else '').split(',')))
 GS = SCEN.get('ground_speed', 0.5)  # m/s, frozen scenario parameter
 kin_state = {}
 KIN_FIELDS = {}
@@ -127,7 +137,7 @@ def send(nm, node, task=None):
     cmd_seq += 1
     x, y = NODES[node][0], NODES[node][1]
     berth_x = x
-    if PHYSICAL_ACTUATION and node == 'E' and nm not in AERIAL:
+    if PHYSICAL_ACTUATION and not PHYSICAL_STAGING and node == 'E' and nm not in AERIAL:
         # a motor-driven chassis settles about 0.18 m short of the point it is
         # commanded to, so a target exactly on the east mouth leaves the hull
         # straddling the 4.95 m occupancy boundary: it is counted as inside the
@@ -143,10 +153,14 @@ def send(nm, node, task=None):
 
 
 t = 0
+carrier_index = 0
 for nm in actors:
     state[nm] = {'idx': 0, 'arrive_since': None, 'target_node': None,
                  'done': [], 'entered_channel': False, 'reservation': None}
-    send(nm, ROUTES[nm][0][0], ROUTES[nm][0][1])
+    if not PHYSICAL_STAGING or nm not in CARRIER_ORDER:
+        send(nm, *ROUTES[nm][0])
+if PHYSICAL_STAGING:
+    ev('carrier_granted', {'order': 0}, CARRIER_ORDER[0])
 
 pending_reports = []
 channel_holder = None
@@ -159,6 +173,8 @@ TRUTH_ATT = os.environ.get('GONGYU_TRUTH_ATT', '0') == '1'
 start_wall = time.time()
 prev_t = -1
 last_truth_t = -500
+physical_entered = {}
+previous_overlaps = set()
 
 while sup.step(ts) != -1:
     t = int(sup.getTime() * 1000)
@@ -181,18 +197,43 @@ while sup.step(ts) != -1:
             _p = _nd.getPosition()
             rec['pos'][_nm] = [round(_p[0], 4), round(_p[1], 4)]
         bus.append('truth_att.jsonl', rec)
+    if PHYSICAL_STAGING:
+        ground_positions = {name: truth(name)[:2] for name in actors if name not in AERIAL}
+        occupied = {
+            name for name, (x, y) in ground_positions.items() if occupies_corridor(x, y)
+        }
+        for name in sorted(occupied.difference(physical_entered)):
+            x, y = ground_positions[name]
+            physical_entered[name] = t
+            metrics['channel_enters'] += 1
+            ev('channel_enter', {'x': x, 'y': y}, name)
+        for name in sorted(set(physical_entered).difference(occupied)):
+            x, y = ground_positions[name]
+            started = physical_entered.pop(name)
+            metrics['channel_releases'] += 1
+            ev('channel_cleared', {'x': x, 'y': y, 'duration_ms': t - started}, name)
+        overlaps = {
+            (a, b) for a in occupied for b in occupied if a < b
+        }
+        for pair in sorted(overlaps.difference(previous_overlaps)):
+            item = {'t_ms': t, 'kind': 'channel_overlap', 'actors': list(pair)}
+            metrics['violations'].append(item)
+            ev('channel_overlap', item)
+        previous_overlaps = overlaps
     if True:
         for nm in list(actors):
             st = state[nm]
             if st['idx'] >= len(ROUTES[nm]):
                 continue
             node, task = ROUTES[nm][st['idx']]
+            if PHYSICAL_STAGING and nm in CARRIER_ORDER and nm != CARRIER_ORDER[carrier_index]:
+                continue
             x, y, _ = truth(nm)
             gx, gy = NODES[node][0], NODES[node][1]
             d = math.hypot(x - gx, y - gy)
             if st['target_node'] != node:
                 hold = False
-                if PHYSICAL_ACTUATION and channel_holder not in (None, nm):
+                if PHYSICAL_ACTUATION and not PHYSICAL_STAGING and channel_holder not in (None, nm):
                     outside = x < 2.05 or x > 4.95
                     tx = NODES[node][0]
                     cross = (x < 2.05 and tx > 4.95) or (x > 4.95 and tx < 2.05)
@@ -205,7 +246,7 @@ while sup.step(ts) != -1:
                 else:
                     send(nm, node, task)
             # channel occupancy from independent truth
-            in_channel = 2.05 <= x <= 4.95 and abs(y) <= 0.6
+            in_channel = not PHYSICAL_STAGING and 2.05 <= x <= 4.95 and abs(y) <= 0.6
             if in_channel and not st['entered_channel']:
                 if channel_holder not in (None, nm):
                     metrics['violations'].append({'t_ms': t, 'kind': 'channel_overlap', 'actors': [channel_holder, nm]})
@@ -224,11 +265,17 @@ while sup.step(ts) != -1:
                                                   'early_seconds': round((st['reservation']['end'] - rel) / 1000, 3)}, nm, task)
                 if channel_holder == nm:
                     channel_holder = None
-            if d <= max(TOL, 0.18):
+            duration = SERVICE if task or not PHYSICAL_STAGING else 0
+            released_at = TASKS.get(task, {}).get('release_ms', 0) if PHYSICAL_STAGING else 0
+            tolerance = TOL if PHYSICAL_STAGING and nm in CARRIER_ORDER else max(TOL, 0.18)
+            ready = d <= tolerance and t >= released_at
+            if ready and PHYSICAL_STAGING and task and nm not in AERIAL:
+                ready = math.hypot(*actors[nm].getVelocity()[:2]) <= 0.10
+            if ready:
                 if st['arrive_since'] is None:
                     st['arrive_since'] = t
                     ev('arrived', {'x': x, 'y': y, 'distance': round(d, 4)}, nm, task)
-                elif t - st['arrive_since'] >= SERVICE:
+                elif t - st['arrive_since'] >= duration:
                     st['done'].append(node)
                     if task and task in TASKS:
                         dl = TASKS[task]['deadline_ms']
@@ -259,10 +306,15 @@ while sup.step(ts) != -1:
                                                        'slot_id': '%s_%d' % (nm, st['idx']),
                                                        'direction': 'E->W' if prev_node == 'E' else 'W->E'}, nm, nt)
                         send(nm, nn, nt)
+                    elif PHYSICAL_STAGING and nm in CARRIER_ORDER:
+                        ev('carrier_released', {'order': carrier_index}, nm, task)
+                        if carrier_index + 1 < len(CARRIER_ORDER):
+                            carrier_index += 1
+                            ev('carrier_granted', {'order': carrier_index}, CARRIER_ORDER[carrier_index])
             else:
                 # cancel the berth dwell only when the platform clearly leaves the
                 # tolerance band, otherwise steady-state parking error re-arms it forever
-                if d > 0.18 * 1.28:
+                if PHYSICAL_STAGING or d > 0.18 * 1.28:
                     st['arrive_since'] = None
         for rep in list(pending_reports):
             if t >= rep['deliver_at']:
@@ -297,10 +349,12 @@ while sup.step(ts) != -1:
     if t >= END or all(s['idx'] >= len(ROUTES[nm]) for nm, s in state.items()):
         break
 
-on_time = sum(1 for v in metrics['task_completed'].values() if v['on_time'])
-total = len(metrics['task_completed'])
-metrics['on_time'] = on_time
-metrics['total'] = total
+metrics.update(summarize_tasks(expected_task_ids, metrics['task_completed']))
+metrics['motion_backend'] = 'hybrid' if PHYSICAL_ACTUATION and AERIAL else 'motor' if PHYSICAL_ACTUATION else 'kinematic'
+metrics['kinematic_actors'] = sorted(AERIAL.intersection(actors)) if PHYSICAL_ACTUATION else sorted(actors)
+metrics['corridor_protocol'] = 'footprint_serial_dispatch' if PHYSICAL_STAGING else 'legacy'
+metrics['occupied_at_close'] = sorted(physical_entered) if PHYSICAL_STAGING else []
+on_time, total = metrics['on_time'], metrics['total']
 metrics['full_window'] = t >= END
 metrics['wall_seconds'] = round(time.time() - start_wall, 3)
 metrics['violation_count'] = len(metrics['violations'])
@@ -308,6 +362,8 @@ json.dump(metrics, open(os.path.join(RUN, 'result', 'metrics.json'), 'w'), inden
 json.dump({'started_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(start_wall)),
            'ended_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
            'scene': SCENE, 'mechanism': MECH, 'status': 'COMPLETE',
+           'motion_backend': metrics['motion_backend'], 'kinematic_actors': metrics['kinematic_actors'],
+           'corridor_protocol': metrics['corridor_protocol'],
            'failure': None, 'sim_end_ms': t, 'wall_seconds': metrics['wall_seconds'],
            'source': 'webots-r2025a-cpu-' + ('motor' if PHYSICAL_ACTUATION else 'kinematic') + ('-norender' if os.environ.get('GONGYU_NO_RENDER') else '-render')},
           open(os.path.join(RUN, 'shutdown.json'), 'w'), indent=1)

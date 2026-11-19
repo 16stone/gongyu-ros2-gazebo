@@ -14,7 +14,8 @@ name = robot.getName()
 ts = int(robot.getBasicTimeStep())
 run_dir = os.environ.get('GONGYU_RUN_DIR', '/tmp/gongyu_default')
 mode = os.environ.get('GONGYU_FEEDBACK_MODE', 'sensor')
-physical_actuation = os.environ.get('GONGYU_PHYS', '0') == '1'
+aerial_kinematic = set(os.environ.get('GONGYU_AERIAL', '').split(','))
+physical_actuation = os.environ.get('GONGYU_PHYS', '0') == '1' and name not in aerial_kinematic
 bus = Bus(os.path.join(run_dir, 'bus'))
 
 gps = robot.getDevice('gps'); gps.enable(ts)
