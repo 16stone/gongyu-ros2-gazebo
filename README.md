@@ -2,21 +2,30 @@
 
 《无人系统导论》课程设计题目二。六辆差速地面车和两架无人机在 Webots 仿真场地执行运输和观察，共用一条窄通道。程序按车体实际清空、任务时窗和观察报告的有效期安排放行。
 
-## 课程报告与演示
+## 正式提交版本
+
+**`report_course_final/` 是唯一提交版本**：PDF 与 DOCX 由同一份 [`body.md`](report_course_final/body.md) 生成，49 页 / 23503 汉字 / 46 表 / 16 图，目录页码逐条回填，`SHA256SUMS` 可校验。重建命令为 `python report_course_final/src/build_report.py`（需 python-docx、LibreOffice、poppler）；构建的第一遍产物和系统配置写在临时目录，不落进仓库。
+
+报告第 1.4 节给出主版本与四层证据的边界，第 4 章是三组整机实跑，第 7 章是设计复盘，附录 A 是可核对的证据入口，附录 C 是判定性调试记录。`report_v11/` 是 55 页历史扩展稿，只作方案演进记录，**不作为提交版本**。
 
 | 入口 | 内容 |
 | --- | --- |
-| [46 页合订复评版](report_course_final) | 正式 PDF、可编辑 Word、同源正文和图表。第 40 页汇总四项增强的验证范围，第 46 页是课程设计完成度自评表。 |
-| [Webots 正常回合同源回放](docs/demo/course_final_replay.mp4) | 用裁判轨迹和事件还原一轮完整任务。 |
-| [复现入口](docs/webots/course_final_reproduce.md) | Webots 环境、场景、运行器和回执读法。 |
-| [整场与专项记录](evidence/course_final) | 正常、首份观察延迟、侦察车起点变化三轮的指标、事件和结束回执，以及专项结果汇总。 |
-| [55 页历史版](report_v11) | Gazebo 和早期 Webots 方案、图表及归档说明。 |
+| [正式报告](report_course_final/) | PDF、Word、同源正文、图表、构建脚本、校验清单 |
+| [交稿版整机回放](docs/demo/course_final_replay.mp4) | 53 s 配套回放；[历史运动学回合回放](docs/demo/webots_full_run.mp4) 与[自包含演示页](docs/demo/webots_replay.html) 另存 |
+| [Webots 复现](docs/webots/course_final_reproduce.md) | 交稿三组回合的场景、环境变量与回执读法 |
+| [图模型与 Gazebo 复现](docs/reproduce.md) | 离散算例与归档整机的复现步骤 |
+| [整场证据](evidence/course_final/) | normal / delay / holdout 的指标、事件、关闭回执与专项汇总 |
+| [逐回合索引](docs/evidence_index.md) | 33 个 Webots 专项回合；[Gazebo 归档](evidence/fp124-ent-ind-01/) 单独存放 |
+| [验收状态](docs/acceptance_status.md) | 已闭合结果、执行器层诊断与开放边界 |
 
 ## 已验证的结果
 
-- 正常、观察延迟和起点变化三轮，以及两次正常复跑，均在 400 s 仿真窗口内完成 14/14 项按期任务，通道进入和清空各 5 次，记录的车体占用无重叠。
-- 对同一份过期观察，仅拒收时为 13/14 项按期，拒收并补采后恢复为 14/14 项。两车专项中，按实际清空放行比固定时刻少等 24.112 s。
-- [B1 单车专项](docs/webots/B1_PHASE_B.md)比较 Dijkstra 与 A*，记录前后左右的目标回波和近距漏检。低位雷达触发了低箱前停车。
-- [多旋翼专项](docs/webots/uav_course.md)在四组单机条件中验证起飞、到达、驻留、返场和降落。八实体整场的两架无人机采用航点运动学。跨车接替未完任务的整场验证仍待完成。
+- 正式主版本为**混合后端**：六辆地面车由真实电机驱动，B3 与 R5 留在航点运动学层（本后端无旋翼动力学）；关闭回执记 `motion_backend=hybrid`、`kinematic_actors=["B3","R5"]`。
+- 正常、首份观察延迟、侦察车起点变化三组，以及两次正常复跑，均在 400 s 窗口内完成 14/14 项按期任务，通道进入与清空各 5 次，无车体占用重叠。
+- 同一份过期观察：仅拒收为 13/14 项按期，拒收并主动补采后恢复 14/14；延迟回合 B2 交付 306.1 s → 314.2 s。两车专项中，按实际清空放行比固定 32 s 少等 24.112 s。
+- [B1 单车专项](docs/webots/B1_PHASE_B.md)：Dijkstra 与 A* 同图对照、四方向回波与近距漏检、低位雷达触发低箱前停车。
+- [多旋翼专项](docs/webots/uav_course.md)：四组单机条件验证起飞、到达、驻留、返场与降落；八实体整场的空中部分为航点运动学。跨车接替未完任务的整场验证仍待完成。
 
-Gazebo 与离散任务基线参见[历史证据索引](docs/evidence_index.md)。早期运行和专项保留各自的场景、计数口径和适用范围。
+## 版本口径
+
+`evidence/course_final/` 的三组回合是交稿结论；`evidence/webots/p-motor-full-*` 是采用旧瞬时占用判据的执行器诊断分支，未闭合、不计入正式结果；`f-webots-full-01` 是运动学筛选回合；第 5、6 章的 Gazebo 归档与图模型按各自平台时间单独陈述。跨平台只比较行为是否复现，不并列秒数。

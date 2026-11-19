@@ -8,8 +8,10 @@ is exported from the same DOCX by LibreOffice, so the two deliverables stay in s
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -43,6 +45,32 @@ def _fonts(run, eastasia):
     rf.set(qn('w:hAnsi'), LATIN)
 
 
+def _emit_runs(p, text, size, bold, font):
+    """Render **bold** and `inline code` without leaking markdown markers."""
+    for chunk in re.split(r'(\*\*.+?\*\*|`[^`]+`)', text):
+        if not chunk:
+            continue
+        if chunk.startswith('**') and chunk.endswith('**') and len(chunk) > 4:
+            run = p.add_run(chunk[2:-2])
+            run.bold = True
+            run.font.size = Pt(size)
+            _fonts(run, font)
+        elif chunk.startswith('`') and chunk.endswith('`') and len(chunk) > 2:
+            run = p.add_run(chunk[1:-1])
+            run.font.size = Pt(size - 0.5)
+            rf = run._element.get_or_add_rPr().find(qn('w:rFonts'))
+            if rf is None:
+                rf = OxmlElement('w:rFonts')
+                run._element.get_or_add_rPr().insert(0, rf)
+            for attr in ('w:ascii', 'w:hAnsi', 'w:eastAsia'):
+                rf.set(qn(attr), 'Courier New')
+        else:
+            run = p.add_run(chunk)
+            run.font.size = Pt(size)
+            run.bold = bold
+            _fonts(run, font)
+
+
 def para(doc, text, size=11, bold=False, align=None, first_indent=True,
          font=BODY_FONT, space_before=0, space_after=5, line=1.30):
     p = doc.add_paragraph()
@@ -53,14 +81,7 @@ def para(doc, text, size=11, bold=False, align=None, first_indent=True,
         p.paragraph_format.first_line_indent = Cm(0.74)
     if align is not None:
         p.alignment = align
-    for i, chunk in enumerate(re.split(r'(\*\*.+?\*\*)', text)):
-        if not chunk:
-            continue
-        strong = chunk.startswith('**') and chunk.endswith('**') and len(chunk) > 4
-        run = p.add_run(chunk[2:-2] if strong else chunk)
-        run.font.size = Pt(size)
-        run.bold = bold or strong
-        _fonts(run, font)
+    _emit_runs(p, text, size, bold, font)
     return p
 
 
@@ -71,8 +92,6 @@ def heading(doc, text, level):
     pf.space_before = Pt(14 if level == 1 else 10)
     pf.space_after = Pt(6 if level == 1 else 4)
     pf.keep_with_next = True
-    if text.startswith("7.4 "):
-        p.paragraph_format.page_break_before = True
     run = p.add_run(text)
     run.font.size = Pt(sizes.get(level, 11))
     run.bold = True
@@ -117,16 +136,8 @@ def table(doc, rows, caption=None):
     t = doc.add_table(rows=0, cols=ncol)
     t.style = 'Table Grid'
     t.alignment = 1
-    scoring = caption and '百分制自评' in caption
-    if scoring:
-        t.autofit = False
-        for column, width in zip(t.columns, (3.7, 1.4, 1.4, 9.3)):
-            column.width = Cm(width)
     for ri, row in enumerate(rows):
         cells = t.add_row().cells
-        if scoring:
-            for cell, column in zip(cells, t.columns):
-                cell.width = column.width
         for ci in range(ncol):
             text = row[ci] if ci < len(row) else ''
             cell = cells[ci]
@@ -136,14 +147,7 @@ def table(doc, rows, caption=None):
             p.paragraph_format.space_before = Pt(1)
             p.paragraph_format.line_spacing = 1.0
             p.paragraph_format.keep_with_next = ri == 0 or (len(rows) <= 7 and ri < len(rows) - 1)
-            for chunk in re.split(r'(\*\*.+?\*\*)', text):
-                if not chunk:
-                    continue
-                strong = chunk.startswith('**') and chunk.endswith('**') and len(chunk) > 4
-                run = p.add_run(chunk[2:-2] if strong else chunk)
-                run.font.size = Pt(9.2)
-                run.bold = strong or ri == 0
-                _fonts(run, BODY_FONT)
+            _emit_runs(p, text, 9.2, ri == 0, BODY_FONT)
             if ri == 0:
                 shade(cell, 'EDF1F5')
     repeat_header(t.rows[0])
@@ -369,7 +373,7 @@ def build(blocks, pages=None):
     for b in blocks:
         kind = b[0]
         if kind == 'h':
-            if b[2] == 1 and b[1] not in ('摘要', '3 多体协同与仿生启发'):
+            if b[2] == 1 and b[1] != '摘要':
                 doc.add_page_break()
             heading(doc, b[1], b[2])
         elif kind == 'p':
@@ -391,9 +395,13 @@ def build(blocks, pages=None):
 
 
 def to_pdf(docx_path, outdir):
-    subprocess.run(['soffice', '-env:UserInstallation=file://' + outdir + '/.lo-profile', '--headless', '--convert-to', 'pdf',
-                    '--outdir', outdir, docx_path],
-                   check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    profile = tempfile.mkdtemp(prefix='gongyu_lo_')
+    try:
+        subprocess.run(['soffice', '-env:UserInstallation=file://' + profile, '--headless', '--convert-to', 'pdf',
+                        '--outdir', outdir, docx_path],
+                       check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    finally:
+        shutil.rmtree(profile, ignore_errors=True)
     return os.path.join(outdir, os.path.splitext(os.path.basename(docx_path))[0] + '.pdf')
 
 
@@ -427,14 +435,18 @@ def page_map(pdf, blocks):
 
 def main():
     blocks = parse(BODY)
-    docx1 = os.path.join(ROOT, '_pass1.docx')
-    build(blocks).save(docx1)
-    pdf1 = to_pdf(docx1, ROOT)
-    pages = page_map(pdf1, blocks)
-    docx2 = os.path.join(ROOT, STEM + '.docx')
-    build(blocks, pages).save(docx2)
-    pdf2 = to_pdf(docx2, ROOT)
-    info = subprocess.run(['pdfinfo', pdf2], stdout=subprocess.PIPE).stdout.decode()
+    scratch = tempfile.mkdtemp(prefix='gongyu_report_')
+    try:
+        docx1 = os.path.join(scratch, '_pass1.docx')
+        build(blocks).save(docx1)
+        pdf1 = to_pdf(docx1, scratch)
+        pages = page_map(pdf1, blocks)
+        docx2 = os.path.join(ROOT, STEM + '.docx')
+        build(blocks, pages).save(docx2)
+        pdf2 = to_pdf(docx2, ROOT)
+        info = subprocess.run(['pdfinfo', pdf2], stdout=subprocess.PIPE).stdout.decode()
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
     npages = [l for l in info.split('\n') if l.startswith('Pages')]
     print('cjk chars:', len(re.findall(r'[\u4e00-\u9fff]', open(BODY, encoding='utf-8').read())))
     print('parsed blocks:', len(blocks),
