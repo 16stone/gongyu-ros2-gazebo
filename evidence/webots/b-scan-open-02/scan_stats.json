@@ -1,0 +1,16 @@
+{
+ "actors": {
+  "B1": {
+   "first_return_m": 9.9,
+   "hit_horizon_s": 0.0,
+   "hit_samples_below_1m": 0,
+   "samples": 49
+  }
+ },
+ "hit_threshold_m": 1.0,
+ "note": "lidar_low sits exactly at the 0.18 m obstacle top, so the first return appears at contact range; usable detection horizon is therefore short and is reported instead of a nominal range",
+ "obstacle_top_m": 0.18,
+ "run": "b-scan-open-02",
+ "sensor_height_m": 0.18,
+ "source": "bus/tel_*.jsonl lidar_low_front, 500 ms sampling"
+}

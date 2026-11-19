@@ -1,0 +1,11 @@
+{
+ "started_utc": "2026-11-19T00:01:40Z",
+ "ended_utc": "2026-11-19T00:01:59Z",
+ "scene": "web_b1_clear_phys",
+ "mechanism": "release",
+ "status": "COMPLETE",
+ "failure": null,
+ "sim_end_ms": 130000,
+ "wall_seconds": 19.481,
+ "source": "webots-r2025a-cpu-motor-norender"
+}

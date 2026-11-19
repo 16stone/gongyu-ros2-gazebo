@@ -14,6 +14,8 @@ NODES = SCEN['nodes']
 
 # ---- visual palette (dark tech / control-room aesthetic) ----
 SKY = [(0.05, 0.08, 0.13), (0.09, 0.13, 0.20), (0.13, 0.18, 0.26)]
+# True when emitting the physical-actuation variant (*_phys.wbt).
+PHYS_MODEL = os.environ.get('GONGYU_WORLD_PHYS', '0') == '1'
 FLOOR = (0.10, 0.13, 0.18)
 GRID = (0.08, 0.42, 0.52)
 CHANNEL = (0.90, 0.66, 0.16)
@@ -96,6 +98,51 @@ def robot_ugv(name, sx, sy, heading=0.0):
     wheel_shapes = []
     for _ in range(4):
         wheel_shapes.append('Shape { appearance %s geometry Cylinder { height 0.05 radius 0.085 subdivision 20 } }' % dark)
+    if PHYS_MODEL:
+        # Physical variant: true differential drive, two driven wheels on the
+        # mid axis plus two ball casters.  A 4-wheel rectangular skid-steer
+        # cannot pivot in place under isotropic Coulomb friction: the same
+        # normal force feeds both the yaw moment and the resisting scrub, so
+        # the net yaw moment collapses and the wheels merely slip.  That was
+        # the root cause of phys-full-01/02 stalling at the first turn.
+        ws = wheel_shapes[0]
+        joints = []
+        for mn, sn, wy in (('left_motor', 'left_sensor', -0.17),
+                           ('right_motor', 'right_sensor', 0.17)):
+            joints.append('''HingeJoint {
+  jointParameters HingeJointParameters { axis 0 1 0 anchor 0 %.2f -0.035 }
+  device [ RotationalMotor { name "%s" maxVelocity 12 maxTorque 40 } PositionSensor { name "%s" } ]
+  endPoint Solid {
+    translation 0 %.2f -0.035
+    children [ %s ]
+    boundingObject Cylinder { height 0.05 radius 0.085 subdivision 20 }
+    physics Physics { density 800 }
+  }
+}''' % (wy, mn, sn, wy, ws))
+        for cx in (-0.19, 0.19):
+            joints.append('''BallJoint {
+  jointParameters BallJointParameters { anchor %.2f 0 -0.085 }
+  endPoint Solid {
+    translation %.2f 0 -0.085
+    children [ Shape { appearance %s geometry Sphere { radius 0.035 } } ]
+    boundingObject Sphere { radius 0.035 }
+    physics Physics { density 300 }
+  }
+}''' % (cx, cx, dark))
+        sensors = '''Lidar { name "lidar_main" translation 0.18 0 0.20 horizontalResolution 180 numberOfLayers 1 fieldOfView 6.283185 minRange 0.02 maxRange 3.0 }
+Lidar { name "lidar_low" translation 0.18 0 0.18 horizontalResolution 180 numberOfLayers 1 fieldOfView 6.283185 minRange 0.15 maxRange 1.2 }
+InertialUnit { name "imu" }
+Compass { name "compass" }
+GPS { name "gps" }'''
+        children = ' '.join([shape, canopy, beacon] + joints + [sensors])
+        return '''DEF %s Robot {
+  name "%s" translation %s rotation 0 0 1 %.6f
+  controller "gongyu_ugv"
+  children [ %s ]
+  boundingObject Box { size 0.40 0.34 0.14 }
+  physics Physics { density 400 }
+}''' % (name, name, pos(sx, sy, 0.12), heading, children)
+
     joints = []
     motors = [('left_motor', 'left_sensor', -0.17, -0.16),
               ('right_motor', 'right_sensor', 0.17, -0.16),
@@ -279,4 +326,7 @@ if __name__ == '__main__':
     gen('web_holdout_v1', UGV + UAV, holdout=True)
     gen('web_d4', [('B1', 'D'), ('B2', 'O'), ('R3', 'N0'), ('B3', 'F')])
     gen('web_smoke', [('B1', 'D')], low_obstacle=True)
+    # single UGV on the D-E route with no static obstacle: used for the
+    # physical localisation contrast, where the driven wheels really turn
+    gen('web_b1_clear', [('B1', 'D')])
     print('WORLDS_GENERATED suffix=' + suffix)

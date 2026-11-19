@@ -1,0 +1,187 @@
+{
+ "actuation": "motor",
+ "observed": {
+  "arrived_D_m": 0.821,
+  "arrived_E_m": 4.8213,
+  "arrived_W_m": 1.8206,
+  "channel_cleared_x_m": 4.9519,
+  "next_dispatch_after_clear": "L(6,0)",
+  "open_issue": "U-turn at the corridor mouth jams the chassis against the wall ends"
+ },
+ "purpose": "single-vehicle physical run used to verify the differential-drive sign fix, the linear approach law and the corridor clearance handshake",
+ "render": "no-rendering (main view only; camera still renders)",
+ "run": "phys-clear-pass-03",
+ "scene": "web_b1_clear_phys",
+ "timeline": [
+  {
+   "actor": "B1",
+   "kind": "move_commanded",
+   "payload": {
+    "node": "D",
+    "x": 1,
+    "y": 0
+   },
+   "t_ms": 0
+  },
+  {
+   "actor": "B1",
+   "kind": "arrived",
+   "payload": {
+    "distance": 0.179,
+    "x": 0.821,
+    "y": 0.0
+   },
+   "t_ms": 2080
+  },
+  {
+   "actor": "B1",
+   "kind": "move_commanded",
+   "payload": {
+    "node": "W",
+    "x": 2,
+    "y": 0
+   },
+   "t_ms": 4080
+  },
+  {
+   "actor": "B1",
+   "kind": "arrived",
+   "payload": {
+    "distance": 0.1794,
+    "x": 1.8206,
+    "y": 0.0
+   },
+   "t_ms": 7888
+  },
+  {
+   "actor": "B1",
+   "kind": "move_commanded",
+   "payload": {
+    "node": "E",
+    "x": 5,
+    "y": 0
+   },
+   "t_ms": 9888
+  },
+  {
+   "actor": "B1",
+   "kind": "channel_enter",
+   "payload": {
+    "slot": "B1_1",
+    "x": 2.0574,
+    "y": -0.0
+   },
+   "t_ms": 10304
+  },
+  {
+   "actor": "B1",
+   "kind": "arrived",
+   "payload": {
+    "distance": 0.1795,
+    "x": 4.8213,
+    "y": -0.0164
+   },
+   "t_ms": 33536
+  },
+  {
+   "actor": "B1",
+   "kind": "move_commanded",
+   "payload": {
+    "node": "L",
+    "x": 6,
+    "y": 0
+   },
+   "t_ms": 35536
+  },
+  {
+   "actor": "B1",
+   "kind": "channel_cleared",
+   "payload": {
+    "clearance_time": 36064,
+    "x": 4.9519,
+    "y": -0.0387
+   },
+   "t_ms": 36064
+  },
+  {
+   "actor": "B1",
+   "kind": "channel_enter",
+   "payload": {
+    "slot": "B1_1",
+    "x": 4.9496,
+    "y": -0.0615
+   },
+   "t_ms": 38160
+  },
+  {
+   "actor": "B1",
+   "kind": "channel_cleared",
+   "payload": {
+    "clearance_time": 48832,
+    "x": 4.9504,
+    "y": 0.043
+   },
+   "t_ms": 48832
+  },
+  {
+   "actor": "B1",
+   "kind": "channel_enter",
+   "payload": {
+    "slot": "B1_1",
+    "x": 4.9499,
+    "y": 0.0445
+   },
+   "t_ms": 49152
+  },
+  {
+   "actor": "B1",
+   "kind": "channel_cleared",
+   "payload": {
+    "clearance_time": 49632,
+    "x": 4.9508,
+    "y": 0.0422
+   },
+   "t_ms": 49632
+  },
+  {
+   "actor": "B1",
+   "kind": "channel_enter",
+   "payload": {
+    "slot": "B1_1",
+    "x": 4.9496,
+    "y": 0.1878
+   },
+   "t_ms": 58672
+  },
+  {
+   "actor": "B1",
+   "kind": "channel_cleared",
+   "payload": {
+    "clearance_time": 58800,
+    "x": 4.9504,
+    "y": 0.1922
+   },
+   "t_ms": 58800
+  },
+  {
+   "actor": "B1",
+   "kind": "channel_enter",
+   "payload": {
+    "slot": "B1_1",
+    "x": 4.95,
+    "y": 0.2251
+   },
+   "t_ms": 59824
+  },
+  {
+   "actor": "B1",
+   "kind": "channel_cleared",
+   "payload": {
+    "clearance_time": 60080,
+    "x": 4.9506,
+    "y": 0.228
+   },
+   "t_ms": 60080
+  }
+ ]
+}

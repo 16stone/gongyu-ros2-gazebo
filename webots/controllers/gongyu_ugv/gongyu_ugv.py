@@ -9,7 +9,9 @@ from controller import Robot
 sys.path.insert(0, os.environ.get('GONGYU_WEBOTS_COMMON', ''))
 from bus import Bus
 
-R = 0.07
+# wheel radius: 0.085 m per the physical model; the kinematic backend
+# historically assumed 0.07 and its committed telemetry must stay stable
+R = float(os.environ.get('GONGYU_WHEEL_R', '0.085' if os.environ.get('GONGYU_PHYS', '0') == '1' else '0.07'))
 BASE = 0.34
 V_MAX = 0.5
 KP_HEAD = 2.2
@@ -22,13 +24,17 @@ run_dir = os.environ.get('GONGYU_RUN_DIR', '/tmp/gongyu_default')
 bus = Bus(os.path.join(run_dir, 'bus'))
 
 left = robot.getDevice('left_motor'); right = robot.getDevice('right_motor')
+# the physical variant is a two-wheel differential drive with ball casters, so
+# the rear motors do not exist there; every use below tolerates None.
 rl = robot.getDevice('rear_left_motor'); rr = robot.getDevice('rear_right_motor')
 for m in (left, right, rl, rr):
-    m.setPosition(float('inf'))
-    m.setVelocity(0.0)
+    if m is not None:
+        m.setPosition(float('inf'))
+        m.setVelocity(0.0)
 enc = [robot.getDevice(n) for n in ('left_sensor', 'right_sensor', 'rear_left_sensor', 'rear_right_sensor')]
 for e in enc:
-    e.enable(ts)
+    if e is not None:
+        e.enable(ts)
 lid_main = robot.getDevice('lidar_main'); lid_low = robot.getDevice('lidar_low')
 lid_main.enable(ts); lid_low.enable(ts)
 imu = robot.getDevice('imu'); imu.enable(ts)
@@ -46,6 +52,7 @@ init_pose = None
 cmd = None
 last_log = -10**9
 last_cmd_read = -10**9
+err_sign = 1.0   # latched turn direction for near-180 headings
 
 
 def clamp(v, a, b):
@@ -77,31 +84,46 @@ while robot.step(ts) != -1:
         init_pose = [gp[0], gp[1]]
         x, y = init_pose
         wheel_x, wheel_y = init_pose
-    vals = [e.getValue() for e in enc]
+    vals = [None if e is None else e.getValue() for e in enc]
     if prev is None:
         prev = vals
-    dl = ((vals[0] - prev[0]) + (vals[2] - prev[2])) / 2 * R
-    dr = ((vals[1] - prev[1]) + (vals[3] - prev[3])) / 2 * R
+
+    def side_delta(a, b):
+        ds = []
+        for i in (a, b):
+            if vals[i] is not None and prev[i] is not None:
+                ds.append(vals[i] - prev[i])
+        return (sum(ds) / len(ds)) if ds else 0.0
+
+    dl = side_delta(0, 2) * R
+    dr = side_delta(1, 3) * R
     prev = vals
     dth = (dr - dl) / BASE
     wx = wheel_x + (dl + dr) / 2 * math.cos(theta + dth / 2)
     wy = wheel_y + (dl + dr) / 2 * math.sin(theta + dth / 2)
     theta += dth
     wheel_x, wheel_y = wx, wy
-    if physical_actuation:
-        # wheel integration drifts when wheels slip; use IMU yaw as heading source
-        theta = imu.getRollPitchYaw()[2]
     gp = gps.getValues()
-    # heading from true GPS motion (wheel-integration heading drifts on slip)
-    if prev_gps is not None:
-        mdx, mdy = gp[0] - prev_gps[0], gp[1] - prev_gps[1]
-        disp = math.hypot(mdx, mdy)
-        if disp > 0.12:
-            # reliable motion direction over a meaningful baseline
-            theta = math.atan2(mdy, mdx)
-            prev_gps = [gp[0], gp[1]]
-    else:
+    if physical_actuation:
+        # a real chassis turns without translating, so the motion-direction
+        # trick below is only valid when the referee moves the platform; here
+        # the IMU is the honest yaw source (it is a real gyro integration).
+        # spin-pure-02: omega=+0.8 rad/s gave d(yaw)/dt=-0.66 rad/s, so the
+        # device yaw is clockwise-positive and must be negated to match the
+        # controller's counter-clockwise-positive world heading.
+        theta = -imu.getRollPitchYaw()[2]
         prev_gps = [gp[0], gp[1]]
+    else:
+        # heading from true GPS motion (wheel-integration heading drifts on slip)
+        if prev_gps is not None:
+            mdx, mdy = gp[0] - prev_gps[0], gp[1] - prev_gps[1]
+            disp = math.hypot(mdx, mdy)
+            if disp > 0.12:
+                # reliable motion direction over a meaningful baseline
+                theta = math.atan2(mdy, mdx)
+                prev_gps = [gp[0], gp[1]]
+        else:
+            prev_gps = [gp[0], gp[1]]
     if loc_mode == 'gps':
         x, y = gp[0], gp[1]
     else:
@@ -122,19 +144,45 @@ while robot.step(ts) != -1:
         last_cmd_read = t
     v = 0.0
     omega = 0.0
+    err = 0.0
+    if os.environ.get('GONGYU_TEST_SPIN'):
+        # diagnostic only: measure whether the chassis can pivot at all
+        spin = float(os.environ.get('GONGYU_TEST_SPIN'))
+        if t > 3000:
+            v = float(os.environ.get('GONGYU_TEST_V', '0.0'))
+            omega = spin
+        cmd = None
     if cmd and cmd.get('type') == 'goto':
         dx = cmd['x'] - x_c
         dy = cmd['y'] - y_c
         dist = math.hypot(dx, dy)
         desired = math.atan2(dy, dx)
         err = math.atan2(math.sin(desired - th_c), math.cos(desired - th_c))
+        if physical_actuation:
+            # Exactly-reversing targets make atan2(sin pi, cos pi) flip sign on
+            # numerical noise, so omega would alternate between +0.8 and -0.8 and
+            # a pivoting chassis would jitter instead of turning.  Latch one turn
+            # direction while the error is near +-pi and release it once the
+            # heading has been brought back inside the normal range.
+            if abs(err) > 2.85:
+                err = 2.85 * err_sign
+            elif abs(err) < 2.60:
+                err_sign = 1.0 if err >= 0.0 else -1.0
         # arrival hysteresis: stop both translation and rotation inside tolerance
-        if dist <= 0.10:
+        # physical mode must reach the node centre: the referee only clears the
+        # shared channel once the chassis is past x=4.95, so an early stop at the
+        # 0.18 m berth tolerance deadlocks the next dispatch
+        if dist <= (0.10 if physical_actuation else 0.10):
             v = 0.0
             omega = 0.0
         else:
             omega = clamp(KP_HEAD * err, -1.5, 1.5)
-            v = V_MAX if dist > 0.30 else V_MAX * 0.35
+            if physical_actuation:
+                # linear approach: no overshoot on a heavy chassis, and it still
+                # rolls past the corridor mouth instead of stopping inside it
+                v = clamp(0.45 * dist, 0.12, V_MAX)
+            else:
+                v = V_MAX if dist > 0.30 else V_MAX * 0.35
         if front < 0.35 or low_front < 0.30:
             v *= 0.25
             omega += 0.8 if lside > rside else -0.8
@@ -144,17 +192,26 @@ while robot.step(ts) != -1:
     if pivot:
         v = 0.0                       # no translation while correcting heading
         omega = clamp(omega, -0.8, 0.8)
-    wl = (v - omega * BASE / 2) / R
-    wr = (v + omega * BASE / 2) / R
+    if physical_actuation:
+        # +y is the left-hand side: a counter-clockwise (omega > 0) turn needs the
+        # wheel at y = -0.17 to run faster, so the differential term is flipped
+        # relative to the historical kinematic convention.
+        wl = (v + omega * BASE / 2) / R
+        wr = (v - omega * BASE / 2) / R
+    else:
+        wl = (v - omega * BASE / 2) / R
+        wr = (v + omega * BASE / 2) / R
     if physical_actuation:
         # translation needs slip compensation; pivot uses raw differential wheel rate
         gain = 1.0
         for m, w in ((left, wl), (right, wr), (rl, wl), (rr, wr)):
-            m.setVelocity(clamp(w * gain, -6, 6))
+            if m is not None:
+                m.setVelocity(clamp(w * gain, -6, 6))
     else:
         # kinematics-driven: chassis motion applied by independent referee model
         for m in (left, right, rl, rr):
-            m.setVelocity(0.0)
+            if m is not None:
+                m.setVelocity(0.0)
     if t - last_log >= 500:
         bus.append('tel_%s.jsonl' % name, {
             't_ms': t, 'actor': name, 'ver': 'gpsheading-v3', 'theta_dbg': round(theta, 3),

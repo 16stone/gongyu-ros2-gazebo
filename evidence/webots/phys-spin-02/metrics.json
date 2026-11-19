@@ -1,0 +1,106 @@
+{
+ "seed": 0,
+ "scene": "web_smoke_phys",
+ "mechanism": "release",
+ "adapt": "off",
+ "cost": "low",
+ "report_delay_ms": 1000,
+ "physical_actuation": true,
+ "task_completed": {},
+ "channel_enters": 0,
+ "channel_releases": 0,
+ "accepted_reports": [],
+ "expired_reports": [],
+ "replan_decisions": [],
+ "violations": [],
+ "truth_trajectories": {
+  "B1": [
+   {
+    "t_ms": 2000,
+    "pos": [
+     0.5,
+     0.0,
+     0.1134
+    ]
+   },
+   {
+    "t_ms": 4000,
+    "pos": [
+     0.5,
+     0.0,
+     0.1188
+    ]
+   },
+   {
+    "t_ms": 6000,
+    "pos": [
+     0.5,
+     0.0,
+     0.1187
+    ]
+   },
+   {
+    "t_ms": 8000,
+    "pos": [
+     0.5,
+     0.0,
+     0.1187
+    ]
+   },
+   {
+    "t_ms": 10000,
+    "pos": [
+     0.5,
+     0.0,
+     0.1188
+    ]
+   },
+   {
+    "t_ms": 12000,
+    "pos": [
+     0.5,
+     0.0,
+     0.1188
+    ]
+   },
+   {
+    "t_ms": 14000,
+    "pos": [
+     0.5,
+     0.0,
+     0.1187
+    ]
+   },
+   {
+    "t_ms": 16000,
+    "pos": [
+     0.5,
+     0.0,
+     0.1185
+    ]
+   },
+   {
+    "t_ms": 18000,
+    "pos": [
+     0.5,
+     0.0,
+     0.1182
+    ]
+   },
+   {
+    "t_ms": 20000,
+    "pos": [
+     0.5,
+     0.0,
+     0.1178
+    ]
+   }
+  ]
+ },
+ "truth_sample_period_ms": 500,
+ "on_time": 0,
+ "total": 0,
+ "full_window": true,
+ "wall_seconds": 12.132,
+ "violation_count": 0
+}
