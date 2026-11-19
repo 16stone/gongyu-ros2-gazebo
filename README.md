@@ -16,7 +16,7 @@
 
 | 路径 | 内容 |
 | --- | --- |
-| [report_v10](report_v10) | 课程报告 DOCX / PDF（9 页、5265 中文字符、4 图）与同源构建脚本、SHA256SUMS |
+| [report_v11](report_v11) | 课程报告 DOCX / PDF（55 页、29315 中文字符、17 图 40 表）与同源正文 `body.md`、构建脚本、SHA256SUMS |
 | [docs/evidence_index.md](docs/evidence_index.md) | 实验索引，33 个回合，由证据目录自动生成 |
 | [docs/demo/webots_full_run.mp4](docs/demo/webots_full_run.mp4) | 主回合同源视频（44 s / 1200×1080 / 25 fps），画面取自裁判真值与同一批事件 |
 | [docs/demo/webots_replay.html](docs/demo/webots_replay.html) | 可交互回放页，时间轴、四档速度、四章节跳转 |

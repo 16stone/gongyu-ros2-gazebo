@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 FIG='/home/liujingzhi/pandaoxi/gongyu-ros2-gazebo/report_v10/figures'
 REPO='/home/liujingzhi/pandaoxi/gongyu-ros2-gazebo'
 os.makedirs(FIG,exist_ok=True)
-FONT='/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf'
+FONT='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
 def f(sz):return ImageFont.truetype(FONT,sz)
 INK=(30,42,58);BLUE=(22,103,184);RED=(201,67,53);GOLD=(224,170,60);GRID=(222,231,239);GRAY=(110,128,146)
 def canvas(w,h,title):

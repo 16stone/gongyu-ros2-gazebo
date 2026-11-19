@@ -126,11 +126,20 @@ def send(nm, node, task=None):
     global cmd_seq
     cmd_seq += 1
     x, y = NODES[node][0], NODES[node][1]
+    berth_x = x
+    if PHYSICAL_ACTUATION and node == 'E' and nm not in AERIAL:
+        # a motor-driven chassis settles about 0.18 m short of the point it is
+        # commanded to, so a target exactly on the east mouth leaves the hull
+        # straddling the 4.95 m occupancy boundary: it is counted as inside the
+        # channel while parked and never releases.  aiming past the mouth puts the
+        # resting pose outside the window from either approach direction.
+        here = truth(nm)[0]
+        x = 5.22 if here < 4.95 else 4.78
     bus.append('cmd_%s.jsonl' % nm, {'id': 'cmd-%04d' % cmd_seq, 'type': 'goto',
                                      'x': x, 'y': y, 'node': node, 'task_id': task, 't_ms': t})
     state[nm]['target_node'] = node
     kin_state[nm]['target'] = (x, y)
-    ev('move_commanded', {'node': node, 'x': x, 'y': y}, nm, task)
+    ev('move_commanded', {'node': node, 'x': x, 'y': y, 'berth_x': berth_x}, nm, task)
 
 
 t = 0
