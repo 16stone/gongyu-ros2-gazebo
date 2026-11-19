@@ -2,7 +2,7 @@
 
 
 class ObservationGate:
-    def __init__(self, max_age_ms, first_delay_ms, refresh_delay_ms=1000):
+    def __init__(self, max_age_ms, first_delay_ms, refresh_delay_ms=1000, *, retry_on_expiry=True):
         self.max_age_ms = max_age_ms
         self.first_delay_ms = first_delay_ms
         self.refresh_delay_ms = refresh_delay_ms
@@ -10,9 +10,11 @@ class ObservationGate:
         self.pending = None
         self.attempts = 0
         self.authorized = False
+        self.retry_on_expiry = retry_on_expiry
+        self.rejected = False
 
     def step(self, now, observation):
-        if self.authorized:
+        if self.authorized or self.rejected:
             return None
         if self.requested_at is None:
             self.requested_at = now
@@ -26,8 +28,11 @@ class ObservationGate:
             if payload["age_ms"] <= self.max_age_ms:
                 self.authorized = True
                 return "observation_authorized", payload
-            self.requested_at = now
-            payload["refresh_requested_at"] = now
+            if self.retry_on_expiry:
+                self.requested_at = now
+                payload["refresh_requested_at"] = now
+            else:
+                self.rejected = True
             return "observation_expired", payload
         if not observation or not observation.get("camera_bytes"):
             return None

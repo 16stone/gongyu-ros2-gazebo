@@ -28,3 +28,14 @@ class ObservationGateTest(unittest.TestCase):
                          "observation_queued")
         self.assertEqual(gate.step(8360, None)[0], "observation_authorized")
         self.assertTrue(gate.authorized)
+
+    def test_expiry_without_refresh_stays_blocked(self):
+        gate = ObservationGate(6000, 7300, retry_on_expiry=False)
+        gate.step(0, None)
+        gate.step(20, {"t_ms": 20, "camera_bytes": 1})
+        event, payload = gate.step(7320, None)
+        self.assertEqual(event, "observation_expired")
+        self.assertNotIn("refresh_requested_at", payload)
+        self.assertIsNone(gate.step(8320, {"t_ms": 8320, "camera_bytes": 1}))
+        self.assertEqual(gate.attempts, 1)
+        self.assertFalse(gate.authorized)

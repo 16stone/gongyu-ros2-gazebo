@@ -164,7 +164,10 @@ if PHYSICAL_STAGING:
     ev('carrier_granted', {'order': 0}, CARRIER_ORDER[0])
 
 pending_reports = []
-course_gate = ObservationGate(TAU, int(os.environ.get('GONGYU_FIRST_OBSERVATION_DELAY_MS', '1000')))
+course_gate = ObservationGate(
+    TAU, int(os.environ.get('GONGYU_FIRST_OBSERVATION_DELAY_MS', '1000')),
+    retry_on_expiry=os.environ.get('GONGYU_RETRY_OBSERVATION_ON_EXPIRY', '1') != '0',
+)
 channel_holder = None
 metrics = {'seed': SEED, 'scene': SCENE, 'mechanism': MECH, 'adapt': ADAPT,
            'cost': COST, 'report_delay_ms': REPORT_DELAY_MS, 'physical_actuation': PHYSICAL_ACTUATION, 'task_completed': {},
@@ -365,6 +368,7 @@ metrics.update(summarize_tasks(expected_task_ids, metrics['task_completed']))
 metrics['motion_backend'] = 'hybrid' if PHYSICAL_ACTUATION and AERIAL else 'motor' if PHYSICAL_ACTUATION else 'kinematic'
 metrics['kinematic_actors'] = sorted(AERIAL.intersection(actors)) if PHYSICAL_ACTUATION else sorted(actors)
 metrics['corridor_protocol'] = 'footprint_serial_dispatch' if PHYSICAL_STAGING else 'legacy'
+metrics['blue2_observation_retry_on_expiry'] = course_gate.retry_on_expiry
 metrics['blue2_observation_attempts'] = course_gate.attempts
 metrics['blue2_observation_authorized'] = course_gate.authorized
 metrics['occupied_at_close'] = sorted(physical_entered) if PHYSICAL_STAGING else []
