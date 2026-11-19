@@ -1,0 +1,36 @@
+{
+  "start": [0.5, 0.0, 0.0],
+  "goal": [6.5, 0.8],
+  "bounds": [-0.5, 7.0, -2.0, 2.0],
+  "grid_m": 0.05,
+  "inflation_m": 0.34,
+  "model": {"wheel_radius_m": 0.085, "wheel_track_m": 0.34, "footprint_radius_m": 0.263},
+  "sensors": {
+    "main": {"x_m": 0.24, "z_local_m": 0.20, "min_m": 0.02, "max_m": 3.0},
+    "low": {"x_m": 0.24, "z_local_m": 0.105, "min_m": 0.15, "max_m": 1.2},
+    "samples": 180,
+    "field_of_view_rad": 6.283185,
+    "step_ms": 16
+  },
+  "layouts": {
+    "open": [],
+    "narrow": [
+      ["north_wall", 2.4, 5.2, 0.55, 0.75, 0.65],
+      ["south_wall", 2.4, 5.2, -0.75, -0.55, 0.65],
+      ["side_landmark", 5.6, 5.8, -1.15, -0.85, 0.65]
+    ],
+    "lowobs": [["low_crate", 2.95, 3.25, -0.60, 0.60, 0.27]],
+    "coverage": [
+      ["front", 1.20, 1.40, -0.13, 0.13, 0.65],
+      ["rear", -0.35, -0.15, -0.13, 0.13, 0.65],
+      ["left", 0.64, 0.84, 0.70, 0.9, 0.65],
+      ["right", 0.62, 0.86, -0.88, -0.68, 0.65],
+      ["near", 0.78, 0.84, 0.07, 0.13, 0.27]
+    ]
+  },
+  "front_angle_deg": 16,
+  "stop_range_m": 0.42,
+  "target_tolerance_m": 0.09,
+  "service_dwell_ms": 768,
+  "limit_ms": 60000
+}
