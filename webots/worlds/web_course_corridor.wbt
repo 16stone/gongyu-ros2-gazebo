@@ -12,7 +12,6 @@ Solid { name "DEF_floor" translation 9.5000 -2.5000 -0.0800 children [ Shape { a
 Solid { name "channel_rail" translation 3.5000 0.5500 0.3000 children [ Shape { appearance PBRAppearance { baseColor 0.300 0.320 0.380 roughness 0.60 metalness 0.30 emissiveColor 0.900 0.660 0.160 emissiveIntensity 0.15 } geometry Box { size 3.2 0.08 0.6 } } ] boundingObject Box { size 3.2 0.08 0.6 } }
 Solid { name "channel_rail" translation 3.5000 -0.5500 0.3000 children [ Shape { appearance PBRAppearance { baseColor 0.300 0.320 0.380 roughness 0.60 metalness 0.30 emissiveColor 0.900 0.660 0.160 emissiveIntensity 0.15 } geometry Box { size 3.2 0.08 0.6 } } ] boundingObject Box { size 3.2 0.08 0.6 } }
 DEF B1 Robot {
-DEF B1 Robot {
   name "B1" translation 1.43 0 0.1200 rotation 0 0 1 0.0
   controller "gongyu_ugv"
   children [ Shape { appearance PBRAppearance { baseColor 0.100 0.520 0.920 roughness 0.35 metalness 0.35 emissiveColor 0.100 0.520 0.920 emissiveIntensity 0.25 } geometry Box { size 0.4 0.34 0.14 } } Solid { name "canopy" translation 0 0 0.10 children [ Shape { appearance PBRAppearance { baseColor 0.350 0.780 1.000 roughness 0.30 metalness 0.15 emissiveColor 0.350 0.780 1.000 emissiveIntensity 0.80 } geometry Box { size 0.22 0.2 0.06 } } ] } Solid { name "beacon" translation 0.12 0 0.15 children [ Shape { appearance PBRAppearance { baseColor 0.350 0.780 1.000 roughness 0.30 metalness 0.15 emissiveColor 0.350 0.780 1.000 emissiveIntensity 0.80 } geometry Box { size 0.05 0.05 0.05 } } ] } HingeJoint {
