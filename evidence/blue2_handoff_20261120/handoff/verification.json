@@ -1,0 +1,15 @@
+{
+  "completed": {
+    "t_ms": 330976,
+    "deadline_ms": 350000,
+    "on_time": true,
+    "actor": "B1"
+  },
+  "release_ms": 247152,
+  "accept_ms": 247344,
+  "controller_ack_ms": 247328,
+  "reservations_ms": 247344,
+  "pickup_ms": 257536,
+  "channel_enter_ms": 313120,
+  "channel_clear_ms": 324320
+}

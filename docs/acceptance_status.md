@@ -1,5 +1,10 @@
 # 验收状态（2026-11-19，amax 执行）
 
+## 2026-11-20 跨车接管专项
+
+- 在八实体混合后端注入 B2 发车前退让。B1 回传确认，裁判改派通道名额与目的地。B1 于 330.976 s 完成原 `blue2` 任务，350 s 截止前余 19.024 s。整场 400 s，14/14 按期，5 进 5 清，零占用重叠。见 [实跑证据和复现命令](webots/blue2_handoff.md)。
+- 专项覆盖固定中转点的预定 B2→B1 接管。下面的课程报告和历史结果描述 11 月 19 日的快照。
+
 ## 交稿主版本（2026-11-19 收口，覆盖下文历史口径）
 
 - **正式提交**：`report_course_final/`，最新版 PDF 共 49 页，PDF 与 DOCX 同源，可用该目录的 `SHA256SUMS` 核对。
@@ -48,7 +53,7 @@
 
 ## 仍然开放的边界
 
-- 八实体整场尚无跨车接替未完任务并完成交付的回执。三组正式回合的 `blue2` 均由 B2 完成，正常和起点变化回合为 306.112 s，首帧延迟回合补采后为 314.240 s，截止时间为 350 s。见 [延迟回合任务回执](../evidence/course_final/delay/result/metrics.json)和[事件流](../evidence/course_final/delay/bus/events.jsonl)。历史专项 [`d-adapt`](../evidence/webots/d-adapt/events.jsonl)中的 9 条 `dynamic_replan` 事件记录候选和拟选方案，裁判在该分支只写入事件与指标，未将任务交给候选平台。跨车验收需在同一回合记录原车释放未完任务、接手车确认、通道与目的地预约更新，以及接手车按期交付。
+- 11 月 19 日交稿快照中的三组正式回合的 `blue2` 均由 B2 完成，正常和起点变化回合为 306.112 s，首帧延迟回合补采后为 314.240 s，截止时间为 350 s。见 [延迟回合任务回执](../evidence/course_final/delay/result/metrics.json)和[事件流](../evidence/course_final/delay/bus/events.jsonl)。历史专项 [`d-adapt`](../evidence/webots/d-adapt/events.jsonl)中的 9 条 `dynamic_replan` 事件记录候选和拟选方案，裁判在该分支只写入事件与指标，未将任务交给候选平台。跨车验收需在同一回合记录原车释放未完任务、接手车确认、通道与目的地预约更新，以及接手车按期交付。
 
 - 低矮障碍场景在物理上不可通行：障碍 `y` 跨度 0.8、中心 0.15，把 1.2 m 通道压到只剩 0.35 m 空隙，而车体宽 0.34 m。属场景移植缺陷，待改为部分遮挡后重跑，不影响运动学后端的双扫描判决。
 - `web_b1_gate`、`web_b1_unmapped`、`web_long`、`web_cost` 等矩阵场景尚未生成专门世界；B-plan（Dijkstra/A*）与出口泊位检查仍以 v9 Gazebo 证据支撑，不与 Webots 秒数混算。

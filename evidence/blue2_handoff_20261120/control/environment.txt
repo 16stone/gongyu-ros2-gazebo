@@ -1,0 +1,9 @@
+run=handoff-control-20261120-02
+scene=web_medium_phys
+platform=amax-cpu-webots-r2025a
+physical_actuation=1
+loc_mode=gps
+feedback_mode=sensor
+seed=0
+
+webots_exit=0
