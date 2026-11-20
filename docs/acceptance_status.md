@@ -2,7 +2,7 @@
 
 ## 交稿主版本（2026-11-19 收口，覆盖下文历史口径）
 
-- **正式提交**：`report_course_final/`，49 页 / 23008 汉字 / 45 表 / 16 图，PDF 与 DOCX 同源，`SHA256SUMS` 两项 OK；构建后逐项核验通过，目录 62/62 页码逐条命中，PDF 内无遗留反引号与缺图。
+- **正式提交**：`report_course_final/`，最新版 PDF 共 49 页，PDF 与 DOCX 同源，可用该目录的 `SHA256SUMS` 核对。
 - **主版本**：`evidence/course_final/{normal,delay,holdout}`，Webots R2025a CPU，场景 `web_medium_phys` / `web_holdout_v1_phys`；`physical_actuation=true`、`motion_backend=hybrid`、`kinematic_actors=["B3","R5"]`、`corridor_protocol=footprint_serial_dispatch`。三组均 14/14 按期、5 进 5 清、0 违例、400 s 完整窗口。
 - **与下文的关系**：下文「执行器层（真实电机）结论」里的 `p-motor-full-01/02` 是采用旧瞬时占用判据的**诊断分支**（分别完成 11 项与 13 项任务，后者记录 5 次重叠），未闭合、不计入交稿结果；`f-webots-full-01` 是运动学筛选回合，承担历史回放与规则配对。交稿主版本改用整个车体的包络判空与串行放行，结论建立在新回执上，三者数字不相加。
 - **报告改动**：2026-11-19 晚对正文做行文润色，去掉「报告把…」式元叙述、模板化否定对照与正文中的内部代号 / 命令行，改回学生课程报告的叙述口吻；数字、章节、表号图号与可复核路径不变。删除原附录 C 的完成度自评表；新增 1.4 主版本与证据分层、2.1 姿态符号判定性测量、7.2「现象—定位—修改—复验」修改链；把 3.2 的阈值细节与执行器诊断移入新附录 C；附录 A 的证据路径全部改为本仓库实际目录；构建器补行内代码渲染，移除自评表专用列宽与过时标题特例。
@@ -47,6 +47,8 @@
 `f-webots-full-01` 的证据已用 `reverify-full2` 更新，真值轨迹由 20 点提升到 **81 点/实体**（500 ms 密度），其余字段不变。
 
 ## 仍然开放的边界
+
+- 八实体整场尚无跨车接替未完任务并完成交付的回执。三组正式回合的 `blue2` 均由 B2 完成，正常和起点变化回合为 306.112 s，首帧延迟回合补采后为 314.240 s，截止时间为 350 s。见 [延迟回合任务回执](../evidence/course_final/delay/result/metrics.json)和[事件流](../evidence/course_final/delay/bus/events.jsonl)。历史专项 [`d-adapt`](../evidence/webots/d-adapt/events.jsonl)中的 9 条 `dynamic_replan` 事件记录候选和拟选方案，裁判在该分支只写入事件与指标，未将任务交给候选平台。跨车验收需在同一回合记录原车释放未完任务、接手车确认、通道与目的地预约更新，以及接手车按期交付。
 
 - 低矮障碍场景在物理上不可通行：障碍 `y` 跨度 0.8、中心 0.15，把 1.2 m 通道压到只剩 0.35 m 空隙，而车体宽 0.34 m。属场景移植缺陷，待改为部分遮挡后重跑，不影响运动学后端的双扫描判决。
 - `web_b1_gate`、`web_b1_unmapped`、`web_long`、`web_cost` 等矩阵场景尚未生成专门世界；B-plan（Dijkstra/A*）与出口泊位检查仍以 v9 Gazebo 证据支撑，不与 Webots 秒数混算。

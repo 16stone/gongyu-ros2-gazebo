@@ -4,13 +4,13 @@
 
 ## 正式提交版本
 
-**`report_course_final/` 是唯一提交版本**：PDF 与 DOCX 由同一份 [`body.md`](report_course_final/body.md) 生成，49 页 / 23008 汉字 / 45 表 / 16 图，目录页码逐条回填，`SHA256SUMS` 可校验。重建命令为 `python report_course_final/src/build_report.py`（需 python-docx、LibreOffice、poppler）；构建的第一遍产物和系统配置写在临时目录，不落进仓库。
+**`report_course_final/` 是唯一提交版本**：PDF 与 DOCX 由同一份 [`body.md`](report_course_final/body.md) 生成，最新版 PDF 共 49 页，目录页码逐条回填，`SHA256SUMS` 可校验。重建命令为 `python report_course_final/src/build_report.py`（需 python-docx、LibreOffice、poppler）；构建的第一遍产物和系统配置写在临时目录，不落进仓库。
 
 报告第 1.4 节给出主版本与四层证据的边界，第 4 章是三组整机实跑，第 7 章是设计复盘，附录 A 是可核对的证据入口，附录 C 是判定性调试记录。`report_v11/` 是 55 页历史扩展稿，只作方案演进记录，**不作为提交版本**。
 
 | 入口 | 内容 |
 | --- | --- |
-| [正式报告](report_course_final/) | PDF、Word、同源正文、图表、构建脚本、校验清单 |
+| [正式报告 PDF](report_course_final/潘道熙25361130课程设计报告题目二.pdf) | [报告目录](report_course_final/)含 Word、同源正文、图表、构建脚本和校验清单 |
 | [交稿版整机回放](docs/demo/course_final_replay.mp4) | 53 s 配套回放；[历史运动学回合回放](docs/demo/webots_full_run.mp4) 与[自包含演示页](docs/demo/webots_replay.html) 另存 |
 | [Webots 复现](docs/webots/course_final_reproduce.md) | 交稿三组回合的场景、环境变量与回执读法 |
 | [图模型与 Gazebo 复现](docs/reproduce.md) | 离散算例与归档整机的复现步骤 |
@@ -24,7 +24,9 @@
 - 正常、首份观察延迟、侦察车起点变化三组，以及两次正常复跑，均在 400 s 窗口内完成 14/14 项按期任务，通道进入与清空各 5 次，无车体占用重叠。
 - 首帧同样延迟时，仅拒收过期帧的回合为 13/14，B2 未交付；开启补采后为 14/14，B2 在 314.240 s 交付。正常观察回合的 B2 交付时刻为 306.112 s。两车专项中，按实际清空放行比固定 32 s 少等 24.112 s。
 - [B1 单车专项](docs/webots/B1_PHASE_B.md)：Dijkstra 与 A* 同图对照、四方向回波与近距漏检、低位雷达触发低箱前停车。
-- [多旋翼专项](docs/webots/uav_course.md)：四组单机条件验证起飞、到达、驻留、返场与降落；八实体整场的空中部分为航点运动学。跨车接替未完任务的整场验证仍待完成。
+- [多旋翼专项](docs/webots/uav_course.md)：四组单机条件验证起飞、到达、驻留、返场与降落；八实体整场的空中部分为航点运动学。
+
+三组整机回合的第二批运输任务均由 B2 本车完成。首帧延迟时，B2 等到有效补采帧后在 314.240 s 按期交付。跨车接替未完任务并由接手车按期交付的整场验证仍待完成，见[验收状态](docs/acceptance_status.md#仍然开放的边界)。
 
 ## 版本口径
 
