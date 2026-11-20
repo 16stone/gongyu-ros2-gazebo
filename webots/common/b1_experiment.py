@@ -113,7 +113,7 @@ def segment_distance(point, a, b):
     return math.dist(point, (a[0] + fraction * dx, a[1] + fraction * dy))
 
 
-def low_scan_bypass(free, goal, algorithm, pose, scan):
+def low_scan_bypass(free, goal, algorithm, pose, scan, *, depth_m=0.45):
     # shortcut: a single static box is bounded from its observed facade in this fixture;
     # replace with a fused local occupancy map when validating arbitrary obstacle geometry.
     x, y, yaw = pose
@@ -126,7 +126,7 @@ def low_scan_bypass(free, goal, algorithm, pose, scan):
     if len(returns) < 3:
         raise ValueError("insufficient low scan returns for bypass")
     observed_x, observed_y = zip(*returns)
-    bounds = min(observed_x), max(observed_x) + 0.45, min(observed_y) - 0.07, max(observed_y) + 0.07
+    bounds = min(observed_x), max(observed_x) + depth_m, min(observed_y) - 0.07, max(observed_y) + 0.07
     a, b, c, d = bounds
     margin = max(CARD["inflation_m"], CARD["model"]["footprint_radius_m"] +
                  CARD["target_tolerance_m"] + GRID_M)

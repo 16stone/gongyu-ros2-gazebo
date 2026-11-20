@@ -11,7 +11,8 @@ sys.path.insert(0, os.environ.get('GONGYU_WEBOTS_COMMON', ''))
 from bus import Bus
 from task_metrics import summarize_tasks
 from observation_gate import ObservationGate
-from physical_corridor import CARRIER_ORDER, STAGING, TRANSPORT_ROUTES, occupies_corridor
+from physical_corridor import CARRIER_ORDER, HULL_RADIUS, STAGING, TRANSPORT_ROUTES, occupies_corridor
+from course_low_box import SCENE as LOW_BOX_SCENE
 
 RUN = os.environ.get('GONGYU_RUN_DIR', '/tmp/gongyu_default')
 SCENE = os.environ.get('GONGYU_SCENE', 'web_medium')
@@ -24,7 +25,7 @@ SCEN = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '
 NODES = SCEN['nodes']
 TASKS = dict((t['id'], t) for t in SCEN['tasks'])
 PHYSICAL_ACTUATION = os.environ.get('GONGYU_PHYS', '0') == '1'
-PHYSICAL_STAGING = PHYSICAL_ACTUATION and SCENE in {"web_medium_phys", "web_holdout_v1_phys"}
+PHYSICAL_STAGING = PHYSICAL_ACTUATION and SCENE in {"web_medium_phys", "web_holdout_v1_phys", LOW_BOX_SCENE}
 BLUE2_HANDOFF = os.environ.get('GONGYU_BLUE2_HANDOFF', '0') == '1'
 if BLUE2_HANDOFF and not PHYSICAL_STAGING:
     raise ValueError('GONGYU_BLUE2_HANDOFF requires a physical full-course scene')
@@ -72,7 +73,7 @@ for nm in ROUTES:
         actors[nm] = node
 if BLUE2_HANDOFF and not {'B1', 'B2'} <= actors.keys():
     raise ValueError('The blue2 handoff requires both blue ground vehicles')
-FULL_SCENES = {"web_medium", "web_medium_phys", "web_holdout_v1", "web_holdout_v1_phys"}
+FULL_SCENES = {"web_medium", "web_medium_phys", "web_holdout_v1", "web_holdout_v1_phys", LOW_BOX_SCENE}
 if SCENE in FULL_SCENES:
     expected_task_ids = set(TASKS)
 else:
@@ -192,6 +193,13 @@ prev_t = -1
 last_truth_t = -500
 physical_entered = {}
 previous_overlaps = set()
+box = sup.getFromDef('COURSE_LOW_BOX') if SCENE == LOW_BOX_SCENE else None
+if box is not None:
+    center = box.getPosition()
+    size = box.getField('boundingObject').getSFNode().getField('size').getSFVec3f()
+    bounds = [(value - extent / 2, value + extent / 2) for value, extent in zip(center, size)]
+    metrics['low_box'] = {'bounds_m': bounds, 'minimum_clearance_m': {}, 'contacts': []}
+    box_contacts = set()
 
 while sup.step(ts) != -1:
     t = int(sup.getTime() * 1000)
@@ -237,6 +245,23 @@ while sup.step(ts) != -1:
             metrics['violations'].append(item)
             ev('channel_overlap', item)
         previous_overlaps = overlaps
+        if box is not None:
+            minimum = metrics['low_box']['minimum_clearance_m']
+            (x0, x1), (y0, y1), (_, height) = bounds
+            for name, (x, y) in ground_positions.items():
+                gap = math.hypot(max(x0 - x, 0, x - x1), max(y0 - y, 0, y - y1)) - HULL_RADIUS
+                minimum[name] = min(gap, minimum.get(name, math.inf))
+                if gap <= 0.03 and name not in box_contacts:
+                    for contact in actors[name].getContactPoints(True):
+                        px, py, pz = contact.getPoint()
+                        if x0 - 0.012 <= px <= x1 + 0.012 and y0 - 0.012 <= py <= y1 + 0.012 and 0.025 < pz <= height + 0.012:
+                            item = {'t_ms': t, 'kind': 'low_box_contact', 'actor': name,
+                                    'xyz': [px, py, pz]}
+                            metrics['low_box']['contacts'].append(item)
+                            metrics['violations'].append(item)
+                            box_contacts.add(name)
+                            ev('low_box_contact', item, name)
+                            break
     if handoff_offer is not None:
         ack = bus.last('handoff_B1.jsonl')
         if (ack and ack['offer_id'] == handoff_offer['id'] and ack['actor'] == 'B1'

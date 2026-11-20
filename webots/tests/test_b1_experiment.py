@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
 from b1_experiment import (CARD, drive, grid_search, grid_spec, low_scan_bypass, ray_box,
                            segment_distance, wheel_predict, world_point)
 from analyze_b1_experiment import scan_correct
+from course_low_box import east_apron_bypass, near_front_range
 
 
 class SingleVehicleExperiment(unittest.TestCase):
@@ -43,6 +44,15 @@ class SingleVehicleExperiment(unittest.TestCase):
         self.assertAlmostEqual(segment_distance((1, 0.2), (0, 0), (2, 0)), 0.2)
         self.assertAlmostEqual(segment_distance((3, 0), (0, 0), (2, 0)), 1)
         self.assertAlmostEqual(segment_distance((3, 4), (0, 0), (0, 0)), 5)
+
+    def test_course_bypass_uses_north_apron_and_original_delivery(self):
+        low_face = [(0.36, y, 0) for y in (0, 0.08, 0.16, 0.24)]
+        self.assertAlmostEqual(near_front_range(low_face), 0.36)
+        self.assertIsNone(near_front_range([(0.80, 0, 0)]))
+        targets, bounds = east_apron_bypass((6.55, 2.05, 0.0), (8.0, 2.4), low_face)
+        self.assertGreater(bounds[0], 7.10)
+        self.assertTrue(any(y > 2.6 for x, y in targets))
+        self.assertEqual(targets[-1], [8.0, 2.4])
 
     def test_scan_correction_of_lateral_and_yaw_offset(self):
         cloud = [(2.65 + i * 0.085 - 3.6 - 0.24, side * 0.55, 0)
