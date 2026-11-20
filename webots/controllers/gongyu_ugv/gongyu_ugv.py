@@ -258,7 +258,12 @@ while robot.step(ts) != -1:
                 bus.append('ctl_events.jsonl', {'kind': 'apron_scan_stop', 'actor': name,
                            'task_id': 'blue1', 't_ms': t, 'pose': pose, 'source': 'low',
                            'return_m': first_return})
-            if bypass_started is not None and t - bypass_started >= 320:
+            if bypass_started is None:
+                # Keep enough stopping distance for a low box during the east-apron approach.
+                v = min(v, 0.18)
+                wl = (v + omega * BASE / 2) / R
+                wr = (v - omega * BASE / 2) / R
+            elif t - bypass_started >= 320 and gps.getSpeed() <= 0.04:
                 try:
                     bypass_targets, observed = east_apron_bypass(pose, (cmd['x'], cmd['y']), scan)
                 except ValueError as error:
