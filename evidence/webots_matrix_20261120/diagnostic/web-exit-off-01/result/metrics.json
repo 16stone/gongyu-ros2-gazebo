@@ -1,0 +1,43 @@
+{
+  "scene": "web_medium_exit",
+  "motion_backend": "ugv_wheel_motors",
+  "settings": {
+    "early_release": true,
+    "exit_check": false,
+    "berth": [
+      6.4,
+      0.0
+    ]
+  },
+  "task_completed": {
+    "following_delivery": {
+      "actor": "B2",
+      "t_ms": 33264,
+      "deadline_ms": 65000,
+      "on_time": true
+    },
+    "first_delivery": {
+      "actor": "B1",
+      "t_ms": 34016,
+      "deadline_ms": 55000,
+      "on_time": true
+    }
+  },
+  "total": 2,
+  "deadlines_ms": {
+    "first_delivery": 55000,
+    "following_delivery": 65000
+  },
+  "on_time": 2,
+  "full_window": true,
+  "sim_end_ms": 65008,
+  "channel_overlap_samples": 0,
+  "vehicle_envelope_overlap_samples": 450,
+  "violation_count": 450,
+  "min_vehicle_separation_m": 0.4220124191202587,
+  "min_lane_envelope_margin_m": 0.22829302473308444,
+  "paths_m": {
+    "B1": 6.18974306445801,
+    "B2": 7.2992917578711465
+  }
+}
