@@ -264,7 +264,8 @@ while robot.step(ts) != -1:
                 except ValueError as error:
                     bypass_targets = ()
                     bus.append('ctl_events.jsonl', {'kind': 'apron_replan_failed', 'actor': name,
-                               'task_id': 'blue1', 't_ms': t, 'pose': pose, 'reason': str(error)})
+                               'task_id': 'blue1', 't_ms': t, 'pose': pose, 'reason': str(error),
+                               'plan_scan': scan, 'goal': [cmd['x'], cmd['y']]})
                 else:
                     bus.append('ctl_events.jsonl', {'kind': 'apron_replanned', 'actor': name,
                                'task_id': 'blue1', 't_ms': t, 'pose': pose,
