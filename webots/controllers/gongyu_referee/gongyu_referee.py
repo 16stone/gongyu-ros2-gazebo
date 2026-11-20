@@ -33,6 +33,7 @@ if ROTOR_SCENE and not PHYSICAL_STAGING:
     raise ValueError("The rotor course requires GONGYU_PHYS=1")
 ROTOR_AIRCRAFT = {"B3", "R5"} if ROTOR_SCENE else set()
 ROTOR_ALTITUDE = 1.9
+R1_PREPOSITION_NODES = {'east_south_start', 'east_gate', 'east_straight'}
 LANDING_ALTITUDE = 0.045
 BLUE2_HANDOFF = os.environ.get('GONGYU_BLUE2_HANDOFF', '0') == '1'
 if BLUE2_HANDOFF and not PHYSICAL_STAGING:
@@ -182,6 +183,8 @@ def send(nm, node, task=None):
     state[nm]['target_node'] = node
     kin_state[nm]['target'] = (x, y)
     ev('move_commanded', {'node': node, 'x': x, 'y': y, 'berth_x': berth_x}, nm, task)
+    if SCENE == LOW_BOX_SCENE and nm == 'R1' and carrier_order[carrier_index] == 'B1':
+        ev('apron_preposition', {'node': node, 'x': x, 'y': y}, nm, 'red1')
 
 
 t = 0
@@ -226,7 +229,8 @@ if box is not None:
     center = box.getPosition()
     size = box.getField('boundingObject').getSFNode().getField('size').getSFVec3f()
     bounds = [(value - extent / 2, value + extent / 2) for value, extent in zip(center, size)]
-    metrics['low_box'] = {'bounds_m': bounds, 'minimum_clearance_m': {}, 'contacts': []}
+    metrics['low_box'] = {'bounds_m': bounds, 'minimum_clearance_m': {}, 'contacts': [],
+                          'minimum_preposition_separation_m': None}
     box_contacts = set()
 
 while sup.step(ts) != -1:
@@ -274,6 +278,10 @@ while sup.step(ts) != -1:
             ev('channel_overlap', item)
         previous_overlaps = overlaps
         if box is not None:
+            if carrier_order[carrier_index] == 'B1' and state['R1']['target_node'] in R1_PREPOSITION_NODES:
+                gap = math.dist(ground_positions['R1'], ground_positions['B1'])
+                previous = metrics['low_box']['minimum_preposition_separation_m']
+                metrics['low_box']['minimum_preposition_separation_m'] = min(gap, previous) if previous is not None else gap
             minimum = metrics['low_box']['minimum_clearance_m']
             (x0, x1), (y0, y1), (_, height) = bounds
             for name, (x, y) in ground_positions.items():
@@ -309,8 +317,11 @@ while sup.step(ts) != -1:
             if st['idx'] >= len(ROUTES[nm]):
                 continue
             node, task = ROUTES[nm][st['idx']]
+            preposition = (SCENE == LOW_BOX_SCENE and nm == 'R1' and node in R1_PREPOSITION_NODES
+                           and carrier_order[carrier_index] == 'B1'
+                           and state['B1']['target_node'] == 'blue_delivery' and not physical_entered)
             if PHYSICAL_STAGING and nm in CARRIER_ORDER:
-                if nm != carrier_order[carrier_index]:
+                if nm != carrier_order[carrier_index] and not preposition:
                     continue
                 if nm == 'R1' and t < TASKS['red1'].get('release_ms', 0):
                     continue
@@ -420,7 +431,8 @@ while sup.step(ts) != -1:
                             ev('reservation_granted', {'start': t, 'end': t + 48000,
                                                        'slot_id': '%s_%d' % (nm, st['idx']),
                                                        'direction': 'E->W' if prev_node == 'E' else 'W->E'}, nm, nt)
-                        if not (ROTOR_SCENE and nn == 'F_land' and not course_gate.authorized):
+                        if (not preposition or nn in R1_PREPOSITION_NODES) and not (
+                                ROTOR_SCENE and nn == 'F_land' and not course_gate.authorized):
                             send(nm, nn, nt)
                     elif PHYSICAL_STAGING and nm in CARRIER_ORDER:
                         ev('carrier_released', {'order': carrier_index}, nm, task)
