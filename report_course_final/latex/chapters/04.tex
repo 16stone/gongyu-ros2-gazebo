@@ -1,0 +1,243 @@
+\clearpage
+
+\section{Webots 整场与专项实验}\label{sec:4}
+
+\subsection{同一任务卡的试验设计}\label{sec:4.1}
+
+按照地面车辆课程中“建模、编程、仿真”的过程 \cite{ref2,ref5}，首先设置场地、通道和各任务点，再做带差速轮、传感器和碰撞体的地面车。建模时实际车体的尺寸直接影响通道宽度、对准点和停车点。各实体运行自己的运动控制，裁判定期读场景位置、记录事件，连续运行 400~s，最后按任务卡核对结果。轨迹以约 0.5~s 的间隔保存供复核，通道占用按仿真步长判断。
+
+正常组用于观察全场是否能走完规定任务。延迟组只增加 B3 首份发车观察的传递时间，查看等待和补采怎样影响 B2。起点变化组调整 R3、R4 的起始位置，检验运输与侦察同时进行时的协同。正常设置另重复启动两次，逐轮核对完成数和通道互斥。
+
+每轮在 400~s 窗口内按固定的 14 项任务统计完成数和按期数，并逐步检查通道内是否同时出现两个车体包络。两项指标分别回答任务是否完成和通道是否互斥。基础回合与低箱、链路故障回合采用六车电机和两机航点运动。双机旋翼回合保留六辆地面车，由两架四旋翼替代航点运动模型。每项结论按对应回合的实际执行方式陈述。
+
+\subsection{正常回合与起点变动}\label{sec:4.2}
+
+三组试验均使用同样的实体、任务和通道判断方法。主回合按正常速度投递观察。延迟回合只改变 B3 首份发车观察的传递时间。第三组改变 R3、R4 的起点，查看侦察车辆的路线变化后全队是否仍能完成任务。另在同一正常设置下重新启动两次，均为 14 项按期、无通道占用重叠。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-8\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.20000\tableavailable}>{\centering\arraybackslash}p{0.20000\tableavailable}>{\centering\arraybackslash}p{0.20000\tableavailable}>{\centering\arraybackslash}p{0.20000\tableavailable}>{\centering\arraybackslash}p{0.20000\tableavailable}@{}}
+\caption{Webots 完整回合结果}\label{tab:20}\\
+\toprule
+\textbf{条件} & \textbf{完成任务} & \textbf{按期任务} & \textbf{通道进入 / 清空} & \textbf{通道占用重叠} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{条件} & \textbf{完成任务} & \textbf{按期任务} & \textbf{通道进入 / 清空} & \textbf{通道占用重叠} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+正常观察 & 14/14 & 14/14 & 5/5 & 0 \\
+首份观察延迟 & 14/14 & 14/14 & 5/5 & 0 \\
+两辆侦察车起点变化 & 14/14 & 14/14 & 5/5 & 0 \\
+\end{longtable}
+\endgroup
+
+
+图~\ref{fig:7} 给出地面车辆的运输和侦察路线，以及两架无人机的巡察路线。图~\ref{fig:8} 记录的五段车辆占用区间均有结束事件，结束时车体包络已退出保护区域。R2 先从东端穿过通道去装货，再返回东端交付，另外三辆运输车各通过一次，通行数和交付批次分别统计。下表列出四次运输交付。四项运输中余量最小的 R1，正常回合还有约 10.6~s 余量，入口偏移或重复停车会直接消耗这段时间。
+
+\figitem{1}{fig07.pdf}{Webots 正常回合的八实体轨迹及运输区域放大图}{7}
+
+\figitem{0.98}{fig08.pdf}{Webots 正常回合的通道占用与 B2 观察放行时刻}{8}
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.25000\tableavailable}>{\centering\arraybackslash}p{0.25000\tableavailable}>{\centering\arraybackslash}p{0.25000\tableavailable}>{\centering\arraybackslash}p{0.25000\tableavailable}@{}}
+\caption{正常回合的四次运输交付（仿真时间）}\label{tab:21}\\
+\toprule
+\textbf{交付} & \textbf{完成时刻 / s} & \textbf{任务期限 / s} & \textbf{余量 / s} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{交付} & \textbf{完成时刻 / s} & \textbf{任务期限 / s} & \textbf{余量 / s} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+红方第二批 R2 & 80.1 & 100 & 19.9 \\
+蓝方第一批 B1 & 125.4 & 350 & 224.6 \\
+红方第一批 R1 & 239.4 & 250 & 10.6 \\
+蓝方第二批 B2 & 306.1 & 350 & 43.9 \\
+\end{longtable}
+\endgroup
+
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.25000\tableavailable}>{\centering\arraybackslash}p{0.25000\tableavailable}>{\centering\arraybackslash}p{0.25000\tableavailable}>{\centering\arraybackslash}p{0.25000\tableavailable}@{}}
+\caption{正常回合五次车体占用}\label{tab:22}\\
+\toprule
+\textbf{实体} & \textbf{进入 / s} & \textbf{清空 / s} & \textbf{持续 / s} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{实体} & \textbf{进入 / s} & \textbf{清空 / s} & \textbf{持续 / s} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+R2 & 13.088 & 25.312 & 12.224 \\
+R2 & 50.912 & 61.760 & 10.848 \\
+B1 & 86.416 & 96.944 & 10.528 \\
+R1 & 214.528 & 230.256 & 15.728 \\
+B2 & 286.320 & 298.880 & 12.560 \\
+\end{longtable}
+\endgroup
+
+
+这五个区间按进入顺序排列。R2 为取货和返程两次使用通道，其他三台运输车各一次。两段之间的空档还包括装载、任务释放、其他车在入口外对准或等待观察。空档时长本身不能直接归为纯排队，分析某个任务为什么晚，需要顺着它自己的事件链检查。
+
+\subsection{首份观察延迟对交付的影响}\label{sec:4.3}
+
+为检验首份报告的时效如何影响放行，将其传递时间从 1.0~s 调到 7.3~s。正常回合在 240.928~s 放行 B2；延迟回合在 247.232~s 拒收首帧，重新获得有效观察后于 248.992~s 放行。两轮交付分别为 306.112~s 和 314.240~s，相差 8.128~s，均在 350~s 期限内。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\centering\arraybackslash}p{0.26516\tableavailable}>{\raggedright\arraybackslash}p{0.24495\tableavailable}>{\centering\arraybackslash}p{0.24495\tableavailable}>{\centering\arraybackslash}p{0.24495\tableavailable}@{}}
+\caption{蓝方第二批运输的观察时效对照}\label{tab:23}\\
+\toprule
+\textbf{首份观察传递设定 / s} & \textbf{首份为有效观察} & \textbf{有效观察放行 / s} & \textbf{交付 / s} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{首份观察传递设定 / s} & \textbf{首份为有效观察} & \textbf{有效观察放行 / s} & \textbf{交付 / s} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+1.0 & 是 & 240.9 & 306.1 \\
+7.3 & 否，重新采样 & 249.0 & 314.2 \\
+\end{longtable}
+\endgroup
+
+
+两轮从有效放行到交付都用时约 65.2~s，交付时刻的差异主要出现在等待有效观察的阶段。实验记录可以对上首帧过期、补采和放行的顺序。8.128~s 是这两个回合的实测交付差值。附录 A 中，正常设置的三轮复跑也记录到 290.336—306.112~s 的交付时刻，说明交付时间本身会随运行变化。
+
+\subsection{过期观察后的等待与补采}\label{sec:4.4}
+
+正常与延迟的对照表明，时间戳确实影响发车。进一步的问题是：过期观察不能用于放行时，继续等待与主动补采有何区别？为此保持首份观察延迟为 7.3~s，分别尝试“拒收后继续等”和“拒收后请求新帧”。两组在约 247.2~s 收到了同一次采样的过期观察，车辆都保持等待。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.24000\tableavailable}>{\raggedright\arraybackslash}p{0.40000\tableavailable}>{\centering\arraybackslash}p{0.18000\tableavailable}>{\centering\arraybackslash}p{0.18000\tableavailable}@{}}
+\caption{同一延迟下，过期之后两种做法的结果}\label{tab:24}\\
+\toprule
+\textbf{处理} & \textbf{B2 的后续行动} & \textbf{按期任务} & \textbf{通道占用重叠} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{处理} & \textbf{B2 的后续行动} & \textbf{按期任务} & \textbf{通道占用重叠} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+拒收后等待 & 没有新的放行，第二批在 400~s 窗口内未交付 & 13/14 & 0 \\
+拒收后补采 & 约 249.0~s 发车，约 314.2~s 交付 & 14/14 & 0 \\
+\end{longtable}
+\endgroup
+
+
+两组都拒收了过期观察。继续等待的一组在 400~s 内没有交付，主动补采的一组取得有效观察后恢复交付。该轮 B2 的期限为 350~s，补采是否能挽回任务取决于重新观察和行驶所需时间。
+
+\subsection{两种通道放行规则的对照}\label{sec:4.5}
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-8\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.31000\tableavailable}>{\centering\arraybackslash}p{0.16000\tableavailable}>{\centering\arraybackslash}p{0.16000\tableavailable}>{\centering\arraybackslash}p{0.16000\tableavailable}>{\raggedright\arraybackslash}p{0.21000\tableavailable}@{}}
+\caption{Webots 两车场景的放行对照}\label{tab:25}\\
+\toprule
+\textbf{放行条件} & \textbf{B1 清空 / s} & \textbf{B2 放行 / s} & \textbf{B2 进入 / s} & \textbf{B2 清空} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{放行条件} & \textbf{B1 清空 / s} & \textbf{B2 放行 / s} & \textbf{B2 进入 / s} & \textbf{B2 清空} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+清空且等到固定时间 & 7.888 & 32.000 & 34.784 & 60~s 时未清空 \\
+确认前车清空即可放行 & 7.888 & 7.888 & 10.320 & 17.584~s \\
+\end{longtable}
+\endgroup
+
+
+两辆车、运动控制、路线和运行窗口相同。两组都须确认前车的车体完整驶出，固定时间组还须等到 32~s。按实时清空放行在本对照中少等 24.112~s。固定时间组到窗口末端仍未清空，因此只比较可直接观察的放行与进场时刻。两组各跑一轮，用来看清机制怎样起作用。
+
+\subsection{单车路径对照及其验证范围}\label{sec:4.6}
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-8\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.18000\tableavailable}>{\raggedright\arraybackslash}p{0.20000\tableavailable}>{\centering\arraybackslash}p{0.24000\tableavailable}>{\centering\arraybackslash}p{0.20000\tableavailable}>{\centering\arraybackslash}p{0.18000\tableavailable}@{}}
+\caption{单车物理轨迹与服务到位}\label{tab:26}\\
+\toprule
+\textbf{布局} & \textbf{全局搜索} & \textbf{实际轨迹 / m} & \textbf{到位 / s} & \textbf{记录违例} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{布局} & \textbf{全局搜索} & \textbf{实际轨迹 / m} & \textbf{到位 / s} & \textbf{记录违例} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+窄入口 & astar & 6.522 & 17.568 & 0 \\
+窄入口 & dijkstra & 6.589 & 19.056 & 0 \\
+开阔 & astar & 6.509 & 19.920 & 0 \\
+开阔 & dijkstra & 6.509 & 19.920 & 0 \\
+\end{longtable}
+\endgroup
+
+
+栅格规划和实际轨迹同用米作单位，但测得的是不同对象。规划长度是离散格网最短路。执行前的可见性简化会删掉多余的中间点，车辆随后依照实际姿态和几何条件跟踪这些点。表中的实际长度由裁判轨迹计算。单车试验回答路线能否执行，整场试验再检查进入顺序、信息等待与任务期限。
+
+\subsection{低箱绕行与通道外预对准}\label{sec:4.7}
+
+将一只位置未写入初始局部地图的 0.27~m 高低箱放在东侧开阔段。B1 已清空通道后，在 117.824~s 由低位雷达发现约 0.420~m 处的回波并停车。停稳后，它用定位后的回波更新占据图，重新搜索可通行路径，绕北侧到原卸货点，在 133.776~s 完成交付。独立裁判记录到 B1 离箱体的最小保守车体净距为 0.123~m，整场无箱体接触。
+
+前三轮依次暴露了占据估计、制动和调度三个问题。首先，侧面回波已包含部分厚度，重复外推会把卸货点判成被占。修正厚度估计后，车在停转转换时仍与低箱接触一次。将接近速度上限降至 0.18~m/s，并等到测得速度不高于 0.04~m/s 再转向，接触消失，R1 仍晚 1.360~s。最终允许 R1 在原任务释放后先到东侧通道外预对准，B1 交付后才授予 R1 原通行名额。预对准期间两车最小中心距为 3.033~m，R1 于 233.856~s 交付，比原期限早 16.144~s。验收回合为 14/14 项按期、通道 5 进 5 清、零占用重叠。
+
+\subsection{双机旋翼动力学与跨车接管}\label{sec:4.8}
+
+在保留六辆电机驱动地面车和原 14 项任务的场景中，B3、R5 的 GPS、惯性单元和陀螺数据进入位置与姿态控制器，控制器输出四个螺旋桨转速。两架飞行器均完成飞行与返场落地。正常观察回合中，B3 于 239.520~s 采样，B2 于 240.544~s 使用该帧获得放行，在 315.120~s 完成第二批交付。
+
+同场景的接管回合在发车前注入 B2 退让。B2 于 247.152~s 停稳并释放未完任务，B1 控制器在 247.328~s 回传确认，裁判在 247.344~s 更新通道名额和原卸货点归属。B3 在 247.360~s 新拍的相机帧包含 572 个地标像素。B1 在 248.384~s 采用该帧获得放行，随后完成中转点驻留并从东向西清空通道，于 340.176~s 交付，距 350~s 截止还有 9.824~s。两轮均跑满 400~s，14/14 项按期，通道 5 进 5 清，零车体占用重叠。先前的混合后端接管回合也由 B1 交付，完成时刻为 330.976~s。三轮均按各自回执陈述，交付时差包含执行过程的差异。
+
+\subsection{观察链路故障与恢复}\label{sec:4.9}
+
+这组仿真保持原场地和任务卡，在 B3 相机报告的传递环节注入链路故障。丢失帧等到有效期结束才触发重试。随机丢包臂设定丢包概率为 0.25、种子为 1。首帧在 240.928~s 丢失，超时后补采，B2 在 246.976~s 获放行，于 305.248~s 交付。该回合的两次尝试用于核对丢包、超时、补采和发车的顺序。
+
+235—265~s 的断链导致四份报告丢失。恢复后，B2 在 265.120~s 获放行，于 324.976~s 交付，两组恢复回合均为 14/14 项按期。持续断链回合共丢弃 27 帧，B2 未获得运动指令。该轮其余 13 项均按期，通道 4 进 4 清，无占用重叠。这个结果把等待的代价留在任务分母里，也检验了无法取得有效信息时的放行规则。
+
+\subsection{入口与资源准入的补充对照}\label{sec:4.10}
+
+入口对照各重启三次。净距合格时，对准把入场偏航绝对值从 0.356~rad 降至 0.075~rad，交付从 17.568~s 推迟到 21.296~s。对准点距同伴路径仅 0.541~m 时回退，仍按期。九次均无障碍接触或车间包络重叠。
+
+长绕行、泊位和支援对照各处理重复三次。按实际清空放行时，长绕行后车在 22.928~s 交付，固定等到 32~s 时在 72.304~s 交付，超过 65~s 截止。增加泊位检查后，车间保守包络重叠采样由 266 降为 0，检查组的墙侧保守余量最低为 −0.041~m。支援车返场期限从 50~s 缩到 23~s 时，交付车由 B2 改为 B1，两组均为 2/2 按期。

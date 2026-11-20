@@ -1,0 +1,195 @@
+\section{任务与总体设计}\label{sec:1}
+
+\subsection{靶场设想与设计目标}\label{sec:1.1}
+
+本设计把两队的竞争放在一条一次只能通过一辆车的狭窄通道上。每队都有运输、侦察和观察任务。前车何时驶离、后车何时满足发车条件，都可能影响最终交付。这样布置以后，车辆的自主行为可以通过轨迹、通道占用和任务完成时刻来比较。
+
+靶场包括行动实体、共享资源、仿真裁判、场景条件和评价指标，见表~\ref{tab:1}。裁判使用仿真真值检查到位、交付和通道占用。实体的运动控制与通行决策使用各自规定的反馈和任务条件。调整首份观察传递时间或侦察车起点，可以在同一套任务下比较不同条件。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.17000\tableavailable}>{\raggedright\arraybackslash}p{0.43000\tableavailable}>{\raggedright\arraybackslash}p{0.40000\tableavailable}@{}}
+\caption{靶场的组成与职责}\label{tab:1}\\
+\toprule
+\textbf{组成} & \textbf{本设计中的实现} & \textbf{作用} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{组成} & \textbf{本设计中的实现} & \textbf{作用} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+智能靶标 & 红蓝两队共 8 个实体：B1、B2、R1—R4 六辆差速地面车，B3、R5 两架无人机 & 执行运输、侦察、巡察任务，自主决定路线、等待与放行 \\
+对抗资源 & 中央单车通道、入口泊位与交付目的地 & 形成两队对通行时机的竞争 \\
+导控裁判 & Webots 裁判控制器，读取仿真真值 & 加载想定，记录轨迹与事件，裁决到点、超期与通道占用 \\
+想定参数 & 任务卡（释放时刻、期限）、首份观察传递时间、侦察车起点；图模型中另有入口间隔、消息时延和实体数量 & 调节对抗强度，构造单因素对照 \\
+评估指标 & 按期任务数、通道进入 / 清空与占用重叠、任务时间余量、等待时长 & 量化评价单体执行与队伍协同的效果 \\
+\end{longtable}
+\endgroup
+
+
+两队遵守同一通行规则。正常回合的运输放行次序事先确定，每辆车仍须根据前车是否清空、任务是否已到释放时刻以及所需观察是否有效来决定启程。图~\ref{fig:1} 标出了装卸、交付和入口对准的位置。
+
+\figitem{1}{fig01.pdf}{正常回合的共享通道、运输任务点与入口对准点}{1}
+
+取直达路线可以少走路，通道窄口却只能让一台车占用。取外侧路线能回避中央通道上的等待，同时会增加行驶和期限压力。空中单元不受地面导轨的通过方向限制，它能用一次巡察给地面车提供近期观察。把运输、巡察和资源限制放到同一张任务卡上以后，队伍竞争有了量化的比较对象，分别是各自任务的期限余量、共享通道等待和可观察的实际交付时刻。
+
+\subsection{八个实体与十四项任务}\label{sec:1.2}
+
+地面无人车（UGV）适合沿通道运输，也能到观察点侦察后返回。无人机（UAV）在场景中承担巡察和观察，其中蓝方 B3 的相机给第二批运输提供起步条件。表~\ref{tab:2} 列出各实体在完整回合里的职责。红方 R1 的运输要等到仿真 120~s 才允许启动，四次主要交付的期限在运行前确定。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.13000\tableavailable}>{\raggedright\arraybackslash}p{0.17000\tableavailable}>{\raggedright\arraybackslash}p{0.50000\tableavailable}>{\raggedright\arraybackslash}p{0.20000\tableavailable}@{}}
+\caption{八个实体的职责与任务期限}\label{tab:2}\\
+\toprule
+\textbf{实体} & \textbf{平台} & \textbf{登记任务} & \textbf{绝对期限 / s} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{实体} & \textbf{平台} & \textbf{登记任务} & \textbf{绝对期限 / s} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+B1 & 地面车 & 蓝方第一批运输交付 & 350 \\
+B2 & 地面车 & 蓝方第二批运输交付 & 350 \\
+B3 & 无人机 & 蓝方巡察，另按请求提供观察 & 40 \\
+R1 & 地面车 & 红方第一批交付，120~s 释放 & 250 \\
+R2 & 地面车 & 红方第二批交付 & 100 \\
+R3 & 地面车 & 侦察、报告、返场 & 60、70、86 \\
+R4 & 地面车 & 侦察、报告、返场 & 60、70、130 \\
+R5 & 无人机 & 红方空中巡察、巡逻、返场 & 10、60、180 \\
+\end{longtable}
+\endgroup
+
+
+每项任务在仿真前确定最早启动时刻、期限和完成条件。沿途装载和 B3 提供的发车观察是运输的前置事件，独立任务数按两队的任务表计算。未完成的任务仍计入 14 项总数。蓝方 3 个实体、红方 5 个实体，合计 8 个，符合题目规定的 3—10 个实体。
+
+\subsection{课程原理在方案中的应用}\label{sec:1.3}
+
+课程讲授总体设计时强调，应先明确使命任务，再分配各分系统的职责 \cite{ref1}。本设计据此先列出每辆车和每架无人机的任务，再为控制器、协同规则和裁判分配各自所需的信息：控制器用位置、航向和近处障碍，任务协调看通道是否清空、观察是否有效，裁判则从仿真状态检查到点、超期和通道占用。
+
+\figitem{0.98}{fig02.pdf}{任务分配、平台执行与仿真验收的信息关系}{2}
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.32000\tableavailable}>{\raggedright\arraybackslash}p{0.34000\tableavailable}>{\raggedright\arraybackslash}p{0.34000\tableavailable}@{}}
+\caption{从任务要求到实现与检查}\label{tab:3}\\
+\toprule
+\textbf{任务需要} & \textbf{本设计采用的办法} & \textbf{仿真中检查什么} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{任务需要} & \textbf{本设计采用的办法} & \textbf{仿真中检查什么} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+地面车能沿路线通过窄口并停稳 & 行驶反馈、通道外对准、到点减速 & 轨迹、到位、低速和驻留 \\
+两队能共享同一通道 & 依据车体范围判空，按顺序放行运输 & 车辆占用区间有无重叠 \\
+第二批运输使用近期观察 & 相机帧带采样时刻，过期后重新请求 & 收帧、拒收、发车的先后关系 \\
+队伍可以在期限内完成职责 & 预先设任务时间窗，在线判断实际放行时机 & 登记任务数、按期任务数和时间余量 \\
+\end{longtable}
+\endgroup
+
+
+课程在多无人艇任务分配与协同航行部分 \cite{ref4} 采用了上下分层的分工，本设计把这种分工迁移到靶场：上层选车并决定什么时候放行，下层根据位置和航向反馈把车开到指定地点。车辆还在入口调姿态时，任务层会等到位和驻留记录，再确认相应的任务进度。
+
+\subsection{题目要求与实验安排}\label{sec:1.4}
+
+三组整场试验使用两套场景设置。正常组与首份观察延迟组使用同一场地和任务，只将传递时间从 1.0~s 增至 7.3~s。起点变化组调整 R3、R4 的位置，运输任务及通行规则相同。三组均由地面车仿真电机驱动，两架无人机按航点运动。表~\ref{tab:4} 汇总本设计对题目要求的落实情况。
+
+\clearpage
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-2\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.30\tableavailable}>{\raggedright\arraybackslash}p{0.70\tableavailable}@{}}
+\caption{题目要求与本设计的完成内容}\label{tab:4}\\
+\toprule
+\textbf{题目要求} & \textbf{本设计完成的内容} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{题目要求} & \textbf{本设计完成的内容} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+选择单域或跨域 & 采用空地跨域场景，六辆差速地面车与两架无人机分成红蓝两队。\\
+构建对抗靶场 & 设置单车通道、入口泊位和交付点。用任务卡规定释放时刻与期限，由仿真裁判记录轨迹、交付和占用。\\
+设计单个智能靶标 & 地面车具备差速反馈、定位、路径规划、近障检测和驻留交付。无人机执行航点巡察和相机观察。\\
+实现多个智能靶标协同 & 8 个实体按 14 项任务分工。运输车依车体判空放行，空中观察带时间戳，过期时主动补采。\\
+参考仿生集群方法 & 用群集行为解释通道避让，参考知情个体引导设计空地观察分工，并用响应阈值和军蚁搭桥分析岗位支援。\\
+开展仿真演示 & 在 Webots 完成三组八实体整场回合，另做感知、规划、通道放行与观察补采等专项对照，并分析 Gazebo／ROS 2 历史回合。\\
+\end{longtable}
+\endgroup
+
+
+整场仿真回答八个实体能否按时协作。单项实验分别检验定位、感知、多旋翼反馈、报告时效和放行。Gazebo 历史回合与离散模型进一步分析岗位分工、通道预约与通信。两种仿真平台的质量、摩擦、噪声和控制周期有所不同，定量对照在同平台、同条件下进行。早期单体和整场诊断用于说明设计怎样改进。
+
+\subsection{任务协调与完成判定}\label{sec:1.5}
+
+系统按感知、任务管理、决策、执行和通信五部分组织。感知给出位姿、局部障碍与载荷观测；任务管理保存任务卡、目标点和前置条件，决策据此安排路线、岗位与共享资源；执行部分接收目标点并调节运动，完成情况回到任务管理。报告、申请、确认、释放等消息带编号和时间戳，用来保留因果次序。两个平台都沿用这套分层，只是执行部分与仿真器的接口不同。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.16000\tableavailable}>{\raggedright\arraybackslash}p{0.30000\tableavailable}>{\raggedright\arraybackslash}p{0.26000\tableavailable}>{\raggedright\arraybackslash}p{0.28000\tableavailable}@{}}
+\caption{共享资源的状态与判断依据}\label{tab:5}\\
+\toprule
+\textbf{对象} & \textbf{关键状态} & \textbf{主要变化} & \textbf{判断依据} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{对象} & \textbf{关键状态} & \textbf{主要变化} & \textbf{判断依据} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+中央通道 & 空闲、已预约、使用中 & 申请、授权、进入、清空、释放 & 预约编号、方向与起止时刻 \\
+入口与泊位 & 空闲、占用、对准中 & 到位、对准、占用、清空 & 实体姿态与占用区间 \\
+交付目的地 & 空闲、装载中、卸载中 & 装载、服务、卸载、离开 & 任务、服务结果与目的地状态 \\
+观察报告 & 待处理、已送达、过期或失败 & 采样、送达、使用、过期 & 采样与接收时刻、消息编号 \\
+岗位与服务 & 空闲、协商、执行中、释放 & 请求、提议、确认、执行、释放 & 提议编号、服务提供者与请求者 \\
+\end{longtable}
+\endgroup
+
+
+通道预约记录包含名义起止时刻。名义窗用于预约时的冲突检查，实际清空事件用于提前释放未使用部分。泊位和目的地单独记录，避免车辆虽然持有通道时间窗，却在出口处与另一项服务发生冲突。
+
+报告超过有效期后退出候选判断。服务完成、请求撤销或继续占用岗位已无必要时，提供者返回原任务。系统及时更新岗位状态，使空闲车辆能够参与后续任务。
+
+Webots 中的运输放行检查任务是否已释放、前车车体是否完整驶离，以及下一车需要的观察是否仍然有效。Gazebo 另记录岗位确认、泊位占用和时段预约，用于分析入口与交接之间的关系。
+
+\subsection{任务中的四类时刻}\label{sec:1.6}
+
+本设计把以下四类时刻分开记录。
+
+\noindent\textbf{1. 预测}\quad 决策器根据路线、速度参数、等待和服务动作估计某任务何时完成。预测用于比较候选，可能因执行误差和冲突而改变。
+
+\noindent\textbf{2. 执行器完成}\quad Nav2 到达、空中位置环稳定或某个物理动作结束。它只说明局部执行状态，不一定满足整项任务。
+
+\noindent\textbf{3. 任务验收}\quad 车辆位于目标区间、速度低于阈值并持续驻留，且需要的服务事件已经满足。验收后才更新任务管理器中的完成状态。
+
+\noindent\textbf{4. 独立真值审计}\quad 场景记录器检查位置、占用、期限和约束违例。审计用于复核任务管理器，提供与执行器回执独立的核对路径。
+
+例如，车辆到达装卸点后仍需驻留并完成服务。将预测时刻、导航到达、任务完成与裁判复核分别记录，才能用实际交付与期限比较。
+
+Webots 主场景使用 16~ms 仿真步长，按约 0.5~s 保存真值轨迹供绘图。裁判的占用和交付条件每步检查。主窗口为 400~s，图表中的 s 表示仿真时间。图模型的预计时刻、Gazebo 的资源事件与 Webots 的车身占用各自按本平台原始时间计算。

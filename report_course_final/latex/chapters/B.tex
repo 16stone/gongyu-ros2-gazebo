@@ -1,0 +1,185 @@
+\clearpage
+
+\section{辅助实验条件与计算}\label{sec:B}
+
+\setcounter{table}{0}
+
+\subsection{报价与覆盖的逐场景比较}\label{sec:B.1}
+
+本表把少发报价记为“广告式减去按需询问”，正号表示按需询问少发。排队消息变化为“按需询问减去广告式”，正号表示按需询问增加。三个场景的按期率变化都是 0，但排队消息在链路受扰动的场景中增加了 82 条，报价和总消息得分开看。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.31780\tableavailable}>{\centering\arraybackslash}p{0.22740\tableavailable}>{\centering\arraybackslash}p{0.22740\tableavailable}>{\centering\arraybackslash}p{0.22740\tableavailable}@{}}
+\caption{按需询问相对广告式协议的逐场景差值}\label{tab:B.1}\\
+\toprule
+\textbf{场景} & \textbf{少发报价/条} & \textbf{排队消息变化/条} & \textbf{按期率变化} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{场景} & \textbf{少发报价/条} & \textbf{排队消息变化/条} & \textbf{按期率变化} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+自有预算（own\_budget） & 4 & -4 & 0.0 \\
+R3 约束放宽（r3\_looser） & 26 & -26 & 0.0 \\
+链路受扰动（impaired\_link） & 3 & 82 & 0.0 \\
+\end{longtable}
+\endgroup
+
+
+\subsection{实体数与资源争用的条件表}\label{sec:B.2}
+
+整备节点的两种条件里，新增实体都停在整备节点；争用条件里，新增实体一起抢东西向的单容量通道。时隙交易事件只记事件条数，与仍在执行的合约数分开。三种条件在所有规模下都没有记录约束违例。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-12\tabcolsep\relax}
+\begin{longtable}{@{}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}@{}}
+\caption{M1 整备节点规模记录}\label{tab:B.2}\\
+\toprule
+\textbf{N} & \textbf{蓝方按期} & \textbf{红方按期} & \textbf{排队消息/条} & \textbf{事件/条} & \textbf{时隙交易事件/条} & \textbf{违例/条} \\
+\midrule
+\endfirsthead
+\multicolumn{7}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{N} & \textbf{蓝方按期} & \textbf{红方按期} & \textbf{排队消息/条} & \textbf{事件/条} & \textbf{时隙交易事件/条} & \textbf{违例/条} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+6 & 3/3 & 3/3 & 44 & 216 & 0 & 0 \\
+7 & 3/3 & 3/3 & 49 & 226 & 0 & 0 \\
+8 & 3/3 & 3/3 & 54 & 236 & 0 & 0 \\
+9 & 3/3 & 3/3 & 59 & 246 & 0 & 0 \\
+10 & 3/3 & 3/3 & 64 & 256 & 0 & 0 \\
+\end{longtable}
+\endgroup
+
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-12\tabcolsep\relax}
+\begin{longtable}{@{}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}@{}}
+\caption{M2 整备节点规模记录}\label{tab:B.3}\\
+\toprule
+\textbf{N} & \textbf{蓝方按期} & \textbf{红方按期} & \textbf{排队消息/条} & \textbf{事件/条} & \textbf{时隙交易事件/条} & \textbf{违例/条} \\
+\midrule
+\endfirsthead
+\multicolumn{7}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{N} & \textbf{蓝方按期} & \textbf{红方按期} & \textbf{排队消息/条} & \textbf{事件/条} & \textbf{时隙交易事件/条} & \textbf{违例/条} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+6 & 3/3 & 5/5 & 138 & 492 & 9 & 0 \\
+7 & 3/3 & 5/5 & 147 & 511 & 9 & 0 \\
+8 & 3/3 & 5/5 & 156 & 530 & 9 & 0 \\
+9 & 3/3 & 5/5 & 165 & 549 & 9 & 0 \\
+10 & 3/3 & 5/5 & 174 & 568 & 9 & 0 \\
+\end{longtable}
+\endgroup
+
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-12\tabcolsep\relax}
+\begin{longtable}{@{}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}>{\centering\arraybackslash}p{0.14286\tableavailable}@{}}
+\caption{M2 共同争用通道规模记录}\label{tab:B.4}\\
+\toprule
+\textbf{N} & \textbf{蓝方按期} & \textbf{红方按期} & \textbf{排队消息/条} & \textbf{事件/条} & \textbf{时隙交易事件/条} & \textbf{违例/条} \\
+\midrule
+\endfirsthead
+\multicolumn{7}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{N} & \textbf{蓝方按期} & \textbf{红方按期} & \textbf{排队消息/条} & \textbf{事件/条} & \textbf{时隙交易事件/条} & \textbf{违例/条} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+6 & 3/3 & 5/5 & 138 & 492 & 9 & 0 \\
+7 & 3/3 & 4/5 & 117 & 407 & 0 & 0 \\
+8 & 2/3 & 4/5 & 154 & 493 & 0 & 0 \\
+9 & 1/3 & 4/5 & 187 & 569 & 0 & 0 \\
+10 & 1/3 & 4/5 & 198 & 580 & 0 & 0 \\
+\end{longtable}
+\endgroup
+
+
+\subsection{五次提前释放的复算}\label{sec:B.3}
+
+打开机制的那一轮有 5 条通道释放重算记录。提前释放量按名义结束时刻减有效结束时刻计算，表中统一换算成秒。五项合计 114.930~s，是几个名义窗口的剩余量之和，不是 B2 能连续占用的一整段时间。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-10\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.12000\tableavailable}>{\raggedright\arraybackslash}p{0.22000\tableavailable}>{\centering\arraybackslash}p{0.15000\tableavailable}>{\centering\arraybackslash}p{0.15000\tableavailable}>{\centering\arraybackslash}p{0.17000\tableavailable}>{\centering\arraybackslash}p{0.19000\tableavailable}@{}}
+\caption{联合机制开启时的五次提前释放}\label{tab:B.5}\\
+\toprule
+\textbf{实体} & \textbf{slot\_id} & \textbf{名义结束/s} & \textbf{有效结束/s} & \textbf{提前释放/s} & \textbf{资源持有时长/s} \\
+\midrule
+\endfirsthead
+\multicolumn{6}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{实体} & \textbf{slot\_id} & \textbf{名义结束/s} & \textbf{有效结束/s} & \textbf{提前释放/s} & \textbf{资源持有时长/s} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{6}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+R2 & R2\_0 & 48.000 & 25.970 & 22.030 & 25.940 \\
+B1 & B1\_50000 & 98.000 & 76.778 & 21.222 & 26.756 \\
+R1 & R1\_122304 & 170.304 & 147.278 & 23.026 & 24.974 \\
+B1 & B1\_181344 & 229.344 & 204.264 & 25.080 & 22.920 \\
+B2 & B2\_236854 & 284.854 & 261.282 & 23.572 & 24.428 \\
+\end{longtable}
+\endgroup
+
+
+复算算式为 22.030+21.222+23.026+25.080+23.572=114.930~s。B2 通道持有起点则由机制关闭组的 243.466~s 提前到机制开启组的 236.854~s，差值 6.612~s。蓝方 2 批交付由 298.556~s 提前到 295.480~s，差值 3.076~s。三个差值分别对应名义资源、通道持有起点和任务交付，不能互相替代。
+
+\clearpage
+\subsection{图模型中的机会成本复算}\label{sec:B.4}
+
+令 $c_1,c_2$ 为两项任务的完成时刻，$d_1,d_2$ 为对应期限，$w$ 为车辆活跃工作时间。以 $N$ 记按期任务数、$L$ 记两项任务合计逾期量，效用写为\[ U=(N,-L,-w,-(c_1+c_2)). \]按从左到右的顺序比较各项。原模型以毫秒计，32~s 对应第三项 $-32000$。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-12\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.18000\tableavailable}>{\raggedright\arraybackslash}p{0.14000\tableavailable}>{\centering\arraybackslash}p{0.12000\tableavailable}>{\centering\arraybackslash}p{0.11000\tableavailable}>{\centering\arraybackslash}p{0.14000\tableavailable}>{\raggedright\arraybackslash}p{0.20000\tableavailable}>{\raggedright\arraybackslash}p{0.11000\tableavailable}@{}}
+\caption{两组期限下的候选效用与选择}\label{tab:B.6}\\
+\toprule
+\textbf{期限条件} & \textbf{候选} & \textbf{R1 交付/s} & \textbf{返航/s} & \textbf{活跃工作/s} & \textbf{原效用向量} & \textbf{原口径} \\
+\midrule
+\endfirsthead
+\multicolumn{7}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{期限条件} & \textbf{候选} & \textbf{R1 交付/s} & \textbf{返航/s} & \textbf{活跃工作/s} & \textbf{原效用向量} & \textbf{原口径} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+R1=50~s，返航=37~s & 不提供服务 & 42 & 37 & 32 & (2, 0, -32000, -79000) & 选中 \\
+R1=50~s，返航=37~s & 提供服务 & 34 & 37 & 34 & (2, 0, -34000, -71000) & 未选中 \\
+R1=34~s，返航=37~s & 不提供服务 & 42 & 37 & 32 & (1, -8000, -32000, -79000) & 未选中 \\
+R1=34~s，返航=37~s & 提供服务 & 34 & 37 & 34 & (2, 0, -34000, -71000) & 选中 \\
+\end{longtable}
+\endgroup
+
+
+R1 期限 50~s 时，两候选前两项相同，原口径先比较活跃工作，因此不服务获胜。第三项消融置零后，两候选前三项相同，服务的第四项 \ensuremath{-}71000 优于不服务的 \ensuremath{-}79000，选择随之反转。R1 期限 34~s 时，不服务只有 1 项按期且逾期 8000~ms，服务有 2 项按期且逾期为 0，第一、二项已经决定结果，两种成本口径均接受服务。

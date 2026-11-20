@@ -1,0 +1,154 @@
+\clearpage
+
+\section{离散模型的补充验证}\label{sec:6}
+
+\subsection{通信触发方式与响应阈值}\label{sec:6.1}
+
+整场只记录本回合发生的消息，这里再比较两种报价触发方式。历史图模型中做过一组协议对照：广告式由地面中继车不断报价，按需询问则由请求方先说出需求，中继车再决定要不要应答。两组用同样的三个场景，各跑一轮，意愿计算不变，只改谁先发起报价。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.30000\tableavailable}>{\raggedright\arraybackslash}p{0.21000\tableavailable}>{\raggedright\arraybackslash}p{0.19000\tableavailable}>{\raggedright\arraybackslash}p{0.30000\tableavailable}@{}}
+\caption{广告式协议与按需询问的图模型对照}\label{tab:34}\\
+\toprule
+\textbf{指标} & \textbf{广告式协议} & \textbf{按需询问} & \textbf{读法} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{指标} & \textbf{广告式协议} & \textbf{按需询问} & \textbf{读法} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+运行构成 & 3 场景 \ensuremath{\times} 1 回合 & 3 场景 \ensuremath{\times} 1 回合 & 样本很小，只作机制对照 \\
+按期任务比例 & 1.0 & 1.0 & 本组对照中未下降 \\
+平均每回合报价/条 & 13.67 & 2.67 & 平均少 11 条报价 \\
+平均每回合中继请求/条 & 14.00 & 14.67 & 请求并未同步减少 \\
+覆盖失败/次 & 1 & 1 & 报价减少不等于覆盖已经完备 \\
+记录违例 & 0 & 0 & 两组均未记录约束违例 \\
+\end{longtable}
+\endgroup
+
+
+按需询问后，平均报价从 13.67 条降到 2.67 条，同组三个场景的按期率均为 1.0。因为报价由实际需求触发，请求产生前的重复通知减少了。
+
+三个场景的报价分别少了 4、26 和 3 条，按期率均相同。排队消息数的变化分别为 $-4$、$-26$ 和 $+82$ 条。受扰动的场景中，少了 3 条报价，排队消息却多了 82 条。排队消息还包括服务请求、重试等通信，因此评估通信开销时，需要同时看报价数、请求数与排队消息总量。
+
+两组仍各有一次覆盖失败。按需询问省掉的是无需求时的广告，不会凭空多出可用服务者，也不会让过期报告重新有效；附近没有能按时赶到的中继车时，改变通信触发方式同样无济于事。这个负结果与历史整场中跨队请求被拒的记录相互印证：协议如何组织与任务能否完成，需要分别检验。
+
+在按需询问之上，旧稿还做过一层可关闭的响应阈值。刺激量取请求方已经用掉的期限比例，随请求一起发出；中继车只在刺激不低于自己的阈值时才报价。服务成功把阈值下调 0.15，拒绝则上调 0.10，限定在 0.05—0.95 之间。本意是让愿意服务的中继车更积极、总拒绝的少做无效应答，但实测暴露了明显的筛选风险。
+
+固定阈值扫描取五档组合、三个场景，共 15 回合。阈值为 (0.05,0.05)、(0.30,0.70)、(0.50,0.50) 和 (0.70,0.70) 时，平均报价均为 2.67 条，按期率均为 1.0。阈值提高到 (0.90,0.90)后，平均报价降为 0，6 次拒绝，按期率降至 0.8788。提供者平均返航时刻由 94.8~s 提前到 83.3~s，但这只说明中继车更早回到本职任务；请求方失去了原本可以获得的支援，不能据此说全队效果更好。
+
+\figitem{1}{fig15.pdf}{固定阈值对照与三种条件下的阈值变化。阈值扩展在整场默认关闭。}{15}
+
+曲线呈台阶状而不是缓慢变化，看实际刺激值就明白。到达决策环节的观测值只有 0.7167、0.7317、0.7633 和 0.765，集中在约 0.72—0.77 的窄带内。阈值不超过 0.70 时，这些请求都会被应答。阈值升到 0.90 时，又全部被拒绝。所以 0.05 到 0.70 之间几乎看不出变化，并不表示阈值机制普遍稳定，只是这些扫描点之间没有新的刺激穿过阈值。
+
+阈值升高到本轮刺激带之外时，必要的支援请求也可能被过滤。因此本设计保留按需询问，把响应阈值作为默认关闭的扩展。实验只有两台候选中继车，每档覆盖三个离散场景，阈值和报价数的结论限于这些条件。
+
+\subsection{实体规模与资源争用}\label{sec:6.2}
+
+规模试验设置两组条件。第一组让新实体停在整备节点，观察规模增加带来的信息处理开销。第二组让新实体也申请同一条东西向通道，观察资源争用带来的任务变化。两组均在离散模型中将实体数从 6 增至 10。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-10\tabcolsep\relax}
+\begin{longtable}{@{}>{\centering\arraybackslash}p{0.11000\tableavailable}>{\centering\arraybackslash}p{0.18000\tableavailable}>{\centering\arraybackslash}p{0.18000\tableavailable}>{\centering\arraybackslash}p{0.18000\tableavailable}>{\centering\arraybackslash}p{0.18000\tableavailable}>{\centering\arraybackslash}p{0.17000\tableavailable}@{}}
+\caption{两种规模扩展方式的任务结果}\label{tab:35}\\
+\toprule
+\textbf{实体数 N} & \textbf{整备节点：蓝方按期} & \textbf{整备节点：红方按期} & \textbf{争用通道：蓝方按期} & \textbf{争用通道：红方按期} & \textbf{争用条件时隙交易事件/条} \\
+\midrule
+\endfirsthead
+\multicolumn{6}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{实体数 N} & \textbf{整备节点：蓝方按期} & \textbf{整备节点：红方按期} & \textbf{争用通道：蓝方按期} & \textbf{争用通道：红方按期} & \textbf{争用条件时隙交易事件/条} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{6}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+6 & 3/3 & 5/5 & 3/3 & 5/5 & 9 \\
+7 & 3/3 & 5/5 & 3/3 & 4/5 & 0 \\
+8 & 3/3 & 5/5 & 2/3 & 4/5 & 0 \\
+9 & 3/3 & 5/5 & 1/3 & 4/5 & 0 \\
+10 & 3/3 & 5/5 & 1/3 & 4/5 & 0 \\
+\end{longtable}
+\endgroup
+
+
+新增单元停在整备节点时，蓝红按期数始终不变，所有条件的记录违例均为 0，消息与事件处理量随规模增加。M2 整备条件的排队消息由 N=6 时的 138 条增至 N=10 时的 174 条，事件由 492 条增至 568 条，分别增加 36 条和 76 条。换言之，结果不变只是因为新增单元没有进入关键资源，记录与通信处理量实际上一直在增长。
+
+让新增单元争用同一通道后，结果明显不同。红方从 N=7 起由 5/5 降为 4/5，蓝方从 N=8 起由 3/3 降为 2/3，N=9 和 10 进一步降为 1/3。时隙交易事件则由 N=6 的 9 条变为后续条件的 0 条。退化不是蓝红同步发生的，红方先下降、蓝方后下降，说明不能只按 N 拟合一条统一曲线。通道容量为 1，新增实体又依赖同一套预约与协商过程，任务结果首先受资源及其协议约束，而不是简单的“车多了，每辆车就变笨了”。
+
+\figitem{1}{fig16.pdf}{离散模型中的规模变化与单次决策耗时}{16}
+
+争用条件的排队消息为 138、117、154、187 和 198 条，N=7 反而低于 N=6。这个非单调点值得保留：消息数同时受服务请求、失败、重试和合约状态影响，不会是实体数的固定线性函数。整备条件就不同，每多一个单元，消息和事件都稳定增加，因为新增单元只带来状态维护，不改变任务选择。两条曲线放在一起，才把“规模带来的记录开销”和“争用带来的任务退化”分开看。
+
+决策耗时另做了一组小测试。在一份真实视图中填入 1、5、9、17、25、33 和 49 条合成预约，每个规模重复 60 次，候选数始终是 32。单次决策耗时中位数由 1 条预约时的 1.0085~ms 变为 49 条时的 1.4631~ms，视图扩大 49 倍，成本约为 1.45 倍。最小二乘拟合斜率为 0.00937~ms/条、截距 0.9818~ms、$R^2$=0.9129。
+
+\subsection{入口间隔与通信时延}\label{sec:6.3}
+
+从两队任务的时间安排可以看到，延迟的影响取决于尚有多少时间余量。原图模型中保留了两组单卡单参数扫描。第一组只把入口间隔从 0 逐档增加到 10~s，第二组只把消息时延从 0.2~s 逐档增加到 4~s。这里同一张卡上的蓝方分母为 3、红方为 5，和整场 Webots 的 14 项任务定义不同。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-12\tabcolsep\relax}
+\begin{longtable}{@{}>{\centering\arraybackslash}p{0.14000\tableavailable}>{\centering\arraybackslash}p{0.13000\tableavailable}>{\centering\arraybackslash}p{0.13000\tableavailable}>{\centering\arraybackslash}p{0.15000\tableavailable}>{\centering\arraybackslash}p{0.17000\tableavailable}>{\centering\arraybackslash}p{0.14000\tableavailable}>{\centering\arraybackslash}p{0.14000\tableavailable}@{}}
+\caption{通道入口间隔强度扫描}\label{tab:36}\\
+\toprule
+\textbf{参数/ms} & \textbf{蓝方按期} & \textbf{红方按期} & \textbf{合约决策/次} & \textbf{失败消息/条} & \textbf{待处理/条} & \textbf{泊位保持/次} \\
+\midrule
+\endfirsthead
+\multicolumn{7}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{参数/ms} & \textbf{蓝方按期} & \textbf{红方按期} & \textbf{合约决策/次} & \textbf{失败消息/条} & \textbf{待处理/条} & \textbf{泊位保持/次} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+0 & 3/3 & 5/5 & 2 & 38 & 0 & 0 \\
+2000 & 3/3 & 5/5 & 2 & 39 & 0 & 0 \\
+4000 & 3/3 & 4/5 & 1 & 19 & 7 & 0 \\
+6000 & 3/3 & 4/5 & 1 & 13 & 7 & 0 \\
+8000 & 3/3 & 4/5 & 1 & 12 & 7 & 0 \\
+10000 & 2/3 & 4/5 & 0 & 21 & 12 & 0 \\
+\end{longtable}
+\endgroup
+
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-12\tabcolsep\relax}
+\begin{longtable}{@{}>{\centering\arraybackslash}p{0.14000\tableavailable}>{\centering\arraybackslash}p{0.13000\tableavailable}>{\centering\arraybackslash}p{0.13000\tableavailable}>{\centering\arraybackslash}p{0.15000\tableavailable}>{\centering\arraybackslash}p{0.17000\tableavailable}>{\centering\arraybackslash}p{0.14000\tableavailable}>{\centering\arraybackslash}p{0.14000\tableavailable}@{}}
+\caption{消息时延强度扫描}\label{tab:37}\\
+\toprule
+\textbf{参数/ms} & \textbf{蓝方按期} & \textbf{红方按期} & \textbf{合约决策/次} & \textbf{失败消息/条} & \textbf{待处理/条} & \textbf{泊位保持/次} \\
+\midrule
+\endfirsthead
+\multicolumn{7}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{参数/ms} & \textbf{蓝方按期} & \textbf{红方按期} & \textbf{合约决策/次} & \textbf{失败消息/条} & \textbf{待处理/条} & \textbf{泊位保持/次} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+200 & 3/3 & 4/5 & 2 & 13 & 8 & 1 \\
+400 & 3/3 & 4/5 & 2 & 13 & 8 & 1 \\
+1000 & 3/3 & 5/5 & 2 & 39 & 0 & 0 \\
+2000 & 3/3 & 4/5 & 0 & 16 & 6 & 0 \\
+3000 & 1/3 & 3/5 & 0 & 13 & 52 & 0 \\
+4000 & 1/3 & 2/5 & 0 & 14 & 53 & 0 \\
+\end{longtable}
+\endgroup
+
+
+两项扫描都可能减少按期任务。入口等待先压缩红方余量，延迟较大时才观察到蓝方档位也变化。通信时延中红方的逐档结果有回升，涉及请求、承诺和执行次序一起变化。

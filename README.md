@@ -4,13 +4,13 @@
 
 ## 正式提交版本
 
-**`report_course_final/` 是唯一提交版本**：PDF 与 DOCX 由同一份 [`body.md`](report_course_final/body.md) 生成，11 月 20 日定稿 PDF 共 50 页，含 AMAX 补验，`SHA256SUMS` 可校验。终版用 Word 从同源正文生成的 DOCX 导出。Linux 可用 `python report_course_final/src/build_report.py` 重建（需 python-docx、LibreOffice、poppler）；导出字体和分页取决于环境。
+**[正式报告 PDF](report_course_final/潘道熙25361130课程设计报告题目二.pdf)** 共 48 页，在原 47 页 XeLaTeX 稿上纳入 AMAX 实跑结果。可用 [SHA-256 清单](report_course_final/SHA256SUMS) 校验。将 [LaTeX 源码](report_course_final/latex/) 导入 Overleaf，主文档选 `main.tex`，编译器选 XeLaTeX。
 
 报告第 1.4 节给出主版本与四层证据的边界，第 4 章包含基础整场与新增补验，第 7 章是设计复盘，附录 A 是可核对的证据入口，附录 C 是判定性调试记录。`report_v11/` 是 55 页历史扩展稿，只作方案演进记录，**不作为提交版本**。
 
 | 入口 | 内容 |
 | --- | --- |
-| [正式报告 PDF](report_course_final/潘道熙25361130课程设计报告题目二.pdf) | [报告目录](report_course_final/)含 Word、同源正文、图表、构建脚本和校验清单 |
+| [正式报告 PDF](report_course_final/潘道熙25361130课程设计报告题目二.pdf) | [报告目录](report_course_final/)含正式 PDF、XeLaTeX 源码、图表和校验清单 |
 | [交稿版整机回放](docs/demo/course_final_replay.mp4) | 53 s 配套回放；[历史运动学回合回放](docs/demo/webots_full_run.mp4) 与[自包含演示页](docs/demo/webots_replay.html) 另存 |
 | [Webots 复现](docs/webots/course_final_reproduce.md) | 交稿三组回合的场景、环境变量与回执读法 |
 | [图模型与 Gazebo 复现](docs/reproduce.md) | 离散算例与归档整机的复现步骤 |

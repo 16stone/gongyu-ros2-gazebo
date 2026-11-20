@@ -1,0 +1,239 @@
+\clearpage
+
+\section{多体协同与共享通道}\label{sec:3}
+
+\subsection{按车体包络判断通道清空}\label{sec:3.1}
+
+通道导轨内侧宽约 1.02~m。早期曾用车辆中心是否越过通道出口作放行依据。观察轨迹后发现，车中心出去时，后轮或车尾仍可能占在口部。最终方案对底盘、车轮和万向球采用 0.28~m 的保守包络半径。保护区域覆盖两根导轨之间及口部，取 x = 1.90–5.10~m、|y| \ensuremath{\leq} 0.55~m 的矩形。若车身中心到矩形的最短距离不超过 0.28~m，就认为车辆仍占用通道。判空覆盖了车身驶离通道的全过程。
+
+运输车按 R2、B1、R1、B2 的顺序放行，此外的侦察和空中观察可以并行。R2 的交付期限较早，R1 需要等到释放时刻，B2 还需要得到新鲜观察。这样的安排把入口会车问题转化为通道外等待和依次通过。次序在主回合开始前确定，实际启程时刻由净空、任务释放和观察状态共同决定。固定顺序便于检查，也减少了同时运输的机会。
+
+另用两辆电机驱动的车单独比较放行时机。两组都看到前车在约 7.89~s 完整驶出。保留原定时段时，后车等到 32.00~s 发车。按车体实际清空放行时，后车在约 7.89~s 出发，少等约 24.11~s，并于约 17.58~s 清空通道。固定时段下的后车在 60~s 窗口结束时仍在通道内调整姿态。两个回合均未记录到通道占用重叠。在这组场地和出入口条件下，及时归还通道减少了后车的放行等待。
+
+\subsection{入口对准和出口可用性}\label{sec:3.2}
+
+中央通道的时间窗回答“什么时候可以用”，却不能回答“现在是否进得去”。入口附近的泊位、换乘路径和对准动作可能相互交叉。若车辆只凭预约时刻驶入，即使时间上没有重叠，也可能在入口姿态或出口泊位上发生冲突。
+
+东口设置两个泊位和一个对准点。图示表明，换乘路径会穿过对准区，入口动作不能只按通道中心线生成。Gazebo 场景里的联合准入需要同时检查四类条件。
+
+\figitem{0.98}{fig04.pdf}{东口泊位、固定对准点和队友换乘路径。几何关系为示意。}{4}
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.28571\tableavailable}>{\raggedright\arraybackslash}p{0.35714\tableavailable}>{\raggedright\arraybackslash}p{0.35714\tableavailable}@{}}
+\caption{通道准入与释放检查}\label{tab:14}\\
+\toprule
+\textbf{检查对象} & \textbf{通过条件} & \textbf{不满足时的处理} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{检查对象} & \textbf{通过条件} & \textbf{不满足时的处理} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+名义时间窗 & 申请区间没有与既有预约冲突 & 延后、重订或选择绕行 \\
+实际占用 & 通道没有未清空的实体 & 在入口外等待，不提前记录进入 \\
+入口几何 & 对准点与同伴在途移动保持安全距离 & 跳过固定对准点，退回旧两点式入口 \\
+出口与目的地 & 出口方向和目的地区域可以接收 & 暂缓进入或调整目的地服务顺序 \\
+\end{longtable}
+\endgroup
+
+
+获得预约后，车辆还须等待通道及出口具备接收条件。通道状态由预约转为使用后，以实际清空时刻重新计算释放时间，剩余名义时段可供后续合法预约。对准超时或目的地持续被占用时，可取消或重订预约。
+
+在一次 Gazebo 试验中，B2 已获通道授权，却迟迟未能进入，持有通道约 101.5~s。仿真轨迹显示，车辆在入口附近约 74~s 内只移动了 0.24~m。长时间的小幅移动出现在东口，排查因此集中到进场动作。回看车辆姿态后发现，原先边斜移边转向的动作在东口难以完成。加设固定对准点后，同场景的另一次回合记录到约 23.6~s 的占用时间。这支持继续采用入口对准。
+
+对准点随后暴露了一个几何冲突。队友换乘路径与固定对准区域相交，最近距离约 0.497~m。有几次还出现入口目标格被判为不可通行的情况。简单保留固定对准点会把一个入口问题换成队友路径冲突，完全撤销又会回到原来的斜移转向问题。最终在程序中保留两条路径：几何检查通过时用对准点，不通过就退回旧的两点式入口。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.24336\tableavailable}>{\raggedright\arraybackslash}p{0.41654\tableavailable}>{\raggedright\arraybackslash}p{0.34010\tableavailable}@{}}
+\caption{入口设计案例的推理链}\label{tab:15}\\
+\toprule
+\textbf{阶段} & \textbf{观察或检查} & \textbf{对设计的影响} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{阶段} & \textbf{观察或检查} & \textbf{对设计的影响} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+授权后仍无法进入 & 持有通道约 101.5~s。约 74~s 仅移动 0.24~m & 重点检查入口运动，而非继续延长名义时间窗 \\
+增加固定对准点 & 同场景历史对照中占用约 23.6~s & 保留对准动作作为可行入口方案 \\
+发现队友路径冲突 & 对准点与换乘线段最近约 0.497~m & 固定对准点不能无条件使用 \\
+按几何条件选用 & 0.65~m 检查不通过时跳过并回退 & 同时保留改善动作与安全退路 \\
+\end{longtable}
+\endgroup
+
+
+这些数据来自该组 Gazebo 入口对照，说明对准条件为何需要单独检查。八实体 Webots 场景按本章的车体包络核对通行。
+
+对准点能帮助车辆在驶入口部前摆正，也可能与队友的换乘路径冲突。这个场地用 0.65~m 作为参考线段的检查阈值，测得的最近距离、回退规则和适用条件见附录 C。
+
+\subsection{报告时效和岗位确认}\label{sec:3.3}
+
+观察报告注明来源、内容、采样时刻和有效期，并用编号识别重复消息。接收方以到达时刻减去采样时刻，判断报告是否仍在 6~s 有效期内。Gazebo 记录排队、送达、失败和待处理的状态，只有送达且有效的报告才能用于服务或放行。
+
+岗位状态把提议、确认、前往、到位待命、执行和退出分开。每次转换都有对应的事件记录，而不是根据画面中两车的距离推断。
+
+\figitem{1}{fig05.pdf}{六种岗位状态及 Gazebo 历史回合中的服务事件}{5}
+
+一次完整服务经历请求、提议、确认和激活四个阶段。请求者给出所需服务及理由，候选服务者计算自身代价并报价，双方对同一份提议编号确认后，服务才进入激活。激活还需要满足到位、报告有效等条件。完成后记一次释放，车才能回到自己的本职任务。
+
+Gazebo 历史回合记录了蓝方的交接过程。B3 在 115.888~s 采样，B1 和 B2 在 116.952~s 收到，报告年龄为 1.064~s。服务以这次送达为生效依据。另一次跨队服务请求在 90.628~s 被拒绝，因为当时的任务规则只允许队内服务。图~\ref{fig:5} 保留了两类事件。
+
+Webots 的整场控制把报告规则放到 B2 的放行条件里。等待、拒收旧帧、重新采样和获得有效帧四步都有事件时间。报告刚采集时反映的是过去一个时刻的画面，其有效期应由接收方核对。补采完成后，还要检查通道空闲以及任务已释放。Gazebo 中的岗位确认解决的是分工承诺能否履行，Webots 中的新鲜帧确认解决的是 B2 本次是否可以开走。
+
+\subsection{协同方案的生成与筛选}\label{sec:3.4}
+
+任务分配研究通常同时考虑任务收益、执行代价和资源约束\cite{ref12}。Khamis 等综述了多机器人任务分配的主要方法\cite{ref13}，Chakraa 等进一步讨论了优化目标与求解技术\cite{ref14}。本设计不对所有实体和任务做全排列，只按任务图、当前状态和资源生成有限候选，再在候选集里比较。
+
+Gazebo 和离散模型把一次决策拆成四个维度，交叉组合出待检查方案：
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.23000\tableavailable}>{\raggedright\arraybackslash}p{0.34000\tableavailable}>{\raggedright\arraybackslash}p{0.43000\tableavailable}@{}}
+\caption{协同候选方案的四个维度}\label{tab:16}\\
+\toprule
+\textbf{维度} & \textbf{可选方案} & \textbf{含义} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{维度} & \textbf{可选方案} & \textbf{含义} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+运输分工 & 单车运输、双车交接 & 独立完成，或由两辆车分担运输与交接 \\
+观察支援 & 固定岗位、空中观察 & 使用地面固定观察点或无人机报告 \\
+运输路线 & 共享通道、外侧绕行 & 按预约经过中央，或改走外侧 \\
+信息方式 & 补采、自行观察、携带信息、等待 & 根据所需信息的来源与时效选择动作 \\
+\end{longtable}
+\endgroup
+
+
+四个维度产生 32 个待检查组合，每次决策再按当前状态筛掉一部分。预测时要看队友位置与可用承诺、报告新鲜度、空中巡检承诺、观察与通信路线，以及通道时隙；缺能力、缺承诺、信息过期或路线与当前协议不合的候选都会去掉。安全等待只保留在固定观察支援加单车运输这一种情形里，这种情形单列，不与确定预测下的普通路线混为一谈。
+
+筛选时先检查当前平台能否提供候选所需的能力，再看任务是否有足够时间。比如用两车交接，需要第二辆车空闲、交接点可用、双方到达窗口相容。选择中央路线需要有效预约，选择绕行需要核对同一条任务期限。过滤后的方案按按期交付、新增工作量和交接空档比较，准备执行的方案还要等双方确认。
+
+\subsection{仿生分工与军蚁活桥}\label{sec:3.5}
+
+设计协同规则时参考了四类群体行为。自然群体靠局部观察、岗位响应和信息传递形成整体动作，这些现象可以落到具体的判断规则上。表~\ref{tab:17} 逐项列出每个参考用在了设计的哪一步。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.32636\tableavailable}>{\raggedright\arraybackslash}p{0.33338\tableavailable}>{\raggedright\arraybackslash}p{0.34026\tableavailable}@{}}
+\caption{仿生现象与本设计的关系}\label{tab:17}\\
+\toprule
+\textbf{理论或现象} & \textbf{从中得到的设计思路} & \textbf{在本项目中的体现} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{理论或现象} & \textbf{从中得到的设计思路} & \textbf{在本项目中的体现} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+Reynolds 的分离、对齐、聚合规则[7] & 用局部信息维持群体间距与方向秩序 & 取局部间距的思路处理窄口，两车让行仍由通道占用判断 \\
+军蚁活桥的成本收益折中 [6] & 有个体停下为队伍服务时，它原有工作的时间也要计入 & 在离散任务算例中估算中继岗位的机会成本 \\
+社会性昆虫的响应阈值与分工 [8] & 根据任务刺激和原岗位负担决定是否响应 & 作为岗位候选和响应阈值的设计参考 \\
+少数知情个体引导群体运动 [9] & 专门观察的个体可把少量有时间意义的信息传给行动者 & B3 提供带时刻的观察，B2 据此等待或出发 \\
+\end{longtable}
+\endgroup
+
+
+军蚁活桥提供了最直接的启发。一辆车暂时做中继，可能使另一辆车早些交付，这时仍要问中继车原来的工作会不会被耽误。为此构造了一个离散任务算例。比较方案时先看按期任务数，再看总逾期量，其后才比较车辆活跃工作时间与任务完成时刻。这个优先顺序把“做完几件事”和“做这些事花了多少车时”分开了。
+
+例如一张任务卡给 R1 的期限为 50~s，给提供帮助的车辆的期限为 37~s。帮助后，R1 从 42~s 提前到 34~s，提供帮助的车辆仍在 37~s 完成，但合计工作时间由 32~s 增至 34~s。当 R1 已能按期时，节省出来的时间是否值得调车，要看项目对车时的要求。当 R1 的期限压到 34~s 时，帮助能够改变按期任务数，所以两种计分规则均选择帮助。两种计分规则在 12 组条件下各运行一次，其中 2 组的岗位选择发生变化。这个结果说明岗位互助的价值取决于任务还有多少时间可用。
+
+\figitem{1}{fig06.pdf}{任务期限与支援成本对岗位选择的影响}{6}
+
+\subsection{支援的机会成本}\label{sec:3.6}
+
+要把军蚁活桥的启发量化，首先需要判断主任务与支援任务哪一项更紧迫。这里用一个效用向量 U = (按期任务数，\ensuremath{-}总逾期，\ensuremath{-}名义活跃工作时间，\ensuremath{-}完成时刻和)。比较时遇到第一项不同就定先后。R1 期限 50~s、提供者返航期限 37~s 时，不支援的向量是 (2, 0, \ensuremath{-}32, \ensuremath{-}79)，支援是 (2, 0, \ensuremath{-}34, \ensuremath{-}71)，时间在此统一为秒。两者都按期，先比较活跃工作时间，因此保留岗位。去掉活跃工作这一项后，选择完成时刻和更小的支援方案。
+
+该算例在固定图模型经过 12 组、24 次配对运行复核，只有第三项活跃工作成本被置零，其余预测、期限判定、通信和实际验收保持不变。两处选择变化发生在 R1 期限 50~s、提供者返航期限 37~s 和 40~s，另外 10 组选择一致。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-10\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.25000\tableavailable}>{\centering\arraybackslash}p{0.13000\tableavailable}>{\centering\arraybackslash}p{0.13000\tableavailable}>{\centering\arraybackslash}p{0.13000\tableavailable}>{\centering\arraybackslash}p{0.19000\tableavailable}>{\raggedright\arraybackslash}p{0.17000\tableavailable}@{}}
+\caption{R1 期限 50~s、提供者返航 37~s 时的实际运行结果}\label{tab:18}\\
+\toprule
+\textbf{成本处理} & \textbf{R1 交付/s} & \textbf{蓝方 1 批/s} & \textbf{蓝方 2 批/s} & \textbf{提供者返航/s} & \textbf{报价结果} \\
+\midrule
+\endfirsthead
+\multicolumn{6}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{成本处理} & \textbf{R1 交付/s} & \textbf{蓝方 1 批/s} & \textbf{蓝方 2 批/s} & \textbf{提供者返航/s} & \textbf{报价结果} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{6}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+保留活跃工作成本 & 42 & 53 & 61 & 37 & 拒绝 \\
+第三项置零 & 34 & 43 & 53 & 37 & 接受并完成 \\
+\end{longtable}
+\endgroup
+
+
+保留成本时，不提供服务使 R1 较晚交付，蓝方后续两批也相应较晚。置零后成交，R1 与蓝方交付都提前，而提供者返航仍为 37~s。该结果把仿生启发、效用排序和实际选择连了起来，但仍是固定确定性图模型算例。该结果用于解释岗位规则。
+
+当 R1 期限收紧到 34~s 时，两种成本处理都接受服务，实际 R1 交付 34~s、蓝方两批 43~s 和 53~s、提供者返航 37~s。原因是独立方案的 42~s 会造成 8~s 逾期，第一优先级已经改变。机制因此具有明确的条件性：既不会因额外 2~s 工作一概拒绝，也不会因 R1 能提前就一概接受。
+
+\subsection{独立执行与共享资源协调}\label{sec:3.7}
+
+在 Gazebo 历史实验中，八个实体分别运行在独立进程中，各自保留任务状态和可选方案。实体通过消息与队友、任务站及入口服务站协调，由相应服务站统一管理共享资源。这样可以在同一轮试验中观察两件事：实体何时根据自己的任务作出选择，以及这项选择何时得到资源管理方许可。
+
+这一回合记录了 17708 次跨进程请求。该数字反映仿真中的接口调用量。共享资源由服务站协调，参考位姿由仿真环境提供。
+
+同一申请使用唯一编号，重复投递保留其状态，避免同一次请求产生两次占用。消息记录采用统一的仿真时基，可据此核对发送、到达和重试的顺序。第~\ref{sec:4.9} 节在 B3 到运输车的观察链路上注入随机丢包和断链。无线射频传播与实物网络需另测。
+
+Webots 整场由裁判统一核对通行条件，各实体根据各自的传感与运动状态执行。集中核对有助于避免两个入口同时判空，独立执行则保留了单车对局部状态的响应。
+
+\subsection{协同行为与实验小结}\label{sec:3.8}
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.21000\tableavailable}>{\raggedright\arraybackslash}p{0.31000\tableavailable}>{\raggedright\arraybackslash}p{0.22000\tableavailable}>{\raggedright\arraybackslash}p{0.26000\tableavailable}@{}}
+\caption{多体协同行为与关键技术}\label{tab:19}\\
+\toprule
+\textbf{协同行为} & \textbf{关键技术} & \textbf{仿生参考} & \textbf{实验观察} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{协同行为} & \textbf{关键技术} & \textbf{仿生参考} & \textbf{实验观察} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+共享通道互斥通行 & 车体包络判空（包络半径 0.28~m）、串行放行、通道外对准 & 分离规则的局部间距思想[7] & 三组整机 0 重叠，按实际清空放行少等 24.112~s \\
+信息时效与放行 & 报告带采样时刻，6~s 有效期，拒收过期帧并主动补采 & 少数知情个体引导群体[9] & 补采使按期数由 13/14 恢复到 14/14 \\
+岗位协商与支援 & 提议、确认、前往、待命、执行、释放六态岗位，有限候选筛选 & 响应阈值分工 [8] & 按需询问减少报价次数，各组按期率相同 \\
+支援的机会成本 & 字典序效用向量：按期数、逾期、活跃工作、完成时刻 & 军蚁活桥的成本收益折中[6] & 12 组条件中 2 组选择改变 \\
+资源预约与提前释放 & 名义时间窗预约、实际清空后重算释放、联合准入 & — & 提前释放增加可预约余量，交付收益还受目的地占用影响 \\
+\end{longtable}
+\endgroup

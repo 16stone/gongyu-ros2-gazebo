@@ -1,0 +1,79 @@
+\clearpage
+
+\section{典型故障与复验}\label{sec:C}
+
+\setcounter{table}{0}
+
+以下记录用于说明车轮方向、入口对准、通道边界和信息补采怎样影响设计选型。整场检验条件和结果见第 4 章。
+
+\subsection{姿态符号与轮轴映射}\label{sec:C.1}
+
+两处符号错误曾互相掩护：左右轮接反使转弯方向相反，随后把惯性单元读数取负又使环路成为正反馈。判定方法是让单车以 \ensuremath{\pm}0.8~rad/s 纯自转各跑一回合，裁判由 getOrientation() 的旋转矩阵取 atan2(R10, R00) 作真值航向，控制器同时上报惯性单元与四个编码器的原始值。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-8\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.18000\tableavailable}>{\raggedright\arraybackslash}p{0.17000\tableavailable}>{\raggedright\arraybackslash}p{0.17000\tableavailable}>{\raggedright\arraybackslash}p{0.14000\tableavailable}>{\raggedright\arraybackslash}p{0.34000\tableavailable}@{}}
+\caption{纯自转对照的判定性测量}\label{tab:C.1}\\
+\toprule
+\textbf{指令角速度} & \textbf{裁判真值} & \textbf{惯性单元读数} & \textbf{位置漂移} & \textbf{结论} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{指令角速度} & \textbf{裁判真值} & \textbf{惯性单元读数} & \textbf{位置漂移} & \textbf{结论} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
++0.8~rad/s & +0.558~rad/s & +0.535~rad/s & 0.001~m & 两者同号，惯性单元为逆时针正 \\
+\ensuremath{-}0.8~rad/s & 对称取负 & 对称取负 & 同量级 & 恢复惯性单元读数符号，按横向坐标校正轮轴映射 \\
+\end{longtable}
+\endgroup
+
+
+修正后同一单车路线的通道占用由约 23.0~s 降到 7.1~s。回合为 \pathref{evidence/webots/p-att-spin-plus}、p-att-spin-minus；单车完整路线闭合见 p-motor-b1-route（D\ensuremath{\to}W\ensuremath{\to}E\ensuremath{\to}L\ensuremath{\to}O，1/1 按期、0 违例）。
+
+\subsection{入口对准的几何检查与回退}\label{sec:C.2}
+
+在这组 Gazebo 场景中，固定对准点到任一队友在途参考线段的距离至少为 0.65~m 时，才采用该对准点。计算方法为对准点到线段的最短距离。历史记录中的一组间距约 0.497~m，其余不小于 0.906~m，阈值用于区分这两类情况。
+
+检查通过时，车辆经固定对准点进入。检查不通过时，车辆改走两点式入口，再核对实际占用、目的地和导航执行条件。0.65~m 适用于本场地与所用参考线段。回退对应记录为 \pathref{physical_entry_alignment_skipped}。
+
+\subsection{口部几何与占用判据的错位}\label{sec:C.3}
+
+早期两次八实体诊断（\pathref{p-motor-full-01} 和 \pathref{p-motor-full-02}）分别完成 11 项和 13 项任务，后一次记录了 5 次占用重叠。原占用窗口为 $2.05\leq x\leq 4.95$~m，走廊两侧墙体沿 $x$ 轴从 1.8~m 延伸至 5.4~m。参考航点 $W(2,0)$ 与 $E(5,0)$ 分别在原窗口西、东边界外约 0.05~m。车体跨过边界时，姿态变化可能使瞬时判定反复切换。
+
+针对这一现象，曾考虑三种办法：将口部余量增到 0.45~m，在 W、E 处移动原航点或增加过渡点，对占用状态切换设置迟滞。这些办法会改变旧回合的判据，故停留在该轮诊断建议。正式整场采用车体包络判空和串行放行，并把对准点移到口部之外，正常回合得到 14/14 按期、5 次进入、5 次清空和 0 次重叠。原始诊断见 \pathref{docs/webots/PHYSICAL_LAYER.md}。
+
+\subsection{问题、修改与复验结果}\label{sec:C.4}
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-8\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.12000\tableavailable}>{\raggedright\arraybackslash}p{0.22000\tableavailable}>{\raggedright\arraybackslash}p{0.22000\tableavailable}>{\raggedright\arraybackslash}p{0.22000\tableavailable}>{\raggedright\arraybackslash}p{0.22000\tableavailable}@{}}
+\caption{现象、定位、修改与复验}\label{tab:C.2}\\
+\toprule
+\textbf{层次} & \textbf{现象} & \textbf{定位依据} & \textbf{修改} & \textbf{复验结果} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{层次} & \textbf{现象} & \textbf{定位依据} & \textbf{修改} & \textbf{复验结果} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+执行器 & 原地打转、航向误差饱和 & \ensuremath{\pm}0.8~rad/s 真值与惯性单元同号 & 去掉航向负号、重排轮轴 & 单车通道占用 23.0~s \ensuremath{\to} 7.1~s \\
+资源 & 口部反复占用、5 次重叠 & 占用窗口与航点边界错位 & 车体包络判空、对准外移、驻留迟滞与脱困 & 正常回合：14/14 按期，5 进 5 清，0 重叠 \\
+信息 & 过期帧被拒收后 13/14 & 400~s 窗口内无新帧 & 加入主动补采 & 14/14，B2 于 314.240~s 交付 \\
+规则 & 后车等到固定 32~s 才放行 & 两车同场景放行时刻对照 & 按前车实际清空放行 & 少等 24.112~s 且无重叠 \\
+\end{longtable}
+\endgroup
+
+
+表~\ref{tab:C.2} 只汇总同平台内的配对结果；跨平台只比较行为是否复现，不并列秒数。

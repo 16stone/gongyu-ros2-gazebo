@@ -1,0 +1,119 @@
+\clearpage
+
+\section{任务明细与实验记录}\label{sec:A}
+
+\setcounter{table}{0}
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.44000\tableavailable}>{\raggedright\arraybackslash}p{0.16000\tableavailable}>{\centering\arraybackslash}p{0.20000\tableavailable}>{\centering\arraybackslash}p{0.20000\tableavailable}@{}}
+\caption{正常回合逐项完成记录}\label{tab:A.1}\\
+\toprule
+\textbf{任务} & \textbf{执行者} & \textbf{完成时刻 / s} & \textbf{期限 / s} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{任务} & \textbf{执行者} & \textbf{完成时刻 / s} & \textbf{期限 / s} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+蓝方空中巡察 & B3 & 2.016 & 40 \\
+红方空中巡察 & R5 & 2.016 & 10 \\
+R3 侦察 & R3 & 6.080 & 60 \\
+R4 侦察 & R4 & 6.080 & 60 \\
+R4 报告 & R4 & 18.832 & 70 \\
+R3 报告 & R3 & 18.944 & 70 \\
+红方空中巡逻 & R5 & 19.680 & 60 \\
+红方无人机返场 & R5 & 37.328 & 180 \\
+R4 返场 & R4 & 41.584 & 130 \\
+R3 返场 & R3 & 42.336 & 86 \\
+红方第二批交付 & R2 & 80.096 & 100 \\
+蓝方第一批交付 & B1 & 125.392 & 350 \\
+红方第一批交付 & R1 & 239.360 & 250 \\
+蓝方第二批交付 & B2 & 306.112 & 350 \\
+\end{longtable}
+\endgroup
+
+
+正常回合的回放按裁判轨迹和事件复现了八个实体的动作顺序，并标注仿真时间。历史 Gazebo 回合另有原生画面和演示。文件入口列在表~\ref{tab:A.2}。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.22000\tableavailable}>{\raggedright\arraybackslash}p{0.49000\tableavailable}>{\raggedright\arraybackslash}p{0.29000\tableavailable}@{}}
+\caption{关键结果的记录位置与核对方法}\label{tab:A.2}\\
+\toprule
+\textbf{结果} & \textbf{材料中的入口} & \textbf{核对方法} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{结果} & \textbf{材料中的入口} & \textbf{核对方法} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+三组 Webots 整场 & \pathref{evidence/course_final/} 下的 normal、delay、holdout 三组。指标见 \pathref{result/metrics.json}，结束状态见同级 \pathref{shutdown.json}。 & 逐轮核对任务数、仿真窗口、通道进入与清空 \\
+正常条件复跑 & \pathref{evidence/course_final/specialty_results.json} 中的 normal\_restarts & 核对按期数、进入及清空、B2 交付时刻 \\
+拒收与补采 & 同一专项汇总中的 observation\_refresh；\pathref{evidence/webots/d-report-expired/} & 核对收帧、拒收、补采与发车时刻 \\
+两车放行 & 同一专项汇总中的 two\_vehicles；\pathref{evidence/webots/e-mech-release/} & 核对清空、后车放行与进入 \\
+单车、多旋翼与规划计时 & 同一专项汇总中的 b1、uav、planner\_timing；\pathref{evidence/webots/} 下的 b-*、c-*、p-* & 对照专项汇总、真值轨迹与传感记录 \\
+Gazebo 历史整场 & \pathref{evidence/fp124-ent-ind-01/} 下的 result/ 与 result\_launch/ & 对照实体状态、通道事件与任务结果 \\
+成本、规模与通信 & \pathref{source/scenarios/}、\pathref{source/gongyu/}、\pathref{docs/course_alignment/} & 按固定图模型复算效用与逐档结果 \\
+回合索引与回放 & \pathref{docs/evidence_index.md}、\pathref{docs/reproduce.md}、\pathref{docs/demo/} & 查询 33 个回合、运行说明与整场回放 \\
+\end{longtable}
+\endgroup
+
+
+\subsection{实验结果的复查方法}\label{sec:A.1}
+
+复查 Webots 回合时，先核对版本、400~s 窗口和各回合的执行器配置。运行说明见 \pathref{docs/reproduce.md}。逐项核对 14 项任务，再检查通道进入、清空与重叠。可按表~\ref{tab:A.1} 中的执行者、任务和时刻查找对应事件。
+
+整机回放见 \pathref{docs/demo/course_final_replay.mp4}。逐回合索引汇集了 33 个回合。规划耗时取多次搜索的中位数，到位用裁判轨迹，停障用接触与触发记录复核。配套材料保存可核对的摘要、指标和事件，体积较大的原始输出留在运行环境。
+
+\subsection{正常条件下的重复试验}\label{sec:A.2}
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-8\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.20000\tableavailable}>{\centering\arraybackslash}p{0.20000\tableavailable}>{\centering\arraybackslash}p{0.20000\tableavailable}>{\centering\arraybackslash}p{0.20000\tableavailable}>{\centering\arraybackslash}p{0.20000\tableavailable}@{}}
+\caption{同条件复跑的任务与通道记录}\label{tab:A.3}\\
+\toprule
+\textbf{回合} & \textbf{按期任务} & \textbf{进入与清空} & \textbf{重叠} & \textbf{B2 完成 / s} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{回合} & \textbf{按期任务} & \textbf{进入与清空} & \textbf{重叠} & \textbf{B2 完成 / s} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+正常主回合 & 14/14 & 5/5 & 0 & 306.112 \\
+第二次启动 & 14/14 & 5/5 & 0 & 290.336 \\
+第三次启动 & 14/14 & 5/5 & 0 & 306.112 \\
+\end{longtable}
+\endgroup
+
+
+相同设置下三轮均达到通道互斥和按期条件。第二次启动的 B2 完成得更早，说明按期结果一致时，具体动作时序仍可发生变化。仿真窗口均为 400~s；三轮的逐项指标保存在 \pathref{evidence/course_final/specialty_results.json} 的 normal\_restarts，与主版本 normal 同配置。
+
+
+\subsection{AMAX 补验回执}\label{sec:A.3}
+
+\pathref{docs/webots/amax_validation_20261120.md} 列出各回合及复现命令。
+
+\noindent\textbf{低箱整场} \pathref{evidence/b1_full_lowbox_20261120/}，查停车、绕行、预对准与交付。
+
+\noindent\textbf{旋翼与接管} \pathref{evidence/rotor_course_20261120/}，查转速、飞行、像素签名、放行与交付。
+
+\noindent\textbf{断链及专项} \pathref{evidence/observation_link_20261120/} 留有超时与恢复记录。感知和资源对照见补验总索引。

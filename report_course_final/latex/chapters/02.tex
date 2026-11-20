@@ -1,0 +1,284 @@
+\clearpage
+
+\section{单体自主行为与实现}\label{sec:2}
+
+单体设计包括两类平台。地面车主要解决定位、沿路点行驶、避障和停车交付，无人机主要完成航点巡察与下视观察。表~\ref{tab:7} 按分系统列出两类平台的组成。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.20000\tableavailable}>{\raggedright\arraybackslash}p{0.43000\tableavailable}>{\raggedright\arraybackslash}p{0.37000\tableavailable}@{}}
+\caption{单体智能靶标的分系统组成}\label{tab:7}\\
+\toprule
+\textbf{分系统} & \textbf{地面无人车（B1、B2、R1—R4）} & \textbf{无人机（B3、R5）} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{分系统} & \textbf{地面无人车（B1、B2、R1—R4）} & \textbf{无人机（B3、R5）} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+结构 & 车体约 0.40~m \ensuremath{\times} 0.34~m \ensuremath{\times} 0.14~m，两驱动轮加万向球，顶部有队色标识块 & 四旋翼机体，下视相机 \\
+动力与执行 & 左右轮电机，轮半径 0.085~m、轮距 0.34~m，差速转向 & 四个螺旋桨电机；旋翼补验中两机均由动力学模型驱动 \\
+导航、制导与控制 & GPS、惯性单元、罗盘与轮编码器；航向反馈差速控制，到点减速驻留 & GPS、惯性单元与陀螺；单机模型采用位置外环、姿态内环 \\
+感知载荷 & 主、低位两路 360° 激光雷达（名义扫描平面 0.32~m、0.225~m） & 下视相机，按标记像素数判断观察是否有效 \\
+通信 & 任务消息带编号与时间戳 & 观察报告带采样时刻，由接收方判断时效 \\
+任务载荷与任务 & 运输交付（装载、卸载）、侦察与报告 & 巡察、观察与报告 \\
+\end{longtable}
+\endgroup
+
+
+\subsection{Webots 差速运动控制}\label{sec:2.1}
+
+Webots 中，六辆地面车采用两轮差速底盘。控制器获得模拟 GPS 位置和惯性测量单元的航向，从当前位置指向下一目标点，比较目标方向和车头方向，再给左右轮发速度指令。航向误差按最短转角计算，避免角度经过正负 180° 处时给出反方向转动。地面车的任务路线事先确定，近处出现障碍时由雷达和局部规则改变车速、转向或执行短时脱困。任务路线、局部运动和到点确认是三件不同的事，停车和行驶都在仿真物理中执行。
+
+设期望线速度为 $v$、角速度为 $\omega$，轮距为 $B=0.34\,\mathrm m$，轮半径为 $r=0.085\,\mathrm m$。按本模型的轮轴命名，左右轮角速度为\begin{equation}\Omega_{\mathrm L}=\frac{v+\omega B/2}{r},\qquad \Omega_{\mathrm R}=\frac{v-\omega B/2}{r}.\label{eq:wheel}\end{equation}两轮的平均线速度决定平移速度，速度差决定转向。早期调试中，车辆持续原地旋转，航向误差不断增大。轮轴映射与惯性单元符号先后调整，单靠整条路线的表现难以辨认各自的影响。
+
+为判断航向符号是否取反，分别给单车下发 $+0.8$ 和 $-0.8\,\mathrm{rad/s}$ 的原地转动指令。裁判用仿真姿态矩阵计算参考航向，控制器记录惯性测量单元（IMU）与编码器读数。给出正转指令时，仿真参考值与 IMU 读数分别约为 $+0.558$ 和 $+0.535\,\mathrm{rad/s}$。给出反转指令时，两者均为负，位置漂移约 0.001~m。两组读数的符号一致，说明 IMU 与参考值都以逆时针为正，可以去掉 \texttt{theta = -imu} 中的负号。另按车轮的横向坐标调整左右轮映射。两项调整完成后，同一路线的通道占用从约 23.0~s 降至 7.1~s。试验细节见附录 C。
+
+进入通道前，车辆先在外侧调整朝向。接近任务点后降低速度，到了停车距离才置零。四辆运输车的交付还要满足目标距离不大于 0.10~m、车速不高于 0.10~m/s 并连续驻留 2~s。这个判据让任务记录反映真正停车交付。地面侦察、空中巡察等其他任务按各自的到点规则计时。
+
+按总体设计课的导航、制导与控制分工 \cite{ref1}，导航先估计车的位置和航向，制导再用下一路点确定应朝向哪里，控制把速度与航向误差变成轮速。无人机同样从目标位置和反馈出发，最后要经过姿态与推力分配。
+
+令 $x,y$ 表示地图平面上的位置，$\psi$ 表示车体前向轴相对地图 $x$ 轴的航向。理想无侧滑时有\[ \dot{x}=v\cos\psi,\qquad \dot{y}=v\sin\psi,\qquad \dot{\psi}=\omega . \]参考航向与控制器的符号需要一致，否则转向可能放大原有误差。先用正反自转检查映射，再用跟踪误差判断反馈是否收敛，可以减少同时调整路线和控制参数带来的混淆。
+
+\subsection{从里程计到地图位姿}\label{sec:2.2}
+
+课上讲地面无人车路径规划时，区分了利用已知地图选路线的全局规划和根据局部观测调整运动的局部规划\cite{ref2}。Gazebo 导航算例用 AMCL 提供定位，NavFn 在地图上选路，DWB 根据附近障碍和底盘约束给出速度命令。任务层通过 Nav2 的导航动作接口传入目标点\cite{ref10}。通道授权和任务验收由靶场的任务层判断。
+
+AMCL 不把一次初始位姿当作永久真值。车辆运动后，粒子先按运动模型预测，再由激光观测与地图的匹配程度更新权重，最后重采样，使粒子逐渐集中到更符合观测的位姿附近。map 到 odom 的修正再交给规划和控制节点使用。主配置使用 500—2000 个粒子、60 束激光，平移或旋转达到 0.1 后触发更新。粒子数影响计算量和分布表达能力，观测更新则决定车辆运动后能否及时纠正先验。
+
+这一层与任务验收分开。AMCL 收敛表示导航获得了可用位姿，并不表示侦察、装载或交付已经完成。任务管理器仍需检查目标区域、驻留和服务回执。
+
+\subsection{Gazebo 全局规划与局部控制}\label{sec:2.3}
+
+全局规划器选用 NavFn 的 Dijkstra 模式，关闭 A* 启发项，目标容差设为零。场地已经结构化，主要连通关系由中央通道和少量绕行路线构成，本设计首先需要一条稳定、可复查的搜索基线。Dijkstra 不依赖启发项，在统一代价地图上按累计代价扩展节点，调整膨胀层或入口几何时，排查问题不必同时处理启发权重变化。Smac Hybrid-A*把车辆运动学约束编入节点扩展，更适合需要直接生成可执行曲率路径的场景。它对应的是另一种实现复杂度与运动可行性的取舍，而不是绝对性能高低。
+
+全局代价地图依次由静态层、障碍层、同伴层和膨胀层组成。膨胀半径 0.55~m、代价缩放 3.0，障碍标记距离 2.5~m、清障光线 3.0~m；局部代价地图使用 3~m \ensuremath{\times} 3~m 的滚动窗口。膨胀层在障碍附近随距离衰减提高通行代价，促使路径保留间隙，但并不把整个膨胀范围都改成禁止通行区域。真正不可进入的栅格与“可通过但代价较高”的栅格必须区分，否则窄通道调试时容易把路径贴墙、无路可走和控制器不愿进入混为同一个问题。
+
+这也解释了为什么不能只按通道净宽判断可行性。静态建筑、动态障碍、队友占位和膨胀代价共同改变全局路线。即使全局路线存在，局部控制器仍可能因姿态、速度采样或入口目标布置而无法收敛。
+
+\subsubsection*{DWB 轨迹采样与权重}
+
+DWB 在允许速度范围内采样，按航向、目标距离、障碍间隙和速度等评分项选择命令\cite{ref10}。Fox 等人提出的动态窗口方法讲的就是这种“短时预测—候选评分—执行反馈”的思路\cite{ref11}。B1 采用的一组权重中，路径对齐（PathAlign）与目标对齐（GoalAlign）都取 0，路径距离 32、目标距离 24、转向目标 32、基础障碍项 0.02。
+
+把路径对齐与目标对齐归零，与窄通道入口的摆头现象有关。路径对齐和目标对齐会牵引车辆姿态持续追随局部路径或目标方向。通道内本来就需要小幅修正时，这两项可能放大左右摆动。保留路径距离和目标距离评价，可以继续比较轨迹偏离与推进程度，把旋转更多交给接近目标后的控制过程。
+
+局部规划得到的车体速度仍需按第 2.1 节的关系转换为轮速。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.35000\tableavailable}>{\raggedright\arraybackslash}p{0.28000\tableavailable}>{\raggedright\arraybackslash}p{0.37000\tableavailable}@{}}
+\caption{地面与空中运动的主要参数}\label{tab:8}\\
+\toprule
+\textbf{参数} & \textbf{取值} & \textbf{作用层级与说明} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{参数} & \textbf{取值} & \textbf{作用层级与说明} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+地图分辨率 & 0.05~m & 全局与局部代价地图栅格尺度 \\
+最大平移速度（max\_vel\_x） & 0.26~m/s & 地面平移命令上限 \\
+最大角速度（max\_vel\_theta） & 1.0~rad/s & 地面角速度命令上限 \\
+线速度、角速度采样档数 & 10 / 15 & DWB 平移与角速度采样档数 \\
+局部预测时长（sim\_time） & 1.7~s & 局部轨迹前向预测时长 \\
+控制频率 & 10~Hz & DWB 控制循环频率 \\
+线加速度、角加速度上限 & 2.5 / 3.2 & 线、角加速度限制 \\
+全局规划、局部控制目标容差 & 0.0 / 0.08~m & 分属全局规划与控制目标容差 \\
+空中位置环 & kp=2.0，积分限幅 0.30，输出限幅 3.0 & 误差限幅\ensuremath{\pm}5~m，使用自身仿真位姿 \\
+\end{longtable}
+\endgroup
+
+
+两种执行实现使用不同的速度、几何和到达条件。Webots 的规划对比使用二值膨胀栅格，Gazebo 的代价地图带分级代价。比较某个平台内的算法或规则时固定该平台的起点、任务和配置，才能说明变量改变以后发生了什么。
+
+\subsection{Webots 单车路径与定位对照}\label{sec:2.4}
+
+结合地面车辆课程的路径规划内容 \cite{ref2}，本节检验：在相同的起点、终点和障碍下，更换搜索方法是否会改变路线长度与计算量。实验在 0.05~m 栅格上选取开阔和窄入口两种布局，把障碍膨胀距离固定为 0.34~m。每步可向八个方向走，斜向经过的格角两侧也必须可通行。Dijkstra 按从起点累积的路程扩展，A* 在此基础上加上到目标的最短格网距离估计。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.16000\tableavailable}>{\raggedright\arraybackslash}p{0.30000\tableavailable}>{\raggedright\arraybackslash}p{0.28000\tableavailable}>{\raggedright\arraybackslash}p{0.26000\tableavailable}@{}}
+\caption{两种全局搜索在同一地图上的比较}\label{tab:9}\\
+\toprule
+\textbf{布局} & \textbf{Dijkstra 扩展节点 / 耗时中位数} & \textbf{A* 扩展节点 / 耗时中位数} & \textbf{两者的规划路径长度} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{布局} & \textbf{Dijkstra 扩展节点 / 耗时中位数} & \textbf{A* 扩展节点 / 耗时中位数} & \textbf{两者的规划路径长度} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+开阔 & 11 239 / 51.3~ms & 305 / 1.9~ms & 6.33~m \\
+窄入口 & 8 652 / 37.3~ms & 178 / 1.2~ms & 6.33~m \\
+\end{longtable}
+\endgroup
+
+
+每种布局分别比较了 31 次，两种方法的最短路长度相同。窄入口仍有一条达到最短网格距离的路径，A* 把更多搜索集中在通往目标的方向。这里计时的是全局栅格计算。车辆过窄口还要调姿态、避障，行驶时间由闭环运动的记录判断。
+
+把两种搜索分别接入同一个反馈控制器后，四个单车回合均完成行驶和到位检查。开阔场地都在约 19.92~s 到位。窄入口中，Dijkstra 与 A* 对应的到位时刻为 19.06~s 和 17.57~s，最短路径等长，简化后交给车的目标点可以不同。
+
+此外，用同一条窄入口轨迹比较了两种定位方法。只积分车轮读数时，打滑和转弯误差会随行程积累。叠加激光扫描与已知墙面的匹配后，A* 回合的位置均方根误差由约 0.47~m 降到 0.17~m。这项比较由记录回放得到，实际行驶由 GPS 和惯性单元反馈控制。平行墙面对沿走廊方向的限制较弱，出口附近的不同方向边缘对校正位置更有帮助。
+
+\subsection{双高度扫描与受阻处理}\label{sec:2.5}
+
+直路两边有导轨，入口外又有墙角。车辆走到这样的地方时，角度对准和横向净空同样重要。调试中曾把贴近中心线的定位值直接改成中心线坐标。这样做虽然使记录看起来整齐，但在车实际偏向一侧时，控制器看不到横向误差，于是缺少把车拉回中心的依据。后来保留测得的位置，并在外侧完成对准，车可以在入通道前调整航向与横向误差。
+
+局部避障用雷达距离区分前方和两侧的余量。遇到墙角，雷达未必能完整看见挡在车体旁边的几何边缘。控制器因此增加了一项运动检查：若有速度指令而车的位移或转角持续很小，先短时后退并偏转，再重新对准。这个判断用车载位置和姿态的变化，从而可以应对部分单靠前向距离难以辨认的卡滞。
+
+该设计在单车场景中进行了检验：保持路线和控制相同，在地图里没有标注的位置放一个 0.27~m 高的箱子。两路雷达的名义扫描平面分别为 0.32~m 和 0.225~m。仅用主雷达参与停车判断时，车与箱体发生接触。启用低位雷达后，车在仿真 5.47~s、前方约 0.42~m 处触发停车，全程没有接触箱体。这两次都未到达终点。补验在相同的低箱布置下增加回波定位、局部占据图和重新规划，B1 于 33.248~s 到达终点并完成驻留，全程零接触。仅停车的对照仍留在箱前。整场绕行见第~\ref{sec:4.7} 节。
+
+单车路线试验把地图规划、行驶控制和急停分开。低箱体插在本来可走的线上，地图搜索仍给出原路径，车辆移动后才由传感器获得箱体回波。这个布置让箱体可见性真正改变运行条件。只看搜索是否成功无法判断车辆能不能通过，接触日志和停车时刻提供了更直接的证据。固定姿态的四方向覆盖检查
+
+单车专项还使用了静止的 B1 和四个立体目标。两具 Webots 激光雷达均设为 180 点、6.283185 rad 名义视场，采样周期 16~ms。裁判真值用来把点和预先布置的物体对应，再检查命中方向和距离。每个物体的代表点按靠近目标方向选取，记录的是回波点的距离和角度。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.30340\tableavailable}>{\raggedright\arraybackslash}p{0.35475\tableavailable}>{\raggedright\arraybackslash}p{0.34185\tableavailable}@{}}
+\caption{固定姿态的双雷达方向检查}\label{tab:10}\\
+\toprule
+\textbf{布置方向} & \textbf{主雷达距离与方位} & \textbf{低位雷达距离与方位} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{布置方向} & \textbf{主雷达距离与方位} & \textbf{低位雷达距离与方位} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+前方 & 0.46~m / -1° & 0.46~m / -1° \\
+后方 & 0.89~m / -179° & 该物体未检出 \\
+左侧 & 0.70~m / 91° & 0.70~m / 91° \\
+右侧 & 0.68~m / -91° & 0.68~m / -89° \\
+近距离低目标 & 该物体未检出 & 该物体未检出 \\
+\end{longtable}
+\endgroup
+
+
+主雷达在四个方向都收到目标回波。低位雷达在后方目标和近距离低目标上没有命中，主雷达对该近距离低目标也没有命中。扫描视场、安装高度、近距离裁剪和周围结构共同决定能不能看到物体。这组固定姿态实验覆盖了四个方向与一个近距样点。低箱行驶对照显示主要传感器会遗漏部分高度范围，低位检测对实际停车有帮助。
+
+\subsection{从接近目标到任务完成}\label{sec:2.6}
+
+执行器把“接近目标”与“任务完成”分开。车辆进入目标半径只是第一个条件，还需满足横向误差、低速稳定和驻留时间。对需要装载、卸载、侦察或报告的任务，必须有相应服务事件。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.24000\tableavailable}>{\raggedright\arraybackslash}p{0.21000\tableavailable}>{\raggedright\arraybackslash}p{0.21000\tableavailable}>{\raggedright\arraybackslash}p{0.34000\tableavailable}@{}}
+\caption{到位与驻留判据}\label{tab:11}\\
+\toprule
+\textbf{判据} & \textbf{地面运输车} & \textbf{空中观察机} & \textbf{依据} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{判据} & \textbf{地面运输车} & \textbf{空中观察机} & \textbf{依据} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+水平到位容差 & 0.10~m & 0.10~m & Gazebo 场景的泊位到位容差 \\
+到位速度上限 & 0.10~m/s & 0.10~m/s & 按运动参考点速度判定 \\
+到位高度容差 & — & 0.20~m & 地面只查水平距离 \\
+移动到位保持 & 约 1~s & 约 1~s & 到位记录为 1000—1008~ms \\
+服务时长 & 2~s & 2~s & 场景设定的服务时间为 2000~ms \\
+服务记录 & 装载/卸载/交付 & 观察/报告 & 按任务要求 \\
+\end{longtable}
+\endgroup
+
+
+驻留期间如果车辆离开目标区、速度重新升高或服务对象被占用，计时与任务状态需要重新评估。完成时刻可能因此晚于导航到达时刻，这也解释了记录中为什么同时出现到位、物理完成确认和交付等不同事件。
+
+Webots 单车试验另用自己的到位条件。整场运输的判断为到位范围 0.10~m、低速不高于 0.10~m/s、驻留 2~s。记录的完成时刻属于该任务的最后一项验收。观察、报告、装载和交接应分别查事件，不能把经过目标点或接到指令当成交付。
+
+\subsection{空中任务规划与相机载荷}\label{sec:2.7}
+
+无人机课程指出，任务载荷与任务规划相互关联 \cite{ref3}。本设计为蓝方 B3 配置相机载荷和观察点，是为了让运输车能够使用与出发时刻接近的观察。轮到蓝方第二批运输时，它先请求一次观察。相机采样后附带时间戳，收到方检查帧数据及从采样到接收经过的时间。帧超过 6~s 就过期，B2 等重新取得有效帧才启程。由此，观察有没有及时收到会改变车实际开始走的时刻。
+
+基础整场的两架无人机按航点运动，用于检查采样、传递和放行的时序。旋翼动力学先由四螺旋桨单机验证，再接入八实体整场。航点给出去哪，GPS 和惯性测量给出当前位置和姿态。外环把位置误差转成倾角和总推力要求，内环把姿态误差转成力矩，再分配给四个螺旋桨。相机朝下拍摄，驻留时统计洋红色标记的像素数，达到 40 个像素就发送带采样时刻的观测报告。
+
+四个单机回合均完成起飞、到达工位、驻留、返场和降落。使用传感反馈且工位可见时，悬停相对航点的距离均方根约为 0.053~m，驻留采样中识别到的标记像素为 529 至 576 个，发出一次报告。遮挡工况的标记像素为 0，报告未生成。短时 GPS 中断时，飞行器暂停推进航点，定位恢复后继续执行并返场。相机图展示了可见和遮挡时的实际帧。单机实验使用规定颜色的标记核对载荷判断。双机旋翼整场中，B3 应地面请求拍摄并给出放行观察，R5 独立执行航点任务和返场，见第~\ref{sec:4.8} 节。
+
+\figitem{0.89}{fig03.pdf}{多旋翼驻留时记录的下视相机帧（原始画面）}{3}
+
+\subsection{多旋翼单机的反馈验证}\label{sec:2.8}
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-8\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.23000\tableavailable}>{\centering\arraybackslash}p{0.19000\tableavailable}>{\centering\arraybackslash}p{0.21000\tableavailable}>{\centering\arraybackslash}p{0.23000\tableavailable}>{\centering\arraybackslash}p{0.14000\tableavailable}@{}}
+\caption{独立螺旋桨单机飞行对照}\label{tab:12}\\
+\toprule
+\textbf{条件} & \textbf{已验收飞行环节} & \textbf{航点距离均方根 / m} & \textbf{GPS 位置均方根误差 / m} & \textbf{报告数} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{条件} & \textbf{已验收飞行环节} & \textbf{航点距离均方根 / m} & \textbf{GPS 位置均方根误差 / m} & \textbf{报告数} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+真值反馈参考 & 5/5 & 0.054 & — & 1 \\
+传感反馈，工位可见 & 5/5 & 0.053 & 0.010 & 1 \\
+传感反馈，工位遮挡 & 5/5 & 0.053 & 0.010 & 0 \\
+短时定位停更 & 5/5 & 0.130 & 0.010 & 1 \\
+\end{longtable}
+\endgroup
+
+
+五个环节各有独立验收事件。悬停误差按驻留中的位置与目标航点的距离计算，GPS 误差按取样位置与同一时刻的仿真真值计算。定位停更的那一回合里，暂停与恢复按预想走通了，只是恢复后的航点误差仍带着停更期间运动的影响。遮挡组的飞行完成数和正常组相同，报告数从 1 变成 0，说明观测可用性与飞机能否到点是两个条件。
+
+\subsection{单体行为与实验小结}\label{sec:2.9}
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.23000\tableavailable}>{\raggedright\arraybackslash}p{0.43000\tableavailable}>{\raggedright\arraybackslash}p{0.34000\tableavailable}@{}}
+\caption{单体自主行为与关键技术}\label{tab:13}\\
+\toprule
+\textbf{自主行为} & \textbf{关键技术} & \textbf{实验观察} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{自主行为} & \textbf{关键技术} & \textbf{实验观察} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+路径跟踪与差速控制 & 航向误差按最短转角计算，v、\ensuremath{\omega} 换算为左右轮速，符号判定性测量 & 调整航向符号和轮轴映射后，通道占用由约 23.0~s 降至 7.1~s \\
+自主定位 & 轮式里程计、激光与已知墙面匹配、AMCL 粒子滤波 & 位置均方根误差约 0.47~m 降到 0.17~m \\
+全局路径规划 & 栅格 Dijkstra 与 A*、膨胀代价地图 & A* 扩展节点约为 Dijkstra 的 1/37—1/49，路径等长 \\
+局部避障与脱困 & DWB 轨迹采样评分、双高度激光扫描、停滞检测与短时倒车偏转 & 低箱体前约 0.42~m 停车，无接触 \\
+入口对准与到点验收 & 通道外对准，到点减速，距离、速度、驻留三条件判据 & 以距离、速度与驻留共同判定到点 \\
+空中巡察与观察 & 航点任务规划、位置—姿态串级控制、相机标记识别与带时间戳报告 & 悬停误差约 0.053~m，遮挡时不生成报告 \\
+\end{longtable}
+\endgroup

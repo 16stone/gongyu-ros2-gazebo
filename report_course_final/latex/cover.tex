@@ -1,0 +1,34 @@
+\newcommand{\makecover}{%
+\begin{titlepage}
+\thispagestyle{empty}
+\AddToHookNext{shipout/background}{%
+  \put(0,-\paperheight){\includegraphics[width=\paperwidth,height=\paperheight]{assets/cover-background.png}}%
+}
+\centering
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\sffamily\color{ink}
+\vspace*{20mm}
+{\large\bfseries 中山大学\quad 智能工程学院\par}
+\vspace{4mm}
+{\normalsize 无人系统导论\quad 课程设计报告\par}
+\vspace{19mm}
+{\fontsize{30}{40}\selectfont\bfseries 一条通道上的两支队伍\par}
+\vspace{4mm}
+{\fontsize{14}{22}\selectfont 题目二\quad 空地协同无人系统对抗靶场设计\par}
+\vfill
+{\normalsize
+\begin{tabular}{@{}l@{\hspace{20mm}}l@{}}
+\color{muted}课程名称 & 无人系统导论\\[2.3mm]
+\color{muted}学生姓名 & 潘道熙\\[2.3mm]
+\color{muted}学号 & 25361130\\[2.3mm]
+\color{muted}学院 & 智能工程学院\\[2.3mm]
+\color{muted}专业 & 智能科学与技术\\[2.3mm]
+\color{muted}年级 & 2025 级\\[2.3mm]
+\color{muted}提交日期 & 2026 年 11 月
+\end{tabular}\par}
+\vspace{13mm}
+{\small\color{muted}中山大学\par}
+\vspace{1mm}
+\end{titlepage}%
+}

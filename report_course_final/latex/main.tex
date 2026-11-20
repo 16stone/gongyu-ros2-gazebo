@@ -1,0 +1,74 @@
+\documentclass[UTF8,a4paper,zihao=-4,fontset=fandol]{ctexart}
+\usepackage[a4paper,left=24mm,right=24mm,top=23mm,bottom=22mm,headheight=15pt,headsep=8mm,footskip=10mm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage{array,booktabs,longtable}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{url}
+\definecolor{ink}{gray}{0.14}
+\definecolor{muted}{gray}{0.34}
+\definecolor{rulegray}{gray}{0.72}
+\definecolor{pale}{gray}{0.94}
+\hypersetup{hidelinks,hypertexnames=false,bookmarksnumbered=true,pdftitle={一条通道上的两支队伍},pdfauthor={潘道熙},pdfsubject={无人系统导论课程设计}}
+\graphicspath{{figures/}}
+\ctexset{
+ section={name={第,章},number=\arabic{section},format=\LARGE\bfseries\raggedright,aftername=\quad,beforeskip=0.4ex,afterskip=1.2ex},
+ subsection={format=\large\bfseries\raggedright,aftername=\quad,beforeskip=2ex,afterskip=0.8ex},
+ subsubsection={format=\normalsize\bfseries\raggedright,beforeskip=1.2ex,afterskip=0.55ex}}
+\captionsetup{hypcap=false,font=small,labelfont=bf,labelsep=quad,margin=4mm}
+\captionsetup[table]{position=above,skip=5pt}
+\setcounter{tocdepth}{2}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.23\baselineskip plus 1pt minus 1pt}
+\linespread{1.14}
+\setlength{\LTpre}{0.65\baselineskip}
+\setlength{\LTpost}{0.47\baselineskip}
+\setlength{\tabcolsep}{4.3pt}
+\newlength{\tableavailable}
+\renewcommand{\arraystretch}{1.27}
+\raggedbottom
+\emergencystretch=2em
+\widowpenalty=8000
+\clubpenalty=8000
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{muted}无人系统导论\quad 课程设计}
+\fancyhead[R]{\small\color{muted}\nouppercase{\leftmark}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.35pt}
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+\newcommand{\pathref}[1]{\nolinkurl{#1}}
+\newcommand{\appnumbering}{\appendix\ctexset{section={name={附录,},number=\Alph{section}}}\renewcommand{\thetable}{\thesection.\arabic{table}}\renewcommand{\theHtable}{app.\thesection.\arabic{table}}}
+\newcommand{\figitem}[4]{%
+  \begin{center}\begin{minipage}{\linewidth}\centering
+    \includegraphics[width=#1\linewidth,height=0.59\textheight,keepaspectratio]{#2}
+    \captionof{figure}{#3}\label{fig:#4}
+  \end{minipage}\end{center}}
+\newcommand{\plainsection}[1]{\section*{#1}\markboth{#1}{}\phantomsection\addcontentsline{toc}{section}{#1}}
+\input{cover}
+\begin{document}
+\makecover
+\pagenumbering{Roman}
+\begingroup\small\setlength{\parskip}{0pt}\linespread{1.10}\selectfont\tableofcontents\endgroup
+\clearpage
+\input{ref-order}
+\input{chapters/00-abstract}
+\clearpage
+\pagenumbering{arabic}
+\input{chapters/01}
+\input{chapters/02}
+\input{chapters/03}
+\input{chapters/04}
+\input{chapters/05}
+\input{chapters/06}
+\input{chapters/07}
+\clearpage
+\input{references}
+\appnumbering
+\input{chapters/A}
+\input{chapters/B}
+\input{chapters/C}
+\end{document}

@@ -1,0 +1,250 @@
+\clearpage
+
+\addtocontents{toc}{\protect\newpage}
+\section{Gazebo 历史回合与机制对照}\label{sec:5}
+
+\subsection{八实体回合及其结果}\label{sec:5.1}
+
+Gazebo 历史整场中，8 个实体分别运行，六辆地面车完成 AMCL 定位、地图到车体的坐标对齐和导航准备，回合运行至预设窗口结束。该回合用于查看岗位协商、预约和目的地服务怎样在同一轮中衔接。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.20000\tableavailable}>{\raggedright\arraybackslash}p{0.52000\tableavailable}>{\raggedright\arraybackslash}p{0.28000\tableavailable}@{}}
+\caption{Gazebo 历史整场的主要结果}\label{tab:27}\\
+\toprule
+\textbf{指标} & \textbf{观测结果} & \textbf{核对依据} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{指标} & \textbf{观测结果} & \textbf{核对依据} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+实体 & 8 个实体各自在独立进程中运行 & 运行摘要 \\
+跨进程请求 & 17708 次 & 运行摘要 \\
+实际运行用时 & 1054.873~s（墙钟时间） & 运行摘要与结束状态 \\
+任务完成 & 14/14 按期 & 任务完成与期限 \\
+约束违例 & 0 条记录 & 约束检查 \\
+消息状态 & 排队 1065 条，送达 934 条，失败 101 条，待处理 30 条 & 消息状态记录 \\
+岗位状态 & 提议、确认、前往、待命、执行、释放各记录 2 次 & 岗位变更记录 \\
+通道持有 & 5 次，均记录持有起点、释放时刻和提前释放 & 通道事件 \\
+\end{longtable}
+\endgroup
+
+
+任务时间图给出 14 项任务的完成时刻和期限。红方巡察在 3.480~s 完成，期限 10~s。R4 返场在 118.352~s 完成，期限 130~s。红方返场在 163.966~s 完成，期限 180~s。红方 1 批交付在 186.894~s 完成，期限 250~s。蓝方两批交付分别在 243.432~s 和 295.878~s 完成，期限均为 350~s。
+
+\figitem{1}{fig09.pdf}{Gazebo 历史整场的任务完成时刻与期限}{9}
+
+Gazebo 历史回合 14 项任务均按期完成。消息另有 934 条送达、101 条失败及 30 条待处理。这个记录支持分别观察任务完成和消息状态。计算通信成功率还需要同一批消息的逐条去向。
+
+\subsection{场地画面与一次交付过程}\label{sec:5.2}
+
+图~\ref{fig:9} 给出本回合的任务时刻。为说明场地与车辆行驶，图~\ref{fig:10} 和图~\ref{fig:11} 另取自一次早期 Gazebo 独立回合，该轮同样为 14/14 按期。图像拍在第二批交付之后，精确时刻以相应的事件记录为准。
+
+\figitem{0.7}{fig10.pdf}{Gazebo 一次早期独立回合的原生俯瞰画面}{10}
+
+轨迹图来自六辆地面车的一次历史真值记录。B1、B2、R1、R2 在中央运输区活动，R3 位于北侧，R4 位于南侧。轨迹与任务指标承担不同作用：前者显示车辆实际走过哪里，后者判断任务是否按期、资源是否按规则占用。
+
+\figitem{1}{fig11.pdf}{Gazebo 早期独立回合的六辆地面车轨迹}{11}
+
+表~\ref{tab:28} 选取历史回合中的 B1，按顺序列出到达西口、持有资源、清空通道、到达目的地和交付的时刻。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\centering\arraybackslash}p{0.16000\tableavailable}>{\raggedright\arraybackslash}p{0.33000\tableavailable}>{\raggedright\arraybackslash}p{0.51000\tableavailable}@{}}
+\caption{历史整机中 B1 的通道通行与交付片段}\label{tab:28}\\
+\toprule
+\textbf{时刻/s} & \textbf{事件} & \textbf{说明} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{时刻/s} & \textbf{事件} & \textbf{说明} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+9.092 & 到达通道西侧 & 到达通道西侧，不等于已获授权 \\
+50.352 & 开始持有通道（西向东） & 通道持有起点，随后下发运动请求 \\
+89.092 & 验收到达东侧并清空 & 到达验收并释放资源，即释放时刻 \\
+181.280 & 到达交付目的地 & 到达目的地，与跨口完成是不同事件 \\
+183.460 & 卸载并交付 & 任务验收完成，晚于单纯导航到达 \\
+\end{longtable}
+\endgroup
+
+
+表中时刻取自该历史回合的事件记录，按毫秒换算为秒。
+
+\subsection{通道持有起点、释放和任务交付}\label{sec:5.3}
+
+图~\ref{fig:12} 将通道持有（\pathref{channel_enter}）与通道释放（\pathref{channel_cleared}）放在同一时间轴上。提前释放量来自重算事件（\pathref{channel_release_recomputed}）。\texttt{channel\_enter} 写入时，通道资源刚分配给车辆，运动请求随后下发。到达验收并归还资源时写入 \texttt{channel\_cleared}。图中的深色段表示两个事件之间的持有时长，斜纹段表示提前归还的预约时段。
+
+\figitem{1}{fig12.pdf}{Gazebo 历史整场中的五次通道持有与提前释放}{12}
+
+\clearpage
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-8\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.25000\tableavailable}>{\centering\arraybackslash}p{0.16000\tableavailable}>{\centering\arraybackslash}p{0.17000\tableavailable}>{\centering\arraybackslash}p{0.16000\tableavailable}>{\centering\arraybackslash}p{0.26000\tableavailable}@{}}
+\caption{五次通道持有起点、释放时刻与持有时长}\label{tab:29}\\
+\toprule
+\textbf{实体与方向} & \textbf{持有起点/s} & \textbf{释放时刻/s} & \textbf{持有时长/s} & \textbf{名义窗内提前释放/s} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{实体与方向} & \textbf{持有起点/s} & \textbf{释放时刻/s} & \textbf{持有时长/s} & \textbf{名义窗内提前释放/s} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+R2，E\ensuremath{\to}W & 0.000 & 24.130 & 24.130 & 23.870 \\
+B1，W\ensuremath{\to}E & 50.008 & 77.508 & 27.500 & 20.492 \\
+R1，E\ensuremath{\to}W & 122.376 & 149.558 & 27.182 & 20.818 \\
+B1，E\ensuremath{\to}W & 184.788 & 209.094 & 24.306 & 23.694 \\
+B2，E\ensuremath{\to}W & 241.330 & 264.256 & 22.926 & 25.074 \\
+\end{longtable}
+\endgroup
+
+
+五次占用都早于对应的名义结束时刻释放，单次归还 20.492—25.074~s 的可预约时间。后车能否使用这段时间，还取决于口部及目的地条件。
+
+\subsection{联合准入与提前释放的影响}\label{sec:5.4}
+
+为评估联合准入与提前释放带来的变化，选取了同一场景下的两组历史对照：两轮的场地、任务分工、真值反馈和执行层都一样，只把一组联合准入与释放判断关掉、另一组打开。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-4\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.33333\tableavailable}>{\raggedright\arraybackslash}p{0.33333\tableavailable}>{\raggedright\arraybackslash}p{0.33333\tableavailable}@{}}
+\caption{联合准入与提前释放规则的同场景配对}\label{tab:30}\\
+\toprule
+\textbf{指标} & \textbf{机制关} & \textbf{机制开} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{指标} & \textbf{机制关} & \textbf{机制开} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+任务完成 & 14/14 按期 & 14/14 按期 \\
+记录违例 & 0 & 0 \\
+服务释放 & 3/3 & 3/3 \\
+红方 1 批交付/s & 187.784 & 183.448 \\
+蓝方 1 批交付/s & 245.572 & 239.198 \\
+蓝方 2 批交付/s & 298.556 & 295.480 \\
+\end{longtable}
+\endgroup
+
+
+\figitem{0.94}{fig13.pdf}{联合机制开启与关闭的一次同场景配对。两组均为 14/14 按期。}{13}
+
+机制开启后，红方 1 批交付提前 4.336~s，蓝方两批交付分别提前 6.374~s 和 3.076~s。本次配对比较的是联合机制开启前后的变化。
+
+联合机制开启后，多个通道时窗合计归还 114.930~s 的名义余量。这个数字反映可重新预约的时段总量。在同一组对照中，B2 开始持有通道的时刻由 243.466~s 提前到 236.854~s，提前 6.612~s，蓝方第二批交付提前 3.076~s。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.39000\tableavailable}>{\centering\arraybackslash}p{0.18000\tableavailable}>{\centering\arraybackslash}p{0.18000\tableavailable}>{\raggedright\arraybackslash}p{0.25000\tableavailable}@{}}
+\caption{从名义释放到最终交付的分层核对}\label{tab:31}\\
+\toprule
+\textbf{层次} & \textbf{机制关} & \textbf{机制开} & \textbf{本对差值} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{层次} & \textbf{机制关} & \textbf{机制开} & \textbf{本对差值} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+重算释放的名义余量合计/s & 0 & 114.930 & +114.930 \\
+B2 通道持有起点/s & 243.466 & 236.854 & 提前 6.612 \\
+蓝方 2 批交付时刻/s & 298.556 & 295.480 & 提前 3.076 \\
+\end{longtable}
+\endgroup
+
+
+这些余量分布在多个预约时窗里，后车还要等目的地到达区空闲。在联合机制开启的回合中，B2 进场前仍因 B1 占着 D 到达区而等待。通道早释放首先增加了可预约时段，能否提前进场和交付，还取决于下游占用与后续行驶。
+
+\subsection{中绕行与长绕行场景的对照}\label{sec:5.5}
+
+早期 Gazebo 分别在中绕行和长绕行场景比较独立和竞争两种任务组织方式。每一对使用本组同一场景、源码和选择规则，四轮均跑完 400~s。中绕行组的蓝方第二批交付由 294.766~s 变为 328.540~s，晚 33.774~s。长绕行组由 297.726~s 变为 296.066~s，早 1.660~s。两对均完成 14 项按期任务，记录违例为 0。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.23049\tableavailable}>{\centering\arraybackslash}p{0.26951\tableavailable}>{\centering\arraybackslash}p{0.26951\tableavailable}>{\centering\arraybackslash}p{0.23049\tableavailable}@{}}
+\caption{历史 Gazebo 两种场景下的比较}\label{tab:32}\\
+\toprule
+\textbf{场景} & \textbf{独立组织 B2 交付 / s} & \textbf{竞争组织 B2 交付 / s} & \textbf{同场景差值 / s} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{场景} & \textbf{独立组织 B2 交付 / s} & \textbf{竞争组织 B2 交付 / s} & \textbf{同场景差值 / s} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+中绕行 & 294.766 & 328.540 & +33.774 \\
+长绕行 & 297.726 & 296.066 & \ensuremath{-}1.660 \\
+\end{longtable}
+\endgroup
+
+
+通道资源时间与交付时间一起看，才能解释为何这两对出现不同结果。中绕行组 B2 的资源持有起点比独立组织晚约 27.29~s，长绕行组只晚约 0.02~s。一组有明显等待，另一组的起步资源条件几乎未变。这里保留两组，是因为场景条件会显著改变这项机制的效果。
+
+\subsection{噪声与地图外障碍}\label{sec:5.6}
+
+Gazebo 历史实验调整了激光噪声，并在地图中未登记的位置设置两种宽度的柱体。柱心在场地坐标 $(0.30,-1.00)\,\mathrm m$。各组均以这个位置计算轨迹最短距离，未放柱的标称组也使用同一参照。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-8\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.24000\tableavailable}>{\centering\arraybackslash}p{0.22000\tableavailable}>{\centering\arraybackslash}p{0.24000\tableavailable}>{\centering\arraybackslash}p{0.15000\tableavailable}>{\centering\arraybackslash}p{0.15000\tableavailable}@{}}
+\caption{Gazebo 历史实验中的噪声与柱体条件}\label{tab:33}\\
+\toprule
+\textbf{场景条件} & \textbf{扫描噪声估计中位数 / m} & \textbf{轨迹至柱心最小距离 / m} & \textbf{恢复记录 / 次} & \textbf{按期任务} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{场景条件} & \textbf{扫描噪声估计中位数 / m} & \textbf{轨迹至柱心最小距离 / m} & \textbf{恢复记录 / 次} & \textbf{按期任务} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+标称 & 0.0166 & 0.123 & 10 & 13/14 \\
+提高激光噪声 & 0.0397 & 0.856 & 1 & 14/14 \\
+宽柱 & 0.0164 & 0.871 & 10 & 13/14 \\
+窄柱 & 0.0183 & 0.845 & 2 & 14/14 \\
+\end{longtable}
+\endgroup
+
+
+\figitem{1}{fig14.pdf}{Gazebo 历史实验中的扫描噪声与轨迹到柱心的距离}{14}
+
+噪声设定由 0.01~m 增至 0.03~m 时，扫描估计中位数约增至 2.39 倍。加入两种柱体时，轨迹与柱心的最小距离均高于标称结果。该距离从车体参考点量起，用来辨认行驶变化。每个条件有一个历史整场，参数配置也有差异，恢复次数和总任务结果只按记录描述。数值来自原始归档的扩充专项与复算记录。Webots 单车低箱测试独立回答是否触发保护停车。
