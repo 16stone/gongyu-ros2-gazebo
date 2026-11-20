@@ -1,0 +1,45 @@
+{
+  "scene": "web_cost",
+  "motion_backend": "ugv_wheel_motors",
+  "settings": {
+    "cost": "low",
+    "carrier": "B2",
+    "decision": "accept",
+    "provider_deadline_ms": 50000,
+    "direct_return_ms": 12839,
+    "support_return_ms": 28225,
+    "delivery_gain_ms": 13750,
+    "extra_work_ms": 11386
+  },
+  "task_completed": {
+    "delivery": {
+      "actor": "B2",
+      "t_ms": 8160,
+      "deadline_ms": 42000,
+      "on_time": true
+    },
+    "provider_return": {
+      "actor": "B2",
+      "t_ms": 32192,
+      "deadline_ms": 50000,
+      "on_time": true
+    }
+  },
+  "total": 2,
+  "deadlines_ms": {
+    "delivery": 42000,
+    "provider_return": 50000
+  },
+  "on_time": 2,
+  "full_window": true,
+  "sim_end_ms": 60000,
+  "channel_overlap_samples": 0,
+  "vehicle_envelope_overlap_samples": 0,
+  "violation_count": 0,
+  "min_vehicle_separation_m": 3.9114239238045023,
+  "min_lane_envelope_margin_m": null,
+  "paths_m": {
+    "B1": 0.009248165367295377,
+    "B2": 9.545003345584584
+  }
+}

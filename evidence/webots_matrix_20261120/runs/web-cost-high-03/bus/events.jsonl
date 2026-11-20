@@ -1,0 +1,7 @@
+{"t_ms":0,"kind":"opportunity_cost_decision","actor":"B1","cost":"high","carrier":"B1","decision":"reject","provider_deadline_ms":23000,"direct_return_ms":12839,"support_return_ms":28225,"delivery_gain_ms":13750,"extra_work_ms":11386}
+{"t_ms":0,"kind":"dispatch","actor":"B1","goal":[8.0,-1.5],"task_id":"delivery"}
+{"t_ms":0,"kind":"dispatch","actor":"B2","goal":[3.0,-4.0],"task_id":"provider_return"}
+{"t_ms":16896,"kind":"goal_dwell","actor":"B2","goal":[3.0,-4.0],"position":[3.043993503445318,-3.968402573248389,0.11471512717837061],"task_id":"provider_return"}
+{"t_ms":16896,"kind":"task_completed","actor":"B2","deadline_ms":23000,"on_time":true,"task_id":"provider_return"}
+{"t_ms":19072,"kind":"goal_dwell","actor":"B1","goal":[8.0,-1.5],"position":[7.947205508784764,-1.4999161475947493,0.116215748971394],"task_id":"delivery"}
+{"t_ms":19072,"kind":"task_completed","actor":"B1","deadline_ms":42000,"on_time":true,"task_id":"delivery"}

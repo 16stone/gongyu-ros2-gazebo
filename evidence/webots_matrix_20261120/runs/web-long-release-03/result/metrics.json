@@ -1,0 +1,47 @@
+{
+  "scene": "web_long",
+  "motion_backend": "ugv_wheel_motors",
+  "settings": {
+    "early_release": true,
+    "nominal_clear_ms": 32000
+  },
+  "task_completed": {
+    "first_delivery": {
+      "actor": "B1",
+      "t_ms": 15328,
+      "deadline_ms": 30000,
+      "on_time": true
+    },
+    "following_delivery": {
+      "actor": "B2",
+      "t_ms": 22928,
+      "deadline_ms": 65000,
+      "on_time": true
+    },
+    "long_delivery": {
+      "actor": "R1",
+      "t_ms": 92064,
+      "deadline_ms": 135000,
+      "on_time": true
+    }
+  },
+  "total": 3,
+  "deadlines_ms": {
+    "first_delivery": 30000,
+    "following_delivery": 65000,
+    "long_delivery": 135000
+  },
+  "on_time": 3,
+  "full_window": true,
+  "sim_end_ms": 140000,
+  "channel_overlap_samples": 0,
+  "vehicle_envelope_overlap_samples": 0,
+  "violation_count": 0,
+  "min_vehicle_separation_m": 0.8097251029758872,
+  "min_lane_envelope_margin_m": 0.22829302473308444,
+  "paths_m": {
+    "B1": 6.179848819968501,
+    "B2": 6.3882053355141135,
+    "R1": 31.954560125024823
+  }
+}

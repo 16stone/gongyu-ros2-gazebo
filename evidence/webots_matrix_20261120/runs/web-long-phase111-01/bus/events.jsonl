@@ -1,0 +1,17 @@
+{"t_ms":0,"kind":"dispatch","actor":"B1","goal":[7.6,0.0],"task_id":"first_delivery"}
+{"t_ms":0,"kind":"dispatch","actor":"R1","goal":[1.0,-12.6],"task_id":null}
+{"t_ms":592,"kind":"channel_enter","actor":"B1"}
+{"t_ms":7888,"kind":"channel_clear","actor":"B1"}
+{"t_ms":15328,"kind":"goal_dwell","actor":"B1","goal":[7.6,0.0],"position":[7.555074685316211,2.5324146151128895e-05,0.11621925827101581],"task_id":"first_delivery"}
+{"t_ms":15328,"kind":"task_completed","actor":"B1","deadline_ms":30000,"on_time":true,"task_id":"first_delivery"}
+{"t_ms":32000,"kind":"dispatch","actor":"B2","goal":[6.4,0.0],"task_id":"following_delivery"}
+{"t_ms":34784,"kind":"channel_enter","actor":"B2"}
+{"t_ms":38016,"kind":"goal_dwell","actor":"R1","goal":[1.0,-12.6],"position":[1.0179368715158494,-12.549685375715958,0.11624045203169782],"task_id":null}
+{"t_ms":38016,"kind":"dispatch","actor":"R1","goal":[6.0,-12.6],"task_id":null}
+{"t_ms":58320,"kind":"goal_dwell","actor":"R1","goal":[6.0,-12.6],"position":[5.940741267629465,-12.59651809661669,0.11836817819324086],"task_id":null}
+{"t_ms":58320,"kind":"dispatch","actor":"R1","goal":[6.0,-1.1],"task_id":"long_delivery"}
+{"t_ms":66528,"kind":"channel_clear","actor":"B2"}
+{"t_ms":72304,"kind":"goal_dwell","actor":"B2","goal":[6.4,0.0],"position":[6.354621234616145,-0.033466026914698396,0.11578889709514151],"task_id":"following_delivery"}
+{"t_ms":72304,"kind":"task_completed","actor":"B2","deadline_ms":65000,"on_time":false,"task_id":"following_delivery"}
+{"t_ms":92064,"kind":"goal_dwell","actor":"R1","goal":[6.0,-1.1],"position":[6.003165789960112,-1.1595532747765354,0.11770557962036836],"task_id":"long_delivery"}
+{"t_ms":92064,"kind":"task_completed","actor":"R1","deadline_ms":135000,"on_time":true,"task_id":"long_delivery"}

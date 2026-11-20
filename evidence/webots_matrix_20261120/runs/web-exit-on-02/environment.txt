@@ -1,0 +1,10 @@
+run=web-exit-on-02
+scene=web_medium_exit
+platform=amax-cpu-webots-r2025a
+physical_actuation=1
+loc_mode=gps
+feedback_mode=sensor
+seed=0
+blue2_handoff=0
+
+webots_exit=0

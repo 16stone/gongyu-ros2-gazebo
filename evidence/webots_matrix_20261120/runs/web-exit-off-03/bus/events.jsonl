@@ -1,0 +1,17 @@
+{"t_ms":0,"kind":"dispatch","actor":"B1","goal":[6.4,0.0],"task_id":null}
+{"t_ms":0,"kind":"stage_dispatch","actor":"B2","goal":[1.38,0.0],"task_id":null}
+{"t_ms":592,"kind":"channel_enter","actor":"B1"}
+{"t_ms":5104,"kind":"goal_dwell","actor":"B2","goal":[1.38,0.0],"position":[1.3263763518163707,5.688621476828136e-11,0.11621965158659014],"task_id":null}
+{"t_ms":7888,"kind":"channel_clear","actor":"B1"}
+{"t_ms":7888,"kind":"dispatch","actor":"B2","goal":[5.6,0.0],"task_id":null}
+{"t_ms":8256,"kind":"channel_enter","actor":"B2"}
+{"t_ms":20816,"kind":"channel_clear","actor":"B2"}
+{"t_ms":23280,"kind":"goal_dwell","actor":"B2","goal":[5.6,0.0],"position":[5.541668780584743,0.0067066378439301425,0.11679682555815946],"task_id":null}
+{"t_ms":23280,"kind":"move_to_exit_berth","actor":"B2","goal":[6.4,0.0],"task_id":"following_delivery"}
+{"t_ms":28000,"kind":"goal_dwell","actor":"B1","goal":[6.4,0.0],"position":[6.398093572143373,-0.002452321313507699,0.11966445066014374],"task_id":null}
+{"t_ms":28000,"kind":"dispatch","actor":"B1","goal":[7.6,0.0],"task_id":"first_delivery"}
+{"t_ms":30256,"kind":"destination_cleared","actor":"B1","goal":[6.4,0.0],"position":[7.103232192130509,0.013680344857880165,0.11761659208513929]}
+{"t_ms":31968,"kind":"goal_dwell","actor":"B2","goal":[6.4,0.0],"position":[6.342366430752028,0.0141645601558139,0.11679913079870799],"task_id":"following_delivery"}
+{"t_ms":31968,"kind":"task_completed","actor":"B2","deadline_ms":65000,"on_time":true,"task_id":"following_delivery"}
+{"t_ms":34224,"kind":"goal_dwell","actor":"B1","goal":[7.6,0.0],"position":[7.541039864327592,0.0021050493567733837,0.1197844783187808],"task_id":"first_delivery"}
+{"t_ms":34224,"kind":"task_completed","actor":"B1","deadline_ms":55000,"on_time":true,"task_id":"first_delivery"}
