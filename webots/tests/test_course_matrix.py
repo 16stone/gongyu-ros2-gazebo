@@ -4,7 +4,10 @@ from math import dist
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
-from course_matrix import LONG_ROUTE, STARTS, choose_support, dispatch_due
+from course_matrix import EXIT_STAGING, LONG_ROUTE, STARTS, choose_support, dispatch_due
+
+
+from physical_corridor import occupies_corridor
 
 
 class CourseMatrixTest(unittest.TestCase):
@@ -17,6 +20,12 @@ class CourseMatrixTest(unittest.TestCase):
         self.assertFalse(dispatch_due(8000, False, True))
         self.assertTrue(dispatch_due(8000, True, True))
         self.assertTrue(dispatch_due(32000, False, True))
+
+    def test_exit_staging_is_clear_of_the_corridor(self):
+        west, east = EXIT_STAGING
+        self.assertLess(west[0], east[0])
+        self.assertFalse(occupies_corridor(*west))
+        self.assertFalse(occupies_corridor(*east))
 
     def test_destination_blocking_keeps_the_channel_idle(self):
         self.assertFalse(dispatch_due(40000, True, True, destination_clear=False))

@@ -11,7 +11,7 @@ from controller import Supervisor
 
 sys.path.insert(0, os.environ["GONGYU_WEBOTS_COMMON"])
 from bus import Bus
-from course_matrix import (DELIVERY, LONG_ROUTE, NOMINAL_CLEAR_MS, PROVIDER_DEADLINE_MS,
+from course_matrix import (DELIVERY, EXIT_STAGING, LONG_ROUTE, NOMINAL_CLEAR_MS, PROVIDER_DEADLINE_MS,
                            PROVIDER_HOME, STARTS, choose_support, dispatch_due)
 from physical_corridor import HULL_RADIUS, occupies_corridor
 
@@ -49,7 +49,7 @@ def event(kind, actor=None, **fields):
     bus.append("events.jsonl", {"t_ms": now, "kind": kind, "actor": actor, **fields})
 
 
-def send_next(actor):
+def send_next(actor, kind="dispatch"):
     goal, task = routes[actor].pop(0)
     command = {
         "id": f"{actor}-{now}", "type": "goto", "x": goal[0], "y": goal[1],
@@ -57,7 +57,7 @@ def send_next(actor):
     }
     bus.append(f"cmd_{actor}.jsonl", command)
     current[actor] = (goal, task)
-    event("dispatch", actor, goal=goal, task_id=task)
+    event(kind, actor, goal=goal, task_id=task)
 
 
 if scene == "web_long":
@@ -75,7 +75,8 @@ if scene == "web_long":
 elif scene == "web_medium_exit":
     check_destination = {"off": False, "on": True}[os.environ["GONGYU_MATRIX_EXIT_CHECK"]]
     routes = {"B1": [(following_goal, None), ((7.6, 0.0), "first_delivery")],
-              "B2": [(following_goal, "following_delivery")]}
+              "B2": [(EXIT_STAGING[0], None), (EXIT_STAGING[1], None),
+                     (following_goal, "following_delivery")]}
     deadlines = {"first_delivery": 55000, "following_delivery": 65000}
     settings = {"early_release": True, "exit_check": check_destination, "berth": following_goal}
     rule = True
@@ -83,6 +84,7 @@ elif scene == "web_medium_exit":
     destination_reserved = True
     holds_release_until = 28000
     send_next("B1")
+    send_next("B2", "stage_dispatch")
 else:
     cost = os.environ["GONGYU_COST"]
     provider_deadline = PROVIDER_DEADLINE_MS[cost]
@@ -125,7 +127,7 @@ while supervisor.step(step_ms) != -1:
             destination_reserved = False
             event("destination_cleared", "B1", goal=following_goal, position=positions["B1"])
         destination_clear = not settings.get("exit_check", False) or not destination_reserved
-        entrance_clear = clear_b1 and not occupied
+        entrance_clear = clear_b1 and not occupied and "B2" not in current
         if routes["B2"] and dispatch_due(
                 now, rule, entrance_clear, destination_clear=destination_clear):
             send_next("B2")
@@ -148,7 +150,10 @@ while supervisor.step(step_ms) != -1:
             finished[task] = {"actor": actor, "t_ms": now, "deadline_ms": deadlines[task],
                               "on_time": now <= deadlines[task]}
             event("task_completed", **finished[task], task_id=task)
-        if routes[actor]:
+        if scene == "web_medium_exit" and actor == "B2":
+            if goal == EXIT_STAGING[1]:
+                send_next(actor, "move_to_exit_berth")
+        elif routes[actor]:
             send_next(actor)
     if now - last_sample >= 256:
         last_sample = now

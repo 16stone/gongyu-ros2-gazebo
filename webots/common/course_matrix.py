@@ -3,6 +3,7 @@
 from math import dist
 
 NOMINAL_CLEAR_MS = 32000
+EXIT_STAGING = ((1.38, 0.0), (5.60, 0.0))
 LONG_ROUTE = ((1.0, -12.6), (6.0, -12.6), (6.0, -1.1))
 STARTS = {
     "web_long": {"B1": (1.43, 0.0), "B2": (0.50, 0.0), "R1": (1.0, -1.1)},
