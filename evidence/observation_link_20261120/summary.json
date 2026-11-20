@@ -37,5 +37,26 @@
     "missing": [
       "blue2"
     ]
+  },
+  "reconnect": {
+    "run": "observation-reconnect-20261120-01",
+    "on_time": 14,
+    "total": 14,
+    "channel_enter": 5,
+    "channel_clear": 5,
+    "overlap": 0,
+    "closing_ms": 400000,
+    "drop_count": 4,
+    "timeout_count": 4,
+    "first_drop_ms": 240928,
+    "first_timeout_ms": 245920,
+    "accepted_ms": 265120,
+    "blue2": {
+      "t_ms": 324976,
+      "deadline_ms": 350000,
+      "on_time": true,
+      "actor": "B2"
+    },
+    "missing": []
   }
 }

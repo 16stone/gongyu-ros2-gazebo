@@ -1,0 +1,6 @@
+{"id":"cmd-0004","type":"goto","x":14,"y":-8,"node":"F_R","task_id":"red_inspect","t_ms":0,"land":false,"z":1.9}
+{"id":"cmd-0009","type":"goto","x":10,"y":-8,"node":"K_R","task_id":null,"t_ms":4208,"land":false,"z":1.9}
+{"id":"cmd-0014","type":"goto","x":6,"y":-8,"node":"H_R","task_id":"red_patrol","t_ms":7536,"land":false,"z":1.9}
+{"id":"cmd-0017","type":"goto","x":10,"y":-8,"node":"K_R","task_id":null,"t_ms":12832,"land":false,"z":1.9}
+{"id":"cmd-0019","type":"goto","x":14,"y":-8,"node":"F_R","task_id":null,"t_ms":16160,"land":false,"z":1.9}
+{"id":"cmd-0022","type":"goto","x":14,"y":-8,"node":"F_R_land","task_id":"red_return","t_ms":19504,"land":true,"z":0.045}

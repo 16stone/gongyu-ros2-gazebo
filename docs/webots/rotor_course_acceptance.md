@@ -20,6 +20,12 @@
 
 B3 初次到达 F 后识别下方标记，沿 F–K–H–K–F 飞行，在 F 保持待命。B2 准备发车时，裁判发出采样请求。B3 的下视相机重新拍摄并检查标记，从 RGB 像素生成签名，保存证据帧。只有这次请求之后采集的有效报告可以授权 B2 出发。授权后 B3 落地。R5 按 F_R–K_R–H_R–K_R–F_R 飞行，在基地落地后完成返场任务。
 
+## 旋翼与跨车接管组合
+
+同一源码 `d79cc82`，同一场景，回合 `rotor-handoff-20261120-01`。B2 在 247.152 s 释放 `blue2`，B1 在 247.328 s 回传确认，裁判在 247.344 s 改派通道名额和目的地。B3 于 247.360 s 拍到 572 个地标像素，B1 在 248.384 s 使用该帧放行，随后完成中转点驻留、通道清空和原卸货点交付。B1 在 **340.176 s** 完成，距 350 s 截止还有 9.824 s。400.000 s 完整窗口，14/14 项按期、5 进 5 清、零车体占用重叠。
+
+[组合验收回执](../../evidence/rotor_course_20261120/handoff/verification.json) · [裁判事件](../../evidence/rotor_course_20261120/handoff/bus/events.jsonl)。
+
 ## 复现
 
 在具备 Webots R2025a、Xvfb 和 Mesa 软件渲染的 Linux 上，从仓库根目录运行。以绝对路径指定运行目录，并为每次试验使用新回合号。
@@ -30,6 +36,9 @@ python3 -B webots/tools/generate_rotor_course.py
 GONGYU_PHYS=1 GONGYU_AERIAL="" GONGYU_NO_RENDER=1 \
   bash webots/tools/run_webots.sh web_medium_rotor_phys rotor-course-replay
 python3 -B webots/tools/verify_rotor_course.py "$GONGYU_RUNS_ROOT/rotor-course-replay"
+GONGYU_PHYS=1 GONGYU_AERIAL="" GONGYU_NO_RENDER=1 GONGYU_BLUE2_HANDOFF=1 \
+  bash webots/tools/run_webots.sh web_medium_rotor_phys rotor-handoff-replay
+python3 -B webots/tools/verify_rotor_course.py "$GONGYU_RUNS_ROOT/rotor-handoff-replay" --handoff
 ```
 
 验收脚本检查 400 s 完整窗口、14 项任务全部按期、通道 5 进 5 清、零车体占用重叠、两机四旋翼输出及独立飞行轨迹、返场落地，以及 B3 证据帧和 B2 放行事件的时序与签名。地面碰撞判据仍是原通道占用规则，本次条件为正常观察和固定机位。

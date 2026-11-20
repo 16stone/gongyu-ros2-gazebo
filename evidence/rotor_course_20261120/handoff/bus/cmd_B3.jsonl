@@ -1,0 +1,6 @@
+{"id":"cmd-0003","type":"goto","x":14,"y":8,"node":"F","task_id":"blue_inspect","t_ms":0,"land":false,"z":1.9}
+{"id":"cmd-0010","type":"goto","x":10,"y":8,"node":"K","task_id":null,"t_ms":4256,"land":false,"z":1.9}
+{"id":"cmd-0013","type":"goto","x":6,"y":8,"node":"H","task_id":null,"t_ms":7536,"land":false,"z":1.9}
+{"id":"cmd-0016","type":"goto","x":10,"y":8,"node":"K","task_id":null,"t_ms":10848,"land":false,"z":1.9}
+{"id":"cmd-0018","type":"goto","x":14,"y":8,"node":"F","task_id":null,"t_ms":14160,"land":false,"z":1.9}
+{"id":"cmd-0048","type":"goto","x":14,"y":8,"node":"F_land","task_id":null,"t_ms":248384,"land":true,"z":0.045}
