@@ -1,0 +1,50 @@
+{
+  "flights": {
+    "B3": {
+      "tasks": {
+        "blue_inspect": {
+          "t_ms": 4256,
+          "deadline_ms": 40000,
+          "on_time": true,
+          "actor": "B3"
+        }
+      },
+      "landed_ms": 243024,
+      "max_altitude_m": 1.9161
+    },
+    "R5": {
+      "tasks": {
+        "red_inspect": {
+          "t_ms": 4208,
+          "deadline_ms": 10000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red_patrol": {
+          "t_ms": 12832,
+          "deadline_ms": 60000,
+          "on_time": true,
+          "actor": "R5"
+        },
+        "red_return": {
+          "t_ms": 25424,
+          "deadline_ms": 180000,
+          "on_time": true,
+          "actor": "R5"
+        }
+      },
+      "landed_ms": 25424,
+      "max_altitude_m": 1.917
+    }
+  },
+  "authorized_ms": 240544,
+  "camera_sample_ms": 239520,
+  "marker_pixels": 526,
+  "camera_age_ms": 1024,
+  "blue2": {
+    "t_ms": 315120,
+    "deadline_ms": 350000,
+    "on_time": true,
+    "actor": "B2"
+  }
+}
