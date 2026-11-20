@@ -1,0 +1,175 @@
+{
+  "source_commit": "a6e2de00ad8117054c778250f047d4452e293e06",
+  "full_window_ms": 400000,
+  "tasks_on_time": 14,
+  "channel_enters": 5,
+  "channel_releases": 5,
+  "stop": {
+    "kind": "apron_scan_stop",
+    "actor": "B1",
+    "task_id": "blue1",
+    "t_ms": 117824,
+    "pose": [
+      6.565688986807923,
+      1.8372315493306732,
+      0.4746622745002748
+    ],
+    "source": "low",
+    "return_m": 0.4196362361862684
+  },
+  "replan": {
+    "kind": "apron_replanned",
+    "actor": "B1",
+    "task_id": "blue1",
+    "t_ms": 118240,
+    "pose": [
+      6.589230166041631,
+      1.8561543266691771,
+      0.47042567151276415
+    ],
+    "inferred_bounds_m": [
+      7.158737806244896,
+      7.458737806244896,
+      2.043192556242348,
+      2.3777569464728616
+    ],
+    "targets": [
+      [
+        6.75,
+        2.6
+      ],
+      [
+        7.0,
+        2.8
+      ],
+      [
+        7.65,
+        2.8
+      ],
+      [
+        7.8,
+        2.7
+      ],
+      [
+        8.0,
+        2.4
+      ]
+    ]
+  },
+  "waypoints": [
+    {
+      "kind": "apron_waypoint",
+      "actor": "B1",
+      "task_id": "blue1",
+      "t_ms": 122384,
+      "target": [
+        6.75,
+        2.6
+      ]
+    },
+    {
+      "kind": "apron_waypoint",
+      "actor": "B1",
+      "task_id": "blue1",
+      "t_ms": 125408,
+      "target": [
+        7.0,
+        2.8
+      ]
+    },
+    {
+      "kind": "apron_waypoint",
+      "actor": "B1",
+      "task_id": "blue1",
+      "t_ms": 128080,
+      "target": [
+        7.65,
+        2.8
+      ]
+    },
+    {
+      "kind": "apron_waypoint",
+      "actor": "B1",
+      "task_id": "blue1",
+      "t_ms": 129488,
+      "target": [
+        7.8,
+        2.7
+      ]
+    },
+    {
+      "kind": "apron_waypoint",
+      "actor": "B1",
+      "task_id": "blue1",
+      "t_ms": 131696,
+      "target": [
+        8.0,
+        2.4
+      ]
+    }
+  ],
+  "delivery": {
+    "t_ms": 133776,
+    "actor": "B1",
+    "kind": "task_completed",
+    "task_id": "blue1",
+    "payload": {
+      "deadline_ms": 350000,
+      "on_time": true,
+      "slack_s": 216.224
+    }
+  },
+  "clearance_cm": 12.28123384406199,
+  "r1_preposition": [
+    {
+      "t_ms": 120000,
+      "actor": "R1",
+      "kind": "apron_preposition",
+      "task_id": "red1",
+      "payload": {
+        "node": "east_south_start",
+        "x": 5.6,
+        "y": -0.95
+      }
+    },
+    {
+      "t_ms": 123312,
+      "actor": "R1",
+      "kind": "apron_preposition",
+      "task_id": "red1",
+      "payload": {
+        "node": "east_gate",
+        "x": 5.6,
+        "y": 0.0
+      }
+    },
+    {
+      "t_ms": 129696,
+      "actor": "R1",
+      "kind": "apron_preposition",
+      "task_id": "red1",
+      "payload": {
+        "node": "east_straight",
+        "x": 6.5,
+        "y": 0.0
+      }
+    }
+  ],
+  "r1_channel_enter": {
+    "t_ms": 214752,
+    "actor": "R1",
+    "kind": "channel_enter",
+    "task_id": null,
+    "payload": {
+      "x": 5.3793,
+      "y": -0.0144
+    }
+  },
+  "minimum_preposition_separation_m": 3.033491442216378,
+  "red1": {
+    "t_ms": 233856,
+    "deadline_ms": 250000,
+    "on_time": true,
+    "actor": "R1"
+  }
+}
