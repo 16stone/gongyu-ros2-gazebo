@@ -1,4 +1,4 @@
-"""Execute and independently judge the two physical logistics matrix cases."""
+"""Execute and independently judge physical logistics matrix cases."""
 
 from itertools import combinations
 import json
@@ -30,6 +30,11 @@ settled_since = {}
 finished = {}
 occupied = set()
 clear_b1 = False
+destination_reserved = False
+wait_logged = False
+holds_release_until = 0
+channel_case = scene in {"web_long", "web_medium_exit"}
+following_goal = (6.4, 0.0)
 paths_m = dict.fromkeys(robots, 0.0)
 previous = {actor: robot.getPosition()[:2] for actor, robot in robots.items()}
 minimum_separation = float("inf")
@@ -59,7 +64,7 @@ if scene == "web_long":
     rule = {"phase111": False, "release": True}[os.environ["GONGYU_MECH"]]
     routes = {
         "B1": [((7.6, 0.0), "first_delivery")],
-        "B2": [((6.4, 0.0), "following_delivery")],
+        "B2": [(following_goal, "following_delivery")],
         "R1": [(point, None) for point in LONG_ROUTE[:-1]] + [(LONG_ROUTE[-1], "long_delivery")],
     }
     deadlines = {"first_delivery": 30000, "following_delivery": 65000, "long_delivery": 135000}
@@ -67,6 +72,17 @@ if scene == "web_long":
     end_ms = 140000
     send_next("B1")
     send_next("R1")
+elif scene == "web_medium_exit":
+    check_destination = {"off": False, "on": True}[os.environ["GONGYU_MATRIX_EXIT_CHECK"]]
+    routes = {"B1": [(following_goal, None), ((7.6, 0.0), "first_delivery")],
+              "B2": [(following_goal, "following_delivery")]}
+    deadlines = {"first_delivery": 55000, "following_delivery": 65000}
+    settings = {"early_release": True, "exit_check": check_destination, "berth": following_goal}
+    rule = True
+    end_ms = 65000
+    destination_reserved = True
+    holds_release_until = 28000
+    send_next("B1")
 else:
     cost = os.environ["GONGYU_COST"]
     provider_deadline = PROVIDER_DEADLINE_MS[cost]
@@ -90,7 +106,7 @@ while supervisor.step(step_ms) != -1:
     for actor, position in positions.items():
         paths_m[actor] += dist(previous[actor], position[:2])
         previous[actor] = position[:2]
-    if scene == "web_long":
+    if channel_case:
         inside_now = {actor for actor, (x, y, _) in positions.items() if occupies_corridor(x, y)}
         for actor in sorted(inside_now - occupied):
             event("channel_enter", actor)
@@ -104,14 +120,26 @@ while supervisor.step(step_ms) != -1:
             if 1.90 <= x <= 5.10 and abs(y) < 0.55:
                 margin = 0.51 - abs(y) - HULL_RADIUS
                 min_lane_margin = margin if min_lane_margin is None else min(margin, min_lane_margin)
-        if routes["B2"] and dispatch_due(now, rule, clear_b1 and not occupied):
+        if (destination_reserved and current.get("B1", (following_goal, None))[0] != following_goal
+                and dist(positions["B1"][:2], following_goal) >= 0.70):
+            destination_reserved = False
+            event("destination_cleared", "B1", goal=following_goal, position=positions["B1"])
+        destination_clear = not settings.get("exit_check", False) or not destination_reserved
+        entrance_clear = clear_b1 and not occupied
+        if routes["B2"] and dispatch_due(
+                now, rule, entrance_clear, destination_clear=destination_clear):
             send_next("B2")
+        elif routes["B2"] and entrance_clear and not destination_clear and not wait_logged:
+            wait_logged = True
+            event("dispatch_held_for_destination", "B2", goal=following_goal)
     for actor, (goal, task) in list(current.items()):
         speed = hypot(*robots[actor].getVelocity()[:2])
         if dist(positions[actor][:2], goal) > 0.10 or speed > 0.10:
             settled_since.pop(actor, None)
             continue
         if now - settled_since.setdefault(actor, now) < 800:
+            continue
+        if actor == "B1" and goal == following_goal and now < holds_release_until:
             continue
         settled_since.pop(actor)
         del current[actor]

@@ -18,6 +18,10 @@ class CourseMatrixTest(unittest.TestCase):
         self.assertTrue(dispatch_due(8000, True, True))
         self.assertTrue(dispatch_due(32000, False, True))
 
+    def test_destination_blocking_keeps_the_channel_idle(self):
+        self.assertFalse(dispatch_due(40000, True, True, destination_clear=False))
+        self.assertTrue(dispatch_due(40000, True, True, destination_clear=True))
+
     def test_cost_deadline_changes_the_executing_vehicle(self):
         low = choose_support(50000)
         high = choose_support(23000)

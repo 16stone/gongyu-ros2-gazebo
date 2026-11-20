@@ -1,4 +1,4 @@
-"""Build the two logistics matrix scenes using the existing motor chassis."""
+"""Build the logistics matrix scenes using the existing motor chassis."""
 
 import os
 from pathlib import Path
@@ -27,7 +27,7 @@ for scene, starts in STARTS.items():
         "DirectionalLight { direction -0.4 0.3 -1 intensity 2.2 }",
         box("floor", 4, -5.5, -0.08, (16, 18, 0.16), (0.15, 0.19, 0.24)),
     ]
-    if scene == "web_long":
+    if scene in {"web_long", "web_medium_exit"}:
         for side, y in (("south", -0.55), ("north", 0.55)):
             nodes.append(box(f"channel_rail_{side}", 3.5, y, 0.30, (3.2, 0.08, 0.60),
                              (0.30, 0.32, 0.38)))

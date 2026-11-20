@@ -6,6 +6,7 @@ NOMINAL_CLEAR_MS = 32000
 LONG_ROUTE = ((1.0, -12.6), (6.0, -12.6), (6.0, -1.1))
 STARTS = {
     "web_long": {"B1": (1.43, 0.0), "B2": (0.50, 0.0), "R1": (1.0, -1.1)},
+    "web_medium_exit": {"B1": (1.43, 0.0), "B2": (0.50, 0.0)},
     "web_cost": {"B1": (0.0, -1.5), "B2": (5.5, -1.5)},
 }
 DELIVERY = (8.0, -1.5)
@@ -13,8 +14,8 @@ PROVIDER_HOME = (3.0, -4.0)
 PROVIDER_DEADLINE_MS = {"low": 50000, "high": 23000}
 
 
-def dispatch_due(now, early_release, cleared):
-    return cleared and (early_release or now >= NOMINAL_CLEAR_MS)
+def dispatch_due(now, early_release, cleared, *, destination_clear=True):
+    return cleared and destination_clear and (early_release or now >= NOMINAL_CLEAR_MS)
 
 
 def choose_support(provider_deadline_ms):
