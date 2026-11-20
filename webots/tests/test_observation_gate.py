@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
-from observation_gate import ObservationGate
+from observation_gate import ObservationGate, ObservationLink
 
 
 class ObservationGateTest(unittest.TestCase):
@@ -38,4 +38,29 @@ class ObservationGateTest(unittest.TestCase):
         self.assertNotIn("refresh_requested_at", payload)
         self.assertIsNone(gate.step(8320, {"t_ms": 8320, "camera_bytes": 1}))
         self.assertEqual(gate.attempts, 1)
+        self.assertFalse(gate.authorized)
+
+    def test_lost_frame_waits_for_timeout_then_retries_fresh_sample(self):
+        gate = ObservationGate(6000, 1000, link=ObservationLink(loss_rate=0.25, seed=1))
+        gate.step(0, None)
+        gate.step(20, {"t_ms": 20, "camera_bytes": 1})
+        kind, loss = gate.step(1020, None)
+        self.assertEqual((kind, loss["transport_failure"]),
+                         ("observation_transport_dropped", "random_loss"))
+        self.assertFalse(gate.authorized)
+        self.assertIsNone(gate.step(6019, None))
+        self.assertEqual(gate.step(6020, None)[0], "observation_timeout")
+        self.assertIsNone(gate.step(6030, {"t_ms": 20, "camera_bytes": 1}))
+        gate.step(6040, {"t_ms": 6040, "camera_bytes": 1})
+        self.assertEqual(gate.step(7040, None)[0], "observation_authorized")
+
+    def test_persistent_blackout_does_not_release_the_waiting_vehicle(self):
+        gate = ObservationGate(6000, 1000, link=ObservationLink(blackout=(0, 400001)))
+        gate.step(0, None)
+        for sampled in (20, 6040, 12060):
+            gate.step(sampled, {"t_ms": sampled, "camera_bytes": 1})
+            kind, payload = gate.step(sampled + 1000, None)
+            self.assertEqual((kind, payload["transport_failure"]),
+                             ("observation_transport_dropped", "blackout"))
+            self.assertEqual(gate.step(sampled + 6000, None)[0], "observation_timeout")
         self.assertFalse(gate.authorized)

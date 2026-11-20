@@ -10,7 +10,7 @@ from controller import Supervisor
 sys.path.insert(0, os.environ.get('GONGYU_WEBOTS_COMMON', ''))
 from bus import Bus
 from task_metrics import summarize_tasks
-from observation_gate import ObservationGate
+from observation_gate import ObservationGate, ObservationLink
 from physical_corridor import CARRIER_ORDER, STAGING, TRANSPORT_ROUTES, occupies_corridor
 
 RUN = os.environ.get('GONGYU_RUN_DIR', '/tmp/gongyu_default')
@@ -176,9 +176,16 @@ if PHYSICAL_STAGING:
     ev('carrier_granted', {'order': 0}, carrier_order[0])
 
 pending_reports = []
+observation_loss = float(os.environ.get('GONGYU_OBSERVATION_LOSS_RATE', '0'))
+observation_blackout = os.environ.get('GONGYU_OBSERVATION_BLACKOUT_MS')
+observation_link = ObservationLink(
+    loss_rate=observation_loss, seed=SEED,
+    blackout=None if observation_blackout is None else tuple(map(int, observation_blackout.split(':'))),
+)
 course_gate = ObservationGate(
     TAU, int(os.environ.get('GONGYU_FIRST_OBSERVATION_DELAY_MS', '1000')),
     retry_on_expiry=os.environ.get('GONGYU_RETRY_OBSERVATION_ON_EXPIRY', '1') != '0',
+    link=observation_link,
 )
 channel_holder = None
 metrics = {'seed': SEED, 'scene': SCENE, 'mechanism': MECH, 'adapt': ADAPT,
@@ -413,6 +420,7 @@ metrics['motion_backend'] = 'hybrid' if PHYSICAL_ACTUATION and AERIAL else 'moto
 metrics['kinematic_actors'] = sorted(AERIAL.intersection(actors)) if PHYSICAL_ACTUATION else sorted(actors)
 metrics['corridor_protocol'] = 'footprint_serial_dispatch' if PHYSICAL_STAGING else 'legacy'
 metrics['blue2_observation_retry_on_expiry'] = course_gate.retry_on_expiry
+metrics['observation_link'] = {'loss_rate': observation_loss, 'blackout_ms': observation_link.blackout}
 metrics['blue2_observation_attempts'] = course_gate.attempts
 metrics['blue2_observation_authorized'] = course_gate.authorized
 metrics['occupied_at_close'] = sorted(physical_entered) if PHYSICAL_STAGING else []
