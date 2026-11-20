@@ -9,17 +9,25 @@ import sys
 from controller import Supervisor
 
 sys.path.insert(0, os.environ["GONGYU_WEBOTS_COMMON"])
-from b1_experiment import CARD
+from b1_experiment import CARD, experiment_layout
 from bus import Bus
 
 run = Path(os.environ["GONGYU_RUN_DIR"])
 bus = Bus(str(run / "bus"))
-layout = os.environ["GONGYU_SCENE"].removeprefix("web_b1_phaseb_")
+layout = experiment_layout(os.environ["GONGYU_SCENE"])
 sup = Supervisor()
 step = int(sup.getBasicTimeStep())
 b1 = sup.getFromDef("B1")
 goal = CARD["goal"]
-boxes = CARD["layouts"][layout]
+boxes = CARD["layouts"]["narrow" if layout == "gate" else layout]
+peer = sup.getFromDef("B2") if layout == "gate" else None
+if peer is not None:
+    peer_origin = peer.getPosition()[:2]
+    peer_target = CARD["gate"]["peer_targets"][os.environ.get("GONGYU_B1_GATE_PEER", "clear")]
+    bus.append("gate_grant.jsonl", {"t_ms": 0, "peer_origin_m": peer_origin, "peer_target_m": peer_target})
+    bus.append("cmd_B2.jsonl", {"id": "gate-peer-01", "type": "goto", "x": peer_target[0], "y": peer_target[1]})
+    peer_clearance = math.inf
+    peer_displacement = 0.0
 start_service = None
 clearance = math.inf
 first_contact = None
@@ -29,7 +37,7 @@ exited = None
 travel = 0.0
 previous = None
 status = "time_limit"
-limit = 1024 if layout == "coverage" else CARD["limit_ms"]
+limit = 1024 if layout.startswith("coverage") else CARD["limit_ms"]
 while sup.step(step) != -1:
     ts = round(sup.getTime() * 1000)
     x, y, z = b1.getPosition()
@@ -49,7 +57,13 @@ while sup.step(step) != -1:
                 if first_contact is None:
                     first_contact = {"t_ms": ts, "object": name, "xyz": [px, py, pz], "node_id": point.getNodeId()}
                     bus.append("events.jsonl", {"kind": "obstacle_contact", **first_contact})
-    if layout == "narrow":
+    if peer is not None:
+        peer_xy = peer.getPosition()[:2]
+        peer_clearance = min(peer_clearance, math.dist((x, y), peer_xy) -
+                             2 * CARD["model"]["footprint_radius_m"])
+        peer_displacement = max(peer_displacement, math.dist(peer_xy, peer_origin))
+        bus.append("truth_B2.jsonl", {"t_ms": ts, "position": peer.getPosition()})
+    if layout in ("narrow", "gate"):
         if entered is None and x >= 2.4:
             entered = {"t_ms": ts, "xy": [x, y], "yaw_rad": yaw}
             bus.append("events.jsonl", {"kind": "center_passed_entrance", **entered})
@@ -72,11 +86,11 @@ while sup.step(step) != -1:
         status = "obstacle_contact"
         break
     recent_ctl = bus.last("ctl_events.jsonl")
-    if recent_ctl and recent_ctl["kind"] == "scan_stop_latched" and ts - recent_ctl["t_ms"] >= 1024:
+    if recent_ctl and recent_ctl["kind"] in ("scan_stop_latched", "scan_replan_failed") and ts - recent_ctl["t_ms"] >= 1024:
         status = "scan_safe_stop" if first_contact is None else "obstacle_contact"
         break
     if ts >= limit:
-        if layout == "coverage":
+        if layout.startswith("coverage"):
             status = "stationary_sample_complete"
         break
 
@@ -85,8 +99,10 @@ while sup.step(step) != -1:
     "actual_path_m": travel, "minimum_clearance_circle_m": clearance if math.isfinite(clearance) else None,
     "first_obstacle_contact": first_contact, "entered": entered, "cleared": exited,
     "service_ms": arrived, "on_time": int(arrived is not None),
-    "total": int(layout != "coverage"), "full_window": None,
-    "violation_count": int(first_contact is not None)
+    "total": int(not layout.startswith("coverage")), "full_window": None,
+    "violation_count": int(first_contact is not None or (peer is not None and peer_clearance <= 0)),
+    **({"minimum_peer_clearance_circle_m": peer_clearance, "peer_displacement_m": peer_displacement}
+       if peer is not None else {})
 }, indent=2))
 (run / "shutdown.json").write_text(json.dumps({"status": "COMPLETE", "t_ms": ts, "end_reason": status}))
 sup.simulationQuit(0)

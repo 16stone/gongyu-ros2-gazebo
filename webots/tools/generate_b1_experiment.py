@@ -13,7 +13,8 @@ sys.path.insert(0, str(ROOT / "common"))
 from b1_experiment import CARD
 
 
-for layout, boxes in CARD["layouts"].items():
+layouts = {**CARD["layouts"], "gate": CARD["layouts"]["narrow"], "unmapped": CARD["layouts"]["lowobs"]}
+for layout, boxes in layouts.items():
     start = CARD["start"]
     chassis = robot_ugv("B1", *start).replace("gongyu_ugv", "gongyu_b1_trial")
     sensors = CARD["sensors"]
@@ -37,5 +38,8 @@ for layout, boxes in CARD["layouts"].items():
         bbox = f"Box {{ size {size[0]} {size[1]} {size[2]} }}"
         lines.append(solid(name, pos((x0+x1)/2, (y0+y1)/2, h/2),
                            shape_box(size, pbr((0.90, 0.64, 0.11))), bounding=bbox))
+    if layout == "gate":
+        lines.append(robot_ugv("B2", *CARD["gate"]["peer_start"]))
     lines.extend((chassis, 'Robot { name "B1 judge" supervisor TRUE controller "gongyu_b1_judge" }'))
-    (ROOT / "worlds" / f"web_b1_phaseb_{layout}.wbt").write_text("\n".join(lines) + "\n")
+    scene = f"web_b1_{layout}" if layout in ("gate", "unmapped") else f"web_b1_phaseb_{layout}"
+    (ROOT / "worlds" / f"{scene}.wbt").write_text("\n".join(lines) + "\n")

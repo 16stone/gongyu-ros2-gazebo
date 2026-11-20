@@ -5,9 +5,10 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
-from b1_experiment import (CARD, drive, grid_search, grid_spec, ray_box,
-                           wheel_predict, world_point)
+from b1_experiment import (CARD, drive, grid_search, grid_spec, low_scan_bypass, ray_box,
+                           segment_distance, wheel_predict, world_point)
 from analyze_b1_experiment import scan_correct
+from course_low_box import east_apron_bypass, near_front_range
 
 
 class SingleVehicleExperiment(unittest.TestCase):
@@ -27,6 +28,31 @@ class SingleVehicleExperiment(unittest.TestCase):
                     self.assertIn((b[0], a[1]), free)
             self.assertEqual(tuple(world_point(start)), tuple(CARD["start"][:2]))
             self.assertEqual(tuple(world_point(goal)), tuple(CARD["goal"]))
+
+    def test_low_scan_replan_uses_localized_returns(self):
+        free, _, goal = grid_spec("lowobs")
+        crate_face = [(0.35, y, 0) for y in (-0.5, -0.25, 0.0, 0.25, 0.5)]
+        targets, bounds = low_scan_bypass(free, goal, "astar", (2.35, 0.0, 0.0), crate_face)
+        self.assertAlmostEqual(bounds[0], 2.94)
+        self.assertGreater(bounds[1], 3.25)
+        self.assertEqual(targets[-1], CARD["goal"])
+        self.assertTrue(any(abs(y) >= 0.8 for x, y in targets[:-1] if x < 3.5))
+        with self.assertRaises(ValueError):
+            low_scan_bypass(free, goal, "astar", (2.35, 0.0, 0.0), [])
+
+    def test_gate_distance_uses_active_segment_and_includes_endpoints(self):
+        self.assertAlmostEqual(segment_distance((1, 0.2), (0, 0), (2, 0)), 0.2)
+        self.assertAlmostEqual(segment_distance((3, 0), (0, 0), (2, 0)), 1)
+        self.assertAlmostEqual(segment_distance((3, 4), (0, 0), (0, 0)), 5)
+
+    def test_course_bypass_uses_north_apron_and_original_delivery(self):
+        low_face = [(0.36, y, 0) for y in (0, 0.08, 0.16, 0.24)]
+        self.assertAlmostEqual(near_front_range(low_face), 0.36)
+        self.assertIsNone(near_front_range([(0.80, 0, 0)]))
+        targets, bounds = east_apron_bypass((6.55, 2.05, 0.0), (8.0, 2.4), low_face)
+        self.assertGreater(bounds[0], 7.10)
+        self.assertTrue(any(y > 2.6 for x, y in targets))
+        self.assertEqual(targets[-1], [8.0, 2.4])
 
     def test_scan_correction_of_lateral_and_yaw_offset(self):
         cloud = [(2.65 + i * 0.085 - 3.6 - 0.24, side * 0.55, 0)

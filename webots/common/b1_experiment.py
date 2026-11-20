@@ -19,9 +19,15 @@ def world_point(cell):
     return [round(origin + i * GRID_M, 8) for origin, i in zip((ORIGIN_X, ORIGIN_Y), cell)]
 
 
+def experiment_layout(scene):
+    return {"web_b1_gate": "gate", "web_b1_unmapped": "lowobs"}.get(
+        scene, scene.removeprefix("web_b1_phaseb_"))
+
+
 def grid_spec(layout):
     x0, x1, y0, y1 = CARD["bounds"]
-    obstacles = [] if layout in ("lowobs", "coverage") else CARD["layouts"][layout]
+    obstacles = [] if layout == "lowobs" or layout.startswith("coverage") else CARD["layouts"][
+        "narrow" if layout == "gate" else layout]
     inflation = CARD["inflation_m"]
     free = set()
     for i in range(round((x1 - x0) / GRID_M) + 1):
@@ -95,6 +101,44 @@ def tracking_targets(path, free):
         waypoints.append(world_point(path[furthest]))
         index = furthest
     return waypoints
+
+
+def segment_distance(point, a, b):
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    length_squared = dx * dx + dy * dy
+    if not length_squared:
+        return math.dist(point, a)
+    projection = ((point[0] - a[0]) * dx + (point[1] - a[1]) * dy) / length_squared
+    fraction = max(0, min(1, projection))
+    return math.dist(point, (a[0] + fraction * dx, a[1] + fraction * dy))
+
+
+def low_scan_bypass(free, goal, algorithm, pose, scan, *, depth_m=0.45):
+    # shortcut: a single static box is bounded from its observed facade in this fixture;
+    # replace with a fused local occupancy map when validating arbitrary obstacle geometry.
+    x, y, yaw = pose
+    cosine, sine = math.cos(yaw), math.sin(yaw)
+    offset = CARD["sensors"]["low"]["x_m"]
+    returns = [(x + cosine * (px + offset) - sine * py,
+                y + sine * (px + offset) + cosine * py)
+               for px, py, _ in (point for point in scan if point)
+               if px > 0 and math.hypot(px, py) <= 1.0]
+    if len(returns) < 3:
+        raise ValueError("insufficient low scan returns for bypass")
+    observed_x, observed_y = zip(*returns)
+    bounds = min(observed_x), max(observed_x) + depth_m, min(observed_y) - 0.07, max(observed_y) + 0.07
+    a, b, c, d = bounds
+    margin = max(CARD["inflation_m"], CARD["model"]["footprint_radius_m"] +
+                 CARD["target_tolerance_m"] + GRID_M)
+    replanned_free = set()
+    for cell in free:
+        wx, wy = world_point(cell)
+        if math.hypot(max(a - wx, 0, wx - b), max(c - wy, 0, wy - d)) > margin:
+            replanned_free.add(cell)
+    start = tuple(round((value - origin) / GRID_M)
+                  for value, origin in zip((x, y), (ORIGIN_X, ORIGIN_Y)))
+    path, _, _ = grid_search(replanned_free, start, goal, algorithm)
+    return tracking_targets(path, replanned_free), bounds
 
 
 def wheel_predict(pose, right_rad, left_rad):

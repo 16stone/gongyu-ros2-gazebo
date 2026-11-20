@@ -8,6 +8,7 @@ from controller import Robot
 
 sys.path.insert(0, os.environ.get('GONGYU_WEBOTS_COMMON', ''))
 from bus import Bus
+from course_low_box import SCENE as LOW_BOX_SCENE, east_apron_bypass, near_front_range
 
 # wheel radius: 0.085 m per the physical model; the kinematic backend
 # historically assumed 0.07 and its committed telemetry must stay stable
@@ -37,6 +38,10 @@ for e in enc:
         e.enable(ts)
 lid_main = robot.getDevice('lidar_main'); lid_low = robot.getDevice('lidar_low')
 lid_main.enable(ts); lid_low.enable(ts)
+apron_bypass = name == 'B1' and os.environ.get('GONGYU_SCENE') == LOW_BOX_SCENE
+if apron_bypass:
+    from b1_experiment import CARD, drive
+    lid_low.enablePointCloud()
 imu = robot.getDevice('imu'); imu.enable(ts)
 compass = robot.getDevice('compass'); compass.enable(ts)
 gps = robot.getDevice('gps'); gps.enable(ts)
@@ -56,6 +61,9 @@ err_sign = 1.0   # latched turn direction for near-180 headings
 stuck_ref = None      # (t_ms, x, y, theta) sample for the mobility supervisor
 stuck_hits = 0
 escape_until = -10**9
+bypass_started = None
+bypass_targets = None
+bypass_index = 0
 
 
 def clamp(v, a, b):
@@ -239,6 +247,38 @@ while robot.step(ts) != -1:
     else:
         wl = (v - omega * BASE / 2) / R
         wr = (v + omega * BASE / 2) / R
+    if apron_bypass and cmd and cmd.get('task_id') == 'blue1':
+        pose = (x_c, y_c, th_c)
+        if bypass_targets is None:
+            scan = [(point.x, point.y, point.z) for point in lid_low.getPointCloud()
+                    if math.isfinite(point.x) and math.isfinite(point.y)]
+            first_return = near_front_range(scan)
+            if bypass_started is None and first_return is not None:
+                bypass_started = t
+                bus.append('ctl_events.jsonl', {'kind': 'apron_scan_stop', 'actor': name,
+                           'task_id': 'blue1', 't_ms': t, 'pose': pose, 'source': 'low',
+                           'return_m': first_return})
+            if bypass_started is not None and t - bypass_started >= 320:
+                try:
+                    bypass_targets, observed = east_apron_bypass(pose, (cmd['x'], cmd['y']), scan)
+                except ValueError as error:
+                    bypass_targets = ()
+                    bus.append('ctl_events.jsonl', {'kind': 'apron_replan_failed', 'actor': name,
+                               'task_id': 'blue1', 't_ms': t, 'pose': pose, 'reason': str(error)})
+                else:
+                    bus.append('ctl_events.jsonl', {'kind': 'apron_replanned', 'actor': name,
+                               'task_id': 'blue1', 't_ms': t, 'pose': pose,
+                               'inferred_bounds_m': observed, 'targets': bypass_targets})
+        if bypass_started is not None:
+            targets = bypass_targets or ()
+            if bypass_index < len(targets) and math.dist(pose[:2], targets[bypass_index]) <= CARD['target_tolerance_m']:
+                bus.append('ctl_events.jsonl', {'kind': 'apron_waypoint', 'actor': name,
+                           'task_id': 'blue1', 't_ms': t, 'target': targets[bypass_index]})
+                bypass_index += 1
+            target = targets[bypass_index] if bypass_index < len(targets) else None
+            wl, wr = drive(pose, target, target is None)
+            v = (wl + wr) * R / 2
+            omega = (wl - wr) * R / BASE
     if physical_actuation:
         # translation needs slip compensation; pivot uses raw differential wheel rate
         gain = 1.0
