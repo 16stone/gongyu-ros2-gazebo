@@ -126,7 +126,10 @@ def low_scan_bypass(free, goal, algorithm, pose, scan, *, depth_m=0.45):
     if len(returns) < 3:
         raise ValueError("insufficient low scan returns for bypass")
     observed_x, observed_y = zip(*returns)
-    bounds = min(observed_x), max(observed_x) + depth_m, min(observed_y) - 0.07, max(observed_y) + 0.07
+    front_x = min(observed_x)
+    # Side returns already span part of the box depth.
+    back_x = max(max(observed_x), front_x + depth_m)
+    bounds = front_x, back_x, min(observed_y) - 0.07, max(observed_y) + 0.07
     a, b, c, d = bounds
     margin = max(CARD["inflation_m"], CARD["model"]["footprint_radius_m"] +
                  CARD["target_tolerance_m"] + GRID_M)

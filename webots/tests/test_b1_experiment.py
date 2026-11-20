@@ -45,6 +45,19 @@ class SingleVehicleExperiment(unittest.TestCase):
         self.assertAlmostEqual(segment_distance((3, 0), (0, 0), (2, 0)), 1)
         self.assertAlmostEqual(segment_distance((3, 4), (0, 0), (0, 0)), 5)
 
+    def test_course_bypass_keeps_delivery_reachable_with_side_returns(self):
+        # AMAX stop scan extremes include both the front and side of the box.
+        stop_pose = (6.7054627, 1.9454888, 0.3903843)
+        scan = [
+            (0.3101445, 0.1863536, 0.0),
+            (0.3879245, -0.033939, 0.0),
+            (0.262955, 0.070459, 0.0),
+        ]
+        targets, bounds = east_apron_bypass(stop_pose, (8.0, 2.4), scan)
+        self.assertLess(bounds[1], 7.45)
+        self.assertTrue(any(y > 2.6 for x, y in targets))
+        self.assertEqual(targets[-1], [8.0, 2.4])
+
     def test_course_bypass_uses_north_apron_and_original_delivery(self):
         low_face = [(0.36, y, 0) for y in (0, 0.08, 0.16, 0.24)]
         self.assertAlmostEqual(near_front_range(low_face), 0.36)
