@@ -1,0 +1,41 @@
+{
+  "random_loss": {
+    "run": "observation-loss-seed1-20261120-01",
+    "on_time": 14,
+    "total": 14,
+    "channel_enter": 5,
+    "channel_clear": 5,
+    "overlap": 0,
+    "closing_ms": 400000,
+    "drop_count": 1,
+    "timeout_count": 1,
+    "first_drop_ms": 240928,
+    "first_timeout_ms": 245920,
+    "accepted_ms": 246976,
+    "blue2": {
+      "t_ms": 305248,
+      "deadline_ms": 350000,
+      "on_time": true,
+      "actor": "B2"
+    },
+    "missing": []
+  },
+  "blackout": {
+    "run": "observation-blackout-20261120-01",
+    "on_time": 13,
+    "total": 14,
+    "channel_enter": 4,
+    "channel_clear": 4,
+    "overlap": 0,
+    "closing_ms": 400000,
+    "drop_count": 27,
+    "timeout_count": 26,
+    "first_drop_ms": 240928,
+    "first_timeout_ms": 245920,
+    "accepted_ms": null,
+    "blue2": null,
+    "missing": [
+      "blue2"
+    ]
+  }
+}
