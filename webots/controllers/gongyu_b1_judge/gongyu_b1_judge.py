@@ -37,7 +37,7 @@ exited = None
 travel = 0.0
 previous = None
 status = "time_limit"
-limit = 1024 if layout == "coverage" else CARD["limit_ms"]
+limit = 1024 if layout.startswith("coverage") else CARD["limit_ms"]
 while sup.step(step) != -1:
     ts = round(sup.getTime() * 1000)
     x, y, z = b1.getPosition()
@@ -90,7 +90,7 @@ while sup.step(step) != -1:
         status = "scan_safe_stop" if first_contact is None else "obstacle_contact"
         break
     if ts >= limit:
-        if layout == "coverage":
+        if layout.startswith("coverage"):
             status = "stationary_sample_complete"
         break
 
@@ -99,7 +99,7 @@ while sup.step(step) != -1:
     "actual_path_m": travel, "minimum_clearance_circle_m": clearance if math.isfinite(clearance) else None,
     "first_obstacle_contact": first_contact, "entered": entered, "cleared": exited,
     "service_ms": arrived, "on_time": int(arrived is not None),
-    "total": int(layout != "coverage"), "full_window": None,
+    "total": int(not layout.startswith("coverage")), "full_window": None,
     "violation_count": int(first_contact is not None or (peer is not None and peer_clearance <= 0)),
     **({"minimum_peer_clearance_circle_m": peer_clearance, "peer_displacement_m": peer_displacement}
        if peer is not None else {})

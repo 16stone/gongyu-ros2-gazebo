@@ -26,7 +26,8 @@ def experiment_layout(scene):
 
 def grid_spec(layout):
     x0, x1, y0, y1 = CARD["bounds"]
-    obstacles = [] if layout in ("lowobs", "coverage") else CARD["layouts"]["narrow" if layout == "gate" else layout]
+    obstacles = [] if layout == "lowobs" or layout.startswith("coverage") else CARD["layouts"][
+        "narrow" if layout == "gate" else layout]
     inflation = CARD["inflation_m"]
     free = set()
     for i in range(round((x1 - x0) / GRID_M) + 1):

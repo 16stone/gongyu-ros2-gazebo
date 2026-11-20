@@ -38,7 +38,7 @@ free, start, goal = grid_spec(layout)
 started = perf_counter_ns()
 path, length, expanded = grid_search(free, start, goal, algorithm)
 elapsed = perf_counter_ns() - started
-targets = tracking_targets(path, free) if layout != "coverage" else []
+targets = tracking_targets(path, free) if not layout.startswith("coverage") else []
 (run / "result" / "plan.json").write_text(json.dumps({
     "layout": layout, "algorithm": algorithm, "low_scan_used": use_low, "bypass_enabled": bypass,
     "search_ns": elapsed, "grid_path_m": length, "expanded_nodes": expanded,

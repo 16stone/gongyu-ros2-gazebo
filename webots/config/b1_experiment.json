@@ -20,6 +20,13 @@
       ["side_landmark", 5.6, 5.8, -1.15, -0.85, 0.65]
     ],
     "lowobs": [["low_crate", 2.95, 3.25, -0.60, 0.60, 0.27]],
+    "coverage_height_low": [["target", 1.84, 2.04, -0.12, 0.12, 0.27]],
+    "coverage_height_mid": [["target", 1.84, 2.04, -0.12, 0.12, 0.36]],
+    "coverage_height_high": [["target", 1.84, 2.04, -0.12, 0.12, 0.65]],
+    "coverage_height_occluded": [
+      ["target", 1.84, 2.04, -0.12, 0.12, 0.65],
+      ["occluder", 1.15, 1.30, -0.20, 0.20, 0.65]
+    ],
     "coverage": [
       ["front", 1.20, 1.40, -0.13, 0.13, 0.65],
       ["rear", -0.35, -0.15, -0.13, 0.13, 0.65],
