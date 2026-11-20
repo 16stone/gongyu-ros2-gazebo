@@ -19,9 +19,14 @@ def world_point(cell):
     return [round(origin + i * GRID_M, 8) for origin, i in zip((ORIGIN_X, ORIGIN_Y), cell)]
 
 
+def experiment_layout(scene):
+    return {"web_b1_gate": "gate", "web_b1_unmapped": "lowobs"}.get(
+        scene, scene.removeprefix("web_b1_phaseb_"))
+
+
 def grid_spec(layout):
     x0, x1, y0, y1 = CARD["bounds"]
-    obstacles = [] if layout in ("lowobs", "coverage") else CARD["layouts"][layout]
+    obstacles = [] if layout in ("lowobs", "coverage") else CARD["layouts"]["narrow" if layout == "gate" else layout]
     inflation = CARD["inflation_m"]
     free = set()
     for i in range(round((x1 - x0) / GRID_M) + 1):
@@ -95,6 +100,16 @@ def tracking_targets(path, free):
         waypoints.append(world_point(path[furthest]))
         index = furthest
     return waypoints
+
+
+def segment_distance(point, a, b):
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    length_squared = dx * dx + dy * dy
+    if not length_squared:
+        return math.dist(point, a)
+    projection = ((point[0] - a[0]) * dx + (point[1] - a[1]) * dy) / length_squared
+    fraction = max(0, min(1, projection))
+    return math.dist(point, (a[0] + fraction * dx, a[1] + fraction * dy))
 
 
 def low_scan_bypass(free, goal, algorithm, pose, scan):

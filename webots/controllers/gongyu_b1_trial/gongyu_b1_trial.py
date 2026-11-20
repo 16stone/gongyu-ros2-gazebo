@@ -10,12 +10,13 @@ from time import perf_counter_ns
 from controller import Robot
 
 sys.path.insert(0, os.environ["GONGYU_WEBOTS_COMMON"])
-from b1_experiment import CARD, drive, grid_search, grid_spec, low_scan_bypass, tracking_targets, world_point
+from b1_experiment import (CARD, drive, experiment_layout, grid_search, grid_spec, low_scan_bypass,
+                           segment_distance, tracking_targets, world_point)
 from bus import Bus
 
 run = Path(os.environ["GONGYU_RUN_DIR"])
 bus = Bus(str(run / "bus"))
-layout = os.environ["GONGYU_SCENE"].removeprefix("web_b1_phaseb_")
+layout = experiment_layout(os.environ["GONGYU_SCENE"])
 algorithm = os.environ.get("GONGYU_B1_PLANNER", "astar")
 use_low = os.environ.get("GONGYU_B1_LOW", "1") == "1"
 bypass = os.environ.get("GONGYU_B1_BYPASS", "0") == "1"
@@ -65,6 +66,7 @@ index = 0
 blocked = False
 replan_at = None
 replanned = False
+gate_ready = layout != "gate"
 while robot.step(step) != -1:
     t = round(robot.getTime() * 1000)
     x, y, _ = gps.getValues()
@@ -96,10 +98,24 @@ while robot.step(step) != -1:
             replanned = True
             bus.append("ctl_events.jsonl", {"kind": "scan_replan_applied", "t_ms": t,
                                            "inferred_bounds_m": observed_bounds, "targets": targets})
-    if index < len(targets) and math.dist(pose[:2], targets[index]) <= CARD["target_tolerance_m"]:
+    if not gate_ready:
+        grant = bus.last("gate_grant.jsonl")
+        if grant is not None:
+            point = CARD["gate"]["alignment_m"]
+            distance = segment_distance(point, grant["peer_origin_m"], grant["peer_target_m"])
+            enabled = os.environ.get("GONGYU_B1_GATE_ALIGN", "0") == "1"
+            use_alignment = enabled and distance >= CARD["gate"]["min_peer_path_clearance_m"]
+            if use_alignment:
+                targets.insert(0, point)
+            bus.append("ctl_events.jsonl", {"kind": "gate_alignment_checked", "t_ms": t,
+                       "granted": True, "peer_path_clearance_m": distance,
+                       "alignment_enabled": enabled, "alignment_selected": use_alignment,
+                       "alignment_target": point if use_alignment else None})
+            gate_ready = True
+    if gate_ready and index < len(targets) and math.dist(pose[:2], targets[index]) <= CARD["target_tolerance_m"]:
         bus.append("ctl_events.jsonl", {"kind": "tracked_waypoint", "t_ms": t, "target": targets[index]})
         index += 1
-    target = targets[index] if index < len(targets) else None
+    target = targets[index] if gate_ready and index < len(targets) else None
     commands = drive(pose, target, blocked)
     for motor, v in zip(motors, commands):
         motor.setVelocity(v)

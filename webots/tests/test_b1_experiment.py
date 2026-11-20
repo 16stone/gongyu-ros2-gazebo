@@ -6,7 +6,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
 from b1_experiment import (CARD, drive, grid_search, grid_spec, low_scan_bypass, ray_box,
-                           wheel_predict, world_point)
+                           segment_distance, wheel_predict, world_point)
 from analyze_b1_experiment import scan_correct
 
 
@@ -38,6 +38,11 @@ class SingleVehicleExperiment(unittest.TestCase):
         self.assertTrue(any(abs(y) >= 0.8 for x, y in targets[:-1] if x < 3.5))
         with self.assertRaises(ValueError):
             low_scan_bypass(free, goal, "astar", (2.35, 0.0, 0.0), [])
+
+    def test_gate_distance_uses_active_segment_and_includes_endpoints(self):
+        self.assertAlmostEqual(segment_distance((1, 0.2), (0, 0), (2, 0)), 0.2)
+        self.assertAlmostEqual(segment_distance((3, 0), (0, 0), (2, 0)), 1)
+        self.assertAlmostEqual(segment_distance((3, 4), (0, 0), (0, 0)), 5)
 
     def test_scan_correction_of_lateral_and_yaw_offset(self):
         cloud = [(2.65 + i * 0.085 - 3.6 - 0.24, side * 0.55, 0)
