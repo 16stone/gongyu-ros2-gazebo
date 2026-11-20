@@ -145,6 +145,10 @@ while robot.step(ts) != -1:
     if t - last_cmd_read > 200:
         c = bus.last('cmd_%s.jsonl' % name)
         if c and c.get('id') != (cmd or {}).get('id'):
+            if c.get('type') == 'handoff_offer' and c.get('task_id') == 'blue2':
+                bus.append('handoff_%s.jsonl' % name, {
+                    't_ms': t, 'actor': name, 'task_id': c['task_id'], 'offer_id': c['id'],
+                })
             cmd = c
             bus.append('ctl_events.jsonl', {'t_ms': t, 'actor': name, 'ver': 'gpsheading-v3', 'theta_dbg': round(theta, 3), 'kind': 'command_received',
                                             'cmd_id': cmd.get('id'), 'target': [cmd.get('x'), cmd.get('y')]})

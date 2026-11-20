@@ -25,6 +25,9 @@ NODES = SCEN['nodes']
 TASKS = dict((t['id'], t) for t in SCEN['tasks'])
 PHYSICAL_ACTUATION = os.environ.get('GONGYU_PHYS', '0') == '1'
 PHYSICAL_STAGING = PHYSICAL_ACTUATION and SCENE in {"web_medium_phys", "web_holdout_v1_phys"}
+BLUE2_HANDOFF = os.environ.get('GONGYU_BLUE2_HANDOFF', '0') == '1'
+if BLUE2_HANDOFF and not PHYSICAL_STAGING:
+    raise ValueError('GONGYU_BLUE2_HANDOFF requires a physical full-course scene')
 TAU = SCEN['tau_ms']
 SERVICE = SCEN['service_ms']
 END = int(os.environ.get('GONGYU_END_MS', str(SCEN['end_ms'])))
@@ -51,6 +54,10 @@ elif SCENE == 'web_d4':
 if PHYSICAL_STAGING:
     NODES = {**NODES, **STAGING}
     ROUTES.update(TRANSPORT_ROUTES)
+if BLUE2_HANDOFF:
+    # The simulated withdrawal leaves the load at the relay and clears its bay.
+    NODES['blue_withdrawal_bay'] = (9.30, 1.60)
+    ROUTES['B2'] = (('blue_withdrawal_bay', None),)
 
 sup = Supervisor()
 ts = int(sup.getBasicTimeStep())
@@ -63,6 +70,8 @@ for nm in ROUTES:
     node = sup.getFromDef(nm)
     if node is not None:
         actors[nm] = node
+if BLUE2_HANDOFF and not {'B1', 'B2'} <= actors.keys():
+    raise ValueError('The blue2 handoff requires both blue ground vehicles')
 FULL_SCENES = {"web_medium", "web_medium_phys", "web_holdout_v1", "web_holdout_v1_phys"}
 if SCENE in FULL_SCENES:
     expected_task_ids = set(TASKS)
@@ -155,13 +164,16 @@ def send(nm, node, task=None):
 
 t = 0
 carrier_index = 0
+carrier_order = list(CARRIER_ORDER)
+blue2_destination_owner = 'B2'
+handoff_offer = None
 for nm in actors:
     state[nm] = {'idx': 0, 'arrive_since': None, 'target_node': None,
                  'done': [], 'entered_channel': False, 'reservation': None}
     if not PHYSICAL_STAGING or nm not in CARRIER_ORDER:
         send(nm, *ROUTES[nm][0])
 if PHYSICAL_STAGING:
-    ev('carrier_granted', {'order': 0}, CARRIER_ORDER[0])
+    ev('carrier_granted', {'order': 0}, carrier_order[0])
 
 pending_reports = []
 course_gate = ObservationGate(
@@ -225,6 +237,19 @@ while sup.step(ts) != -1:
             metrics['violations'].append(item)
             ev('channel_overlap', item)
         previous_overlaps = overlaps
+    if handoff_offer is not None:
+        ack = bus.last('handoff_B1.jsonl')
+        if (ack and ack['offer_id'] == handoff_offer['id'] and ack['actor'] == 'B1'
+                and ack['task_id'] == 'blue2' and not physical_entered):
+            ev('handoff_accepted', {'offer_id': ack['offer_id'], 'ack_ms': ack['t_ms']}, 'B1', 'blue2')
+            carrier_order[carrier_index] = 'B1'
+            blue2_destination_owner = 'B1'
+            ROUTES['B1'] += TRANSPORT_ROUTES['B2']
+            handoff_offer = None
+            ev('reservations_reassigned', {
+                'previous_owner': 'B2', 'new_owner': 'B1', 'carrier_turn': carrier_index,
+                'channel_direction': 'east_to_west', 'destination': 'blue_return',
+            }, 'B1', 'blue2')
     if True:
         for nm in list(actors):
             st = state[nm]
@@ -232,11 +257,12 @@ while sup.step(ts) != -1:
                 continue
             node, task = ROUTES[nm][st['idx']]
             if PHYSICAL_STAGING and nm in CARRIER_ORDER:
-                if nm != CARRIER_ORDER[carrier_index]:
+                if nm != carrier_order[carrier_index]:
                     continue
                 if nm == 'R1' and t < TASKS['red1'].get('release_ms', 0):
                     continue
-                if nm == 'B2' and not course_gate.authorized:
+                observer_client = 'B1' if BLUE2_HANDOFF else 'B2'
+                if nm == observer_client == blue2_destination_owner and not course_gate.authorized:
                     update = course_gate.step(t, bus.last('observation_B3.jsonl'))
                     if update is not None:
                         ev(*update, actor=nm, task='blue2')
@@ -279,11 +305,15 @@ while sup.step(ts) != -1:
                                                   'early_seconds': round((st['reservation']['end'] - rel) / 1000, 3)}, nm, task)
                 if channel_holder == nm:
                     channel_holder = None
-            duration = SERVICE if task or not PHYSICAL_STAGING else 0
+            handoff_stop = BLUE2_HANDOFF and (
+                node == 'blue_withdrawal_bay' or (nm == 'B1' and node == 'blue_relay'))
+            duration = SERVICE if task or not PHYSICAL_STAGING or handoff_stop else 0
             released_at = TASKS.get(task, {}).get('release_ms', 0) if PHYSICAL_STAGING else 0
             tolerance = TOL if PHYSICAL_STAGING and nm in CARRIER_ORDER else max(TOL, 0.18)
             ready = d <= tolerance and t >= released_at
-            if ready and PHYSICAL_STAGING and task and nm not in AERIAL:
+            if PHYSICAL_STAGING and task == 'blue2':
+                ready = ready and nm == blue2_destination_owner
+            if ready and PHYSICAL_STAGING and (task or handoff_stop) and nm not in AERIAL:
                 ready = math.hypot(*actors[nm].getVelocity()[:2]) <= 0.10
             if ready:
                 if st['arrive_since'] is None:
@@ -291,6 +321,8 @@ while sup.step(ts) != -1:
                     ev('arrived', {'x': x, 'y': y, 'distance': round(d, 4)}, nm, task)
                 elif t - st['arrive_since'] >= duration:
                     st['done'].append(node)
+                    if BLUE2_HANDOFF and nm == 'B1' and node == 'blue_relay':
+                        ev('handoff_pickup', {'node': node, 'x': x, 'y': y}, nm, 'blue2')
                     if task and task in TASKS:
                         dl = TASKS[task]['deadline_ms']
                         ok = t <= dl
@@ -322,9 +354,21 @@ while sup.step(ts) != -1:
                         send(nm, nn, nt)
                     elif PHYSICAL_STAGING and nm in CARRIER_ORDER:
                         ev('carrier_released', {'order': carrier_index}, nm, task)
-                        if carrier_index + 1 < len(CARRIER_ORDER):
+                        if BLUE2_HANDOFF and nm == 'B2':
+                            blue2_destination_owner = None
+                            ev('task_released', {
+                                'reason': 'injected_carrier_withdrawal', 'pickup': 'blue_relay',
+                                'parked_at': node, 'x': x, 'y': y,
+                            }, nm, 'blue2')
+                            if metrics['task_completed'].get('blue1', {}).get('actor') == 'B1':
+                                handoff_offer = {'id': 'blue2-B2-B1', 'type': 'handoff_offer',
+                                                 'task_id': 'blue2', 't_ms': t}
+                                bus.append('cmd_B1.jsonl', handoff_offer)
+                                ev('handoff_offered', {'offer_id': handoff_offer['id'],
+                                                       'previous_owner': 'B2'}, 'B1', 'blue2')
+                        elif carrier_index + 1 < len(carrier_order):
                             carrier_index += 1
-                            ev('carrier_granted', {'order': carrier_index}, CARRIER_ORDER[carrier_index])
+                            ev('carrier_granted', {'order': carrier_index}, carrier_order[carrier_index])
             else:
                 # cancel the berth dwell only when the platform clearly leaves the
                 # tolerance band, otherwise steady-state parking error re-arms it forever
