@@ -24,7 +24,13 @@ SCEN = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '
 NODES = SCEN['nodes']
 TASKS = dict((t['id'], t) for t in SCEN['tasks'])
 PHYSICAL_ACTUATION = os.environ.get('GONGYU_PHYS', '0') == '1'
-PHYSICAL_STAGING = PHYSICAL_ACTUATION and SCENE in {"web_medium_phys", "web_holdout_v1_phys"}
+ROTOR_SCENE = SCENE == "web_medium_rotor_phys"
+PHYSICAL_STAGING = PHYSICAL_ACTUATION and (ROTOR_SCENE or SCENE in {"web_medium_phys", "web_holdout_v1_phys"})
+if ROTOR_SCENE and not PHYSICAL_STAGING:
+    raise ValueError("The rotor course requires GONGYU_PHYS=1")
+ROTOR_AIRCRAFT = {"B3", "R5"} if ROTOR_SCENE else set()
+ROTOR_ALTITUDE = 1.9
+LANDING_ALTITUDE = 0.045
 BLUE2_HANDOFF = os.environ.get('GONGYU_BLUE2_HANDOFF', '0') == '1'
 if BLUE2_HANDOFF and not PHYSICAL_STAGING:
     raise ValueError('GONGYU_BLUE2_HANDOFF requires a physical full-course scene')
@@ -54,6 +60,10 @@ elif SCENE == 'web_d4':
 if PHYSICAL_STAGING:
     NODES = {**NODES, **STAGING}
     ROUTES.update(TRANSPORT_ROUTES)
+if ROTOR_SCENE:
+    NODES.update(F_land=NODES["F"], F_R_land=NODES["F_R"])
+    ROUTES["B3"].append(("F_land", None))
+    ROUTES["R5"][-1:] = [("F_R", None), ("F_R_land", "red_return")]
 if BLUE2_HANDOFF:
     # The simulated withdrawal leaves the load at the relay and clears its bay.
     NODES['blue_withdrawal_bay'] = (9.30, 1.60)
@@ -72,7 +82,7 @@ for nm in ROUTES:
         actors[nm] = node
 if BLUE2_HANDOFF and not {'B1', 'B2'} <= actors.keys():
     raise ValueError('The blue2 handoff requires both blue ground vehicles')
-FULL_SCENES = {"web_medium", "web_medium_phys", "web_holdout_v1", "web_holdout_v1_phys"}
+FULL_SCENES = {"web_medium", "web_medium_phys", "web_holdout_v1", "web_holdout_v1_phys", "web_medium_rotor_phys"}
 if SCENE in FULL_SCENES:
     expected_task_ids = set(TASKS)
 else:
@@ -92,7 +102,9 @@ def ev(kind, payload, actor=None, task=None):
 # The task-logic layer is kinematic (as in the frozen graph backend's travel_time).
 # Truth is produced by this model, never by the controller under test's self-report.
 # Physical sensors (GPS/LiDAR/Camera) still run in Webots for traceable observations.
-AERIAL = set(filter(None, os.environ.get('GONGYU_AERIAL', 'B3,R5' if PHYSICAL_STAGING else '').split(',')))
+AERIAL = set(filter(None, os.environ.get('GONGYU_AERIAL', 'B3,R5' if PHYSICAL_STAGING and not ROTOR_SCENE else '').split(',')))
+if ROTOR_SCENE and AERIAL:
+    raise ValueError("The rotor course does not permit kinematic actors")
 GS = SCEN.get('ground_speed', 0.5)  # m/s, frozen scenario parameter
 kin_state = {}
 KIN_FIELDS = {}
@@ -155,8 +167,12 @@ def send(nm, node, task=None):
         # resting pose outside the window from either approach direction.
         here = truth(nm)[0]
         x = 5.22 if here < 4.95 else 4.78
-    bus.append('cmd_%s.jsonl' % nm, {'id': 'cmd-%04d' % cmd_seq, 'type': 'goto',
-                                     'x': x, 'y': y, 'node': node, 'task_id': task, 't_ms': t})
+    command = {'id': 'cmd-%04d' % cmd_seq, 'type': 'goto',
+               'x': x, 'y': y, 'node': node, 'task_id': task, 't_ms': t}
+    if nm in ROTOR_AIRCRAFT:
+        command['land'] = node.endswith('_land')
+        command['z'] = LANDING_ALTITUDE if command['land'] else ROTOR_ALTITUDE
+    bus.append('cmd_%s.jsonl' % nm, command)
     state[nm]['target_node'] = node
     kin_state[nm]['target'] = (x, y)
     ev('move_commanded', {'node': node, 'x': x, 'y': y, 'berth_x': berth_x}, nm, task)
@@ -215,7 +231,7 @@ while sup.step(ts) != -1:
             rec['pos'][_nm] = [round(_p[0], 4), round(_p[1], 4)]
         bus.append('truth_att.jsonl', rec)
     if PHYSICAL_STAGING:
-        ground_positions = {name: truth(name)[:2] for name in actors if name not in AERIAL}
+        ground_positions = {name: truth(name)[:2] for name in actors if name not in AERIAL | ROTOR_AIRCRAFT}
         occupied = {
             name for name, (x, y) in ground_positions.items() if occupies_corridor(x, y)
         }
@@ -266,9 +282,14 @@ while sup.step(ts) != -1:
                     update = course_gate.step(t, bus.last('observation_B3.jsonl'))
                     if update is not None:
                         ev(*update, actor=nm, task='blue2')
+                        if ROTOR_SCENE and update[0] in {'observation_requested', 'observation_expired'}:
+                            bus.append('observation_request_B3.jsonl', {'t_ms': t})
                     if not course_gate.authorized:
                         continue
-            x, y, _ = truth(nm)
+            waiting_to_land = ROTOR_SCENE and node == 'F_land' and not course_gate.authorized
+            if waiting_to_land:
+                continue
+            x, y, z = truth(nm)
             gx, gy = NODES[node][0], NODES[node][1]
             d = math.hypot(x - gx, y - gy)
             if st['target_node'] != node:
@@ -313,7 +334,16 @@ while sup.step(ts) != -1:
             ready = d <= tolerance and t >= released_at
             if PHYSICAL_STAGING and task == 'blue2':
                 ready = ready and nm == blue2_destination_owner
-            if ready and PHYSICAL_STAGING and (task or handoff_stop) and nm not in AERIAL:
+            if nm in ROTOR_AIRCRAFT:
+                velocity = actors[nm].getVelocity()[:3]
+                if node.endswith('_land'):
+                    ready = d <= 0.22 and z <= 0.075 and math.hypot(*velocity) < 0.15
+                else:
+                    ready = (math.hypot(d, z - ROTOR_ALTITUDE) <= 0.22 and
+                             math.hypot(*velocity) <= 0.26)
+                    if task == 'blue_inspect':
+                        ready = ready and bus.last('observation_B3.jsonl') is not None
+            if ready and PHYSICAL_STAGING and (task or handoff_stop) and nm not in AERIAL | ROTOR_AIRCRAFT:
                 ready = math.hypot(*actors[nm].getVelocity()[:2]) <= 0.10
             if ready:
                 if st['arrive_since'] is None:
@@ -321,6 +351,8 @@ while sup.step(ts) != -1:
                     ev('arrived', {'x': x, 'y': y, 'distance': round(d, 4)}, nm, task)
                 elif t - st['arrive_since'] >= duration:
                     st['done'].append(node)
+                    if nm in ROTOR_AIRCRAFT and node.endswith('_land'):
+                        ev('rotor_landed', {'pos': [x, y, z]}, nm, task)
                     if BLUE2_HANDOFF and nm == 'B1' and node == 'blue_relay':
                         ev('handoff_pickup', {'node': node, 'x': x, 'y': y}, nm, 'blue2')
                     if task and task in TASKS:
@@ -351,7 +383,8 @@ while sup.step(ts) != -1:
                             ev('reservation_granted', {'start': t, 'end': t + 48000,
                                                        'slot_id': '%s_%d' % (nm, st['idx']),
                                                        'direction': 'E->W' if prev_node == 'E' else 'W->E'}, nm, nt)
-                        send(nm, nn, nt)
+                        if not (ROTOR_SCENE and nn == 'F_land' and not course_gate.authorized):
+                            send(nm, nn, nt)
                     elif PHYSICAL_STAGING and nm in CARRIER_ORDER:
                         ev('carrier_released', {'order': carrier_index}, nm, task)
                         if BLUE2_HANDOFF and nm == 'B2':
@@ -411,6 +444,8 @@ while sup.step(ts) != -1:
 metrics.update(summarize_tasks(expected_task_ids, metrics['task_completed']))
 metrics['motion_backend'] = 'hybrid' if PHYSICAL_ACTUATION and AERIAL else 'motor' if PHYSICAL_ACTUATION else 'kinematic'
 metrics['kinematic_actors'] = sorted(AERIAL.intersection(actors)) if PHYSICAL_ACTUATION else sorted(actors)
+if ROTOR_SCENE:
+    metrics['rotor_actors'] = sorted(ROTOR_AIRCRAFT.intersection(actors))
 metrics['corridor_protocol'] = 'footprint_serial_dispatch' if PHYSICAL_STAGING else 'legacy'
 metrics['blue2_observation_retry_on_expiry'] = course_gate.retry_on_expiry
 metrics['blue2_observation_attempts'] = course_gate.attempts
