@@ -14,12 +14,12 @@ def read_events(path):
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
 
 
-def verify(run):
+def verify(run, *, motion_backend="hybrid"):
     metrics = read_json(run / "result/metrics.json")
     shutdown = read_json(run / "shutdown.json")
     events = read_events(run / "bus/events.jsonl")
     assert shutdown["status"] == "COMPLETE" and shutdown["sim_end_ms"] >= 400000
-    assert metrics["motion_backend"] == "hybrid"
+    assert metrics["motion_backend"] == motion_backend
     assert (metrics["on_time"], metrics["total"], metrics["violation_count"]) == (14, 14, 0)
     assert (metrics["channel_enters"], metrics["channel_releases"]) == (5, 5)
     assert not metrics["occupied_at_close"]

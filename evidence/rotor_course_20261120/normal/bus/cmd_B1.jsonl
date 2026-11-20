@@ -1,0 +1,6 @@
+{"id":"cmd-0030","type":"goto","x":0.5,"y":0.0,"node":"blue_source","task_id":null,"t_ms":80112}
+{"id":"cmd-0031","type":"goto","x":1.45,"y":0.0,"node":"west_gate","task_id":null,"t_ms":80128}
+{"id":"cmd-0032","type":"goto","x":5.6,"y":0.0,"node":"east_gate","task_id":null,"t_ms":85312}
+{"id":"cmd-0033","type":"goto","x":6.5,"y":0.0,"node":"east_straight","task_id":null,"t_ms":98624}
+{"id":"cmd-0034","type":"goto","x":6.5,"y":1.8,"node":"east_north","task_id":null,"t_ms":104016}
+{"id":"cmd-0035","type":"goto","x":8.0,"y":2.4,"node":"blue_delivery","task_id":"blue1","t_ms":115808}

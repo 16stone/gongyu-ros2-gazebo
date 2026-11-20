@@ -162,5 +162,65 @@ def run():
         })
 
 
+def run_full_course():
+    """Follow the referee's ENU waypoints with the same sensor flight loop."""
+    robot = Robot()
+    name = robot.getName()
+    dt = int(robot.getBasicTimeStep())
+    bus = Bus(RUN / "bus")
+    gps, imu, gyro, cam = [robot.getDevice(key) for key in ("gps", "inertial unit", "gyro", "camera")]
+    for device, period in [(gps, GP_MS), (imu, dt), (gyro, dt)]:
+        device.enable(period)
+    if name == "B3":
+        cam.enable(FRAME_MS)
+    motors = [robot.getDevice(key) for key in MOTORS]
+    for motor in motors:
+        motor.setPosition(float("inf"))
+        motor.setVelocity(0.0)
+
+    command = position = velocity = estimate_t = None
+    observed_through = -1
+    while robot.step(dt) != -1:
+        t = round(robot.getTime() * 1000)
+        if t % FRAME_MS == 0:
+            command = bus.last(f"cmd_{name}.jsonl")
+        if t % GP_MS == 0:
+            raw_p, raw_v = gps.getValues(), gps.getSpeedVector()
+            if all(math.isfinite(val) for val in (*raw_p, *raw_v)):
+                position, velocity, estimate_t = raw_p, raw_v, t
+        speeds = [0.0] * 4
+        if command and position is not None:
+            target = (command["x"], command["y"], command["z"])
+            rpy, omega = imu.getRollPitchYaw(), gyro.getValues()
+            stale = t - estimate_t > MAX_POSITION_AGE_MS
+            landed = command["land"] and position[2] <= 0.070 and abs(velocity[2]) < 0.15
+            if not landed and all(math.isfinite(val) for val in (*rpy, *omega)):
+                speeds, _ = motor_command(target, position, velocity, rpy, omega, stale)
+            if (name == "B3" and command["node"] == "F" and t % FRAME_MS == 0 and not stale
+                    and math.dist(position, target) <= 0.22 and math.hypot(*velocity) <= 0.26):
+                request = bus.last("observation_request_B3.jsonl")
+                # The first inspection requires an image and later dispatch requires a fresh one.
+                requested_at = request["t_ms"] if request else 0
+                if observed_through < requested_at:
+                    frame = sample_camera(cam, t, bus)
+                    if frame and frame["marker_pixels"] >= 40:
+                        bus.append("observation_B3.jsonl", {
+                            **frame, "sender": name, "kind": "marked_worksite_visible",
+                            "image_signature": int(frame["rgb_sha256"][:8], 16),
+                            "sensor_pose": position,
+                        })
+                        observed_through = requested_at
+        for motor, speed in zip(motors, speeds):
+            motor.setVelocity(speed)
+        if t % 320 == 0:
+            bus.append(f"rotor_{name}.jsonl", {
+                "t_ms": t, "position_sample_ms": estimate_t,
+                "node": command["node"] if command else None, "speeds": speeds,
+            })
+
+
 if __name__ == "__main__":
-    run()
+    if os.environ["GONGYU_SCENE"] == "web_medium_rotor_phys":
+        run_full_course()
+    else:
+        run()
