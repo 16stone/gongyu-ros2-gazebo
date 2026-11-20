@@ -1,0 +1,740 @@
+[
+  {
+    "run_id": "web-cost-low-01",
+    "scene": "web_cost",
+    "source_commit": "3519799e156760195bfa9330031ff1845d416964",
+    "settings": {
+      "cost": "low",
+      "carrier": "B2",
+      "decision": "accept",
+      "provider_deadline_ms": 50000,
+      "direct_return_ms": 12839,
+      "support_return_ms": 28225,
+      "delivery_gain_ms": 13750,
+      "extra_work_ms": 11386
+    },
+    "on_time": 2,
+    "total": 2,
+    "sim_end_ms": 60000,
+    "task_completed": {
+      "delivery": {
+        "actor": "B2",
+        "t_ms": 8160,
+        "deadline_ms": 42000,
+        "on_time": true
+      },
+      "provider_return": {
+        "actor": "B2",
+        "t_ms": 32192,
+        "deadline_ms": 50000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 3.9114239238045023,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": null,
+    "paths_m": {
+      "B1": 0.009248165367295377,
+      "B2": 9.545003345584584
+    }
+  },
+  {
+    "run_id": "web-cost-low-02",
+    "scene": "web_cost",
+    "source_commit": "3519799e156760195bfa9330031ff1845d416964",
+    "settings": {
+      "cost": "low",
+      "carrier": "B2",
+      "decision": "accept",
+      "provider_deadline_ms": 50000,
+      "direct_return_ms": 12839,
+      "support_return_ms": 28225,
+      "delivery_gain_ms": 13750,
+      "extra_work_ms": 11386
+    },
+    "on_time": 2,
+    "total": 2,
+    "sim_end_ms": 60000,
+    "task_completed": {
+      "delivery": {
+        "actor": "B2",
+        "t_ms": 8160,
+        "deadline_ms": 42000,
+        "on_time": true
+      },
+      "provider_return": {
+        "actor": "B2",
+        "t_ms": 32192,
+        "deadline_ms": 50000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 3.9114239238045023,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": null,
+    "paths_m": {
+      "B1": 0.009248165367295377,
+      "B2": 9.545003345584584
+    }
+  },
+  {
+    "run_id": "web-cost-low-03",
+    "scene": "web_cost",
+    "source_commit": "3519799e156760195bfa9330031ff1845d416964",
+    "settings": {
+      "cost": "low",
+      "carrier": "B2",
+      "decision": "accept",
+      "provider_deadline_ms": 50000,
+      "direct_return_ms": 12839,
+      "support_return_ms": 28225,
+      "delivery_gain_ms": 13750,
+      "extra_work_ms": 11386
+    },
+    "on_time": 2,
+    "total": 2,
+    "sim_end_ms": 60000,
+    "task_completed": {
+      "delivery": {
+        "actor": "B2",
+        "t_ms": 8160,
+        "deadline_ms": 42000,
+        "on_time": true
+      },
+      "provider_return": {
+        "actor": "B2",
+        "t_ms": 32192,
+        "deadline_ms": 50000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 3.9114239238045023,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": null,
+    "paths_m": {
+      "B1": 0.009248165367295377,
+      "B2": 9.545003345584584
+    }
+  },
+  {
+    "run_id": "web-cost-high-01",
+    "scene": "web_cost",
+    "source_commit": "3519799e156760195bfa9330031ff1845d416964",
+    "settings": {
+      "cost": "high",
+      "carrier": "B1",
+      "decision": "reject",
+      "provider_deadline_ms": 23000,
+      "direct_return_ms": 12839,
+      "support_return_ms": 28225,
+      "delivery_gain_ms": 13750,
+      "extra_work_ms": 11386
+    },
+    "on_time": 2,
+    "total": 2,
+    "sim_end_ms": 60000,
+    "task_completed": {
+      "provider_return": {
+        "actor": "B2",
+        "t_ms": 16896,
+        "deadline_ms": 23000,
+        "on_time": true
+      },
+      "delivery": {
+        "actor": "B1",
+        "t_ms": 19072,
+        "deadline_ms": 42000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.907234594154241,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": null,
+    "paths_m": {
+      "B1": 7.98850113710588,
+      "B2": 4.478892251515595
+    }
+  },
+  {
+    "run_id": "web-cost-high-02",
+    "scene": "web_cost",
+    "source_commit": "3519799e156760195bfa9330031ff1845d416964",
+    "settings": {
+      "cost": "high",
+      "carrier": "B1",
+      "decision": "reject",
+      "provider_deadline_ms": 23000,
+      "direct_return_ms": 12839,
+      "support_return_ms": 28225,
+      "delivery_gain_ms": 13750,
+      "extra_work_ms": 11386
+    },
+    "on_time": 2,
+    "total": 2,
+    "sim_end_ms": 60000,
+    "task_completed": {
+      "provider_return": {
+        "actor": "B2",
+        "t_ms": 16896,
+        "deadline_ms": 23000,
+        "on_time": true
+      },
+      "delivery": {
+        "actor": "B1",
+        "t_ms": 19072,
+        "deadline_ms": 42000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.907234594154241,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": null,
+    "paths_m": {
+      "B1": 7.98850113710588,
+      "B2": 4.478892251515595
+    }
+  },
+  {
+    "run_id": "web-cost-high-03",
+    "scene": "web_cost",
+    "source_commit": "3519799e156760195bfa9330031ff1845d416964",
+    "settings": {
+      "cost": "high",
+      "carrier": "B1",
+      "decision": "reject",
+      "provider_deadline_ms": 23000,
+      "direct_return_ms": 12839,
+      "support_return_ms": 28225,
+      "delivery_gain_ms": 13750,
+      "extra_work_ms": 11386
+    },
+    "on_time": 2,
+    "total": 2,
+    "sim_end_ms": 60000,
+    "task_completed": {
+      "provider_return": {
+        "actor": "B2",
+        "t_ms": 16896,
+        "deadline_ms": 23000,
+        "on_time": true
+      },
+      "delivery": {
+        "actor": "B1",
+        "t_ms": 19072,
+        "deadline_ms": 42000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.907234594154241,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": null,
+    "paths_m": {
+      "B1": 7.98850113710588,
+      "B2": 4.478892251515595
+    }
+  },
+  {
+    "run_id": "web-long-release-01",
+    "scene": "web_long",
+    "source_commit": "3519799e156760195bfa9330031ff1845d416964",
+    "settings": {
+      "early_release": true,
+      "nominal_clear_ms": 32000
+    },
+    "on_time": 3,
+    "total": 3,
+    "sim_end_ms": 140000,
+    "task_completed": {
+      "first_delivery": {
+        "actor": "B1",
+        "t_ms": 15328,
+        "deadline_ms": 30000,
+        "on_time": true
+      },
+      "following_delivery": {
+        "actor": "B2",
+        "t_ms": 22928,
+        "deadline_ms": 65000,
+        "on_time": true
+      },
+      "long_delivery": {
+        "actor": "R1",
+        "t_ms": 92064,
+        "deadline_ms": 135000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.8097251029758872,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": 0.22829302473308444,
+    "paths_m": {
+      "B1": 6.179848819968501,
+      "B2": 6.3882053355141135,
+      "R1": 31.954560125024823
+    },
+    "b1_clear_ms": 7888,
+    "b2_dispatch_ms": 7888,
+    "b2_enter_ms": 10320
+  },
+  {
+    "run_id": "web-long-release-02",
+    "scene": "web_long",
+    "source_commit": "3519799e156760195bfa9330031ff1845d416964",
+    "settings": {
+      "early_release": true,
+      "nominal_clear_ms": 32000
+    },
+    "on_time": 3,
+    "total": 3,
+    "sim_end_ms": 140000,
+    "task_completed": {
+      "first_delivery": {
+        "actor": "B1",
+        "t_ms": 15328,
+        "deadline_ms": 30000,
+        "on_time": true
+      },
+      "following_delivery": {
+        "actor": "B2",
+        "t_ms": 22928,
+        "deadline_ms": 65000,
+        "on_time": true
+      },
+      "long_delivery": {
+        "actor": "R1",
+        "t_ms": 92064,
+        "deadline_ms": 135000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.8097251029758872,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": 0.22829302473308444,
+    "paths_m": {
+      "B1": 6.179848819968501,
+      "B2": 6.3882053355141135,
+      "R1": 31.954560125024823
+    },
+    "b1_clear_ms": 7888,
+    "b2_dispatch_ms": 7888,
+    "b2_enter_ms": 10320
+  },
+  {
+    "run_id": "web-long-release-03",
+    "scene": "web_long",
+    "source_commit": "3519799e156760195bfa9330031ff1845d416964",
+    "settings": {
+      "early_release": true,
+      "nominal_clear_ms": 32000
+    },
+    "on_time": 3,
+    "total": 3,
+    "sim_end_ms": 140000,
+    "task_completed": {
+      "first_delivery": {
+        "actor": "B1",
+        "t_ms": 15328,
+        "deadline_ms": 30000,
+        "on_time": true
+      },
+      "following_delivery": {
+        "actor": "B2",
+        "t_ms": 22928,
+        "deadline_ms": 65000,
+        "on_time": true
+      },
+      "long_delivery": {
+        "actor": "R1",
+        "t_ms": 92064,
+        "deadline_ms": 135000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.8097251029758872,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": 0.22829302473308444,
+    "paths_m": {
+      "B1": 6.179848819968501,
+      "B2": 6.3882053355141135,
+      "R1": 31.954560125024823
+    },
+    "b1_clear_ms": 7888,
+    "b2_dispatch_ms": 7888,
+    "b2_enter_ms": 10320
+  },
+  {
+    "run_id": "web-long-phase111-01",
+    "scene": "web_long",
+    "source_commit": "3519799e156760195bfa9330031ff1845d416964",
+    "settings": {
+      "early_release": false,
+      "nominal_clear_ms": 32000
+    },
+    "on_time": 2,
+    "total": 3,
+    "sim_end_ms": 140000,
+    "task_completed": {
+      "first_delivery": {
+        "actor": "B1",
+        "t_ms": 15328,
+        "deadline_ms": 30000,
+        "on_time": true
+      },
+      "following_delivery": {
+        "actor": "B2",
+        "t_ms": 72304,
+        "deadline_ms": 65000,
+        "on_time": false
+      },
+      "long_delivery": {
+        "actor": "R1",
+        "t_ms": 92064,
+        "deadline_ms": 135000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.8097251029758872,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": -0.044983053557606845,
+    "paths_m": {
+      "B1": 6.179848819968501,
+      "B2": 7.38588908442862,
+      "R1": 31.954560125024823
+    },
+    "b1_clear_ms": 7888,
+    "b2_dispatch_ms": 32000,
+    "b2_enter_ms": 34784
+  },
+  {
+    "run_id": "web-long-phase111-02",
+    "scene": "web_long",
+    "source_commit": "3519799e156760195bfa9330031ff1845d416964",
+    "settings": {
+      "early_release": false,
+      "nominal_clear_ms": 32000
+    },
+    "on_time": 2,
+    "total": 3,
+    "sim_end_ms": 140000,
+    "task_completed": {
+      "first_delivery": {
+        "actor": "B1",
+        "t_ms": 15328,
+        "deadline_ms": 30000,
+        "on_time": true
+      },
+      "following_delivery": {
+        "actor": "B2",
+        "t_ms": 72304,
+        "deadline_ms": 65000,
+        "on_time": false
+      },
+      "long_delivery": {
+        "actor": "R1",
+        "t_ms": 92064,
+        "deadline_ms": 135000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.8097251029758872,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": -0.044983053557606845,
+    "paths_m": {
+      "B1": 6.179848819968501,
+      "B2": 7.38588908442862,
+      "R1": 31.954560125024823
+    },
+    "b1_clear_ms": 7888,
+    "b2_dispatch_ms": 32000,
+    "b2_enter_ms": 34784
+  },
+  {
+    "run_id": "web-long-phase111-03",
+    "scene": "web_long",
+    "source_commit": "3519799e156760195bfa9330031ff1845d416964",
+    "settings": {
+      "early_release": false,
+      "nominal_clear_ms": 32000
+    },
+    "on_time": 2,
+    "total": 3,
+    "sim_end_ms": 140000,
+    "task_completed": {
+      "first_delivery": {
+        "actor": "B1",
+        "t_ms": 15328,
+        "deadline_ms": 30000,
+        "on_time": true
+      },
+      "following_delivery": {
+        "actor": "B2",
+        "t_ms": 72304,
+        "deadline_ms": 65000,
+        "on_time": false
+      },
+      "long_delivery": {
+        "actor": "R1",
+        "t_ms": 92064,
+        "deadline_ms": 135000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.8097251029758872,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": -0.044983053557606845,
+    "paths_m": {
+      "B1": 6.179848819968501,
+      "B2": 7.38588908442862,
+      "R1": 31.954560125024823
+    },
+    "b1_clear_ms": 7888,
+    "b2_dispatch_ms": 32000,
+    "b2_enter_ms": 34784
+  },
+  {
+    "run_id": "web-exit-on-01",
+    "scene": "web_medium_exit",
+    "source_commit": "24550fc4b795535bff8808313af132cfc46c3d78",
+    "settings": {
+      "early_release": true,
+      "exit_check": true,
+      "berth": [
+        6.4,
+        0.0
+      ]
+    },
+    "on_time": 2,
+    "total": 2,
+    "sim_end_ms": 65008,
+    "task_completed": {
+      "first_delivery": {
+        "actor": "B1",
+        "t_ms": 33968,
+        "deadline_ms": 55000,
+        "on_time": true
+      },
+      "following_delivery": {
+        "actor": "B2",
+        "t_ms": 63216,
+        "deadline_ms": 65000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.929999549336765,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": -0.0411811124711145,
+    "paths_m": {
+      "B1": 6.126653894572663,
+      "B2": 8.264122662066958
+    },
+    "b1_clear_ms": 7888,
+    "b2_dispatch_ms": 30176,
+    "b2_enter_ms": 35008,
+    "destination_clear_ms": 30176
+  },
+  {
+    "run_id": "web-exit-on-02",
+    "scene": "web_medium_exit",
+    "source_commit": "24550fc4b795535bff8808313af132cfc46c3d78",
+    "settings": {
+      "early_release": true,
+      "exit_check": true,
+      "berth": [
+        6.4,
+        0.0
+      ]
+    },
+    "on_time": 2,
+    "total": 2,
+    "sim_end_ms": 65008,
+    "task_completed": {
+      "first_delivery": {
+        "actor": "B1",
+        "t_ms": 33968,
+        "deadline_ms": 55000,
+        "on_time": true
+      },
+      "following_delivery": {
+        "actor": "B2",
+        "t_ms": 63216,
+        "deadline_ms": 65000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.929999549336765,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": -0.0411811124711145,
+    "paths_m": {
+      "B1": 6.126653894572663,
+      "B2": 8.264122662066958
+    },
+    "b1_clear_ms": 7888,
+    "b2_dispatch_ms": 30176,
+    "b2_enter_ms": 35008,
+    "destination_clear_ms": 30176
+  },
+  {
+    "run_id": "web-exit-on-03",
+    "scene": "web_medium_exit",
+    "source_commit": "24550fc4b795535bff8808313af132cfc46c3d78",
+    "settings": {
+      "early_release": true,
+      "exit_check": true,
+      "berth": [
+        6.4,
+        0.0
+      ]
+    },
+    "on_time": 2,
+    "total": 2,
+    "sim_end_ms": 65008,
+    "task_completed": {
+      "first_delivery": {
+        "actor": "B1",
+        "t_ms": 33968,
+        "deadline_ms": 55000,
+        "on_time": true
+      },
+      "following_delivery": {
+        "actor": "B2",
+        "t_ms": 63216,
+        "deadline_ms": 65000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.929999549336765,
+    "vehicle_envelope_overlap_samples": 0,
+    "min_lane_envelope_margin_m": -0.0411811124711145,
+    "paths_m": {
+      "B1": 6.126653894572663,
+      "B2": 8.264122662066958
+    },
+    "b1_clear_ms": 7888,
+    "b2_dispatch_ms": 30176,
+    "b2_enter_ms": 35008,
+    "destination_clear_ms": 30176
+  },
+  {
+    "run_id": "web-exit-off-01",
+    "scene": "web_medium_exit",
+    "source_commit": "24550fc4b795535bff8808313af132cfc46c3d78",
+    "settings": {
+      "early_release": true,
+      "exit_check": false,
+      "berth": [
+        6.4,
+        0.0
+      ]
+    },
+    "on_time": 2,
+    "total": 2,
+    "sim_end_ms": 65008,
+    "task_completed": {
+      "following_delivery": {
+        "actor": "B2",
+        "t_ms": 31968,
+        "deadline_ms": 65000,
+        "on_time": true
+      },
+      "first_delivery": {
+        "actor": "B1",
+        "t_ms": 34224,
+        "deadline_ms": 55000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.42258810974903277,
+    "vehicle_envelope_overlap_samples": 266,
+    "min_lane_envelope_margin_m": 0.08104194952400345,
+    "paths_m": {
+      "B1": 6.193972599017218,
+      "B2": 6.519066816435061
+    },
+    "b1_clear_ms": 7888,
+    "b2_dispatch_ms": 7888,
+    "b2_enter_ms": 8256,
+    "destination_clear_ms": 30256
+  },
+  {
+    "run_id": "web-exit-off-02",
+    "scene": "web_medium_exit",
+    "source_commit": "24550fc4b795535bff8808313af132cfc46c3d78",
+    "settings": {
+      "early_release": true,
+      "exit_check": false,
+      "berth": [
+        6.4,
+        0.0
+      ]
+    },
+    "on_time": 2,
+    "total": 2,
+    "sim_end_ms": 65008,
+    "task_completed": {
+      "following_delivery": {
+        "actor": "B2",
+        "t_ms": 31968,
+        "deadline_ms": 65000,
+        "on_time": true
+      },
+      "first_delivery": {
+        "actor": "B1",
+        "t_ms": 34224,
+        "deadline_ms": 55000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.42258810974903277,
+    "vehicle_envelope_overlap_samples": 266,
+    "min_lane_envelope_margin_m": 0.08104194952400345,
+    "paths_m": {
+      "B1": 6.193972599017218,
+      "B2": 6.519066816435061
+    },
+    "b1_clear_ms": 7888,
+    "b2_dispatch_ms": 7888,
+    "b2_enter_ms": 8256,
+    "destination_clear_ms": 30256
+  },
+  {
+    "run_id": "web-exit-off-03",
+    "scene": "web_medium_exit",
+    "source_commit": "24550fc4b795535bff8808313af132cfc46c3d78",
+    "settings": {
+      "early_release": true,
+      "exit_check": false,
+      "berth": [
+        6.4,
+        0.0
+      ]
+    },
+    "on_time": 2,
+    "total": 2,
+    "sim_end_ms": 65008,
+    "task_completed": {
+      "following_delivery": {
+        "actor": "B2",
+        "t_ms": 31968,
+        "deadline_ms": 65000,
+        "on_time": true
+      },
+      "first_delivery": {
+        "actor": "B1",
+        "t_ms": 34224,
+        "deadline_ms": 55000,
+        "on_time": true
+      }
+    },
+    "min_vehicle_separation_m": 0.42258810974903277,
+    "vehicle_envelope_overlap_samples": 266,
+    "min_lane_envelope_margin_m": 0.08104194952400345,
+    "paths_m": {
+      "B1": 6.193972599017218,
+      "B2": 6.519066816435061
+    },
+    "b1_clear_ms": 7888,
+    "b2_dispatch_ms": 7888,
+    "b2_enter_ms": 8256,
+    "destination_clear_ms": 30256
+  }
+]

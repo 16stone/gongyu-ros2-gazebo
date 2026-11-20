@@ -1,0 +1,3 @@
+{"t_ms":16,"actor":"B1","ver":"gpsheading-v3","theta_dbg":0.0,"kind":"command_received","cmd_id":"B1-0","target":[6.4,0.0]}
+{"t_ms":28096,"actor":"B1","ver":"gpsheading-v3","theta_dbg":0.0,"kind":"command_received","cmd_id":"B1-28000","target":[7.6,0.0]}
+{"t_ms":30384,"actor":"B2","ver":"gpsheading-v3","theta_dbg":0.0,"kind":"command_received","cmd_id":"B2-30176","target":[6.4,0.0]}

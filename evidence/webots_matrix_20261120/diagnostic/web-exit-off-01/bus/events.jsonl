@@ -1,0 +1,13 @@
+{"t_ms":0,"kind":"dispatch","actor":"B1","goal":[6.4,0.0],"task_id":null}
+{"t_ms":592,"kind":"channel_enter","actor":"B1"}
+{"t_ms":7888,"kind":"channel_clear","actor":"B1"}
+{"t_ms":7888,"kind":"dispatch","actor":"B2","goal":[6.4,0.0],"task_id":"following_delivery"}
+{"t_ms":10320,"kind":"channel_enter","actor":"B2"}
+{"t_ms":17584,"kind":"channel_clear","actor":"B2"}
+{"t_ms":28000,"kind":"goal_dwell","actor":"B1","goal":[6.4,0.0],"position":[6.374928557450743,0.0001295610702262411,0.11962547803072716],"task_id":null}
+{"t_ms":28000,"kind":"dispatch","actor":"B1","goal":[7.6,0.0],"task_id":"first_delivery"}
+{"t_ms":30304,"kind":"destination_cleared","actor":"B1","goal":[6.4,0.0],"position":[7.101818188244199,-0.009306191869293483,0.11787677968343607]}
+{"t_ms":33264,"kind":"goal_dwell","actor":"B2","goal":[6.4,0.0],"position":[6.343063670943612,-0.000653315213162434,0.11646883482905326],"task_id":"following_delivery"}
+{"t_ms":33264,"kind":"task_completed","actor":"B2","deadline_ms":65000,"on_time":true,"task_id":"following_delivery"}
+{"t_ms":34016,"kind":"goal_dwell","actor":"B1","goal":[7.6,0.0],"position":[7.541225039169341,-0.0031573205454711764,0.11967653905044766],"task_id":"first_delivery"}
+{"t_ms":34016,"kind":"task_completed","actor":"B1","deadline_ms":55000,"on_time":true,"task_id":"first_delivery"}
