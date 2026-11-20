@@ -97,6 +97,34 @@ def tracking_targets(path, free):
     return waypoints
 
 
+def low_scan_bypass(free, goal, algorithm, pose, scan):
+    # shortcut: a single static box is bounded from its observed facade in this fixture;
+    # replace with a fused local occupancy map when validating arbitrary obstacle geometry.
+    x, y, yaw = pose
+    cosine, sine = math.cos(yaw), math.sin(yaw)
+    offset = CARD["sensors"]["low"]["x_m"]
+    returns = [(x + cosine * (px + offset) - sine * py,
+                y + sine * (px + offset) + cosine * py)
+               for px, py, _ in (point for point in scan if point)
+               if px > 0 and math.hypot(px, py) <= 1.0]
+    if len(returns) < 3:
+        raise ValueError("insufficient low scan returns for bypass")
+    observed_x, observed_y = zip(*returns)
+    bounds = min(observed_x), max(observed_x) + 0.45, min(observed_y) - 0.07, max(observed_y) + 0.07
+    a, b, c, d = bounds
+    margin = max(CARD["inflation_m"], CARD["model"]["footprint_radius_m"] +
+                 CARD["target_tolerance_m"] + GRID_M)
+    replanned_free = set()
+    for cell in free:
+        wx, wy = world_point(cell)
+        if math.hypot(max(a - wx, 0, wx - b), max(c - wy, 0, wy - d)) > margin:
+            replanned_free.add(cell)
+    start = tuple(round((value - origin) / GRID_M)
+                  for value, origin in zip((x, y), (ORIGIN_X, ORIGIN_Y)))
+    path, _, _ = grid_search(replanned_free, start, goal, algorithm)
+    return tracking_targets(path, replanned_free), bounds
+
+
 def wheel_predict(pose, right_rad, left_rad):
     """The right wheel is named left_motor in this Webots model."""
     x, y, yaw = pose

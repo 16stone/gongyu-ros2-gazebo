@@ -72,7 +72,7 @@ while sup.step(step) != -1:
         status = "obstacle_contact"
         break
     recent_ctl = bus.last("ctl_events.jsonl")
-    if recent_ctl and recent_ctl["kind"] == "scan_stop_latched" and ts - recent_ctl["t_ms"] >= 1024:
+    if recent_ctl and recent_ctl["kind"] in ("scan_stop_latched", "scan_replan_failed") and ts - recent_ctl["t_ms"] >= 1024:
         status = "scan_safe_stop" if first_contact is None else "obstacle_contact"
         break
     if ts >= limit:

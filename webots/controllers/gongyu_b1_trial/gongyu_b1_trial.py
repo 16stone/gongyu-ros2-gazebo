@@ -10,7 +10,7 @@ from time import perf_counter_ns
 from controller import Robot
 
 sys.path.insert(0, os.environ["GONGYU_WEBOTS_COMMON"])
-from b1_experiment import CARD, drive, grid_search, grid_spec, tracking_targets, world_point
+from b1_experiment import CARD, drive, grid_search, grid_spec, low_scan_bypass, tracking_targets, world_point
 from bus import Bus
 
 run = Path(os.environ["GONGYU_RUN_DIR"])
@@ -18,6 +18,7 @@ bus = Bus(str(run / "bus"))
 layout = os.environ["GONGYU_SCENE"].removeprefix("web_b1_phaseb_")
 algorithm = os.environ.get("GONGYU_B1_PLANNER", "astar")
 use_low = os.environ.get("GONGYU_B1_LOW", "1") == "1"
+bypass = os.environ.get("GONGYU_B1_BYPASS", "0") == "1"
 
 robot = Robot()
 step = int(robot.getBasicTimeStep())
@@ -38,7 +39,7 @@ path, length, expanded = grid_search(free, start, goal, algorithm)
 elapsed = perf_counter_ns() - started
 targets = tracking_targets(path, free) if layout != "coverage" else []
 (run / "result" / "plan.json").write_text(json.dumps({
-    "layout": layout, "algorithm": algorithm, "low_scan_used": use_low,
+    "layout": layout, "algorithm": algorithm, "low_scan_used": use_low, "bypass_enabled": bypass,
     "search_ns": elapsed, "grid_path_m": length, "expanded_nodes": expanded,
     "path": [world_point(cell) for cell in path], "targets": targets,
     "lidars": [{"count": lidar.getNumberOfPoints(), "fov": lidar.getFov(),
@@ -62,6 +63,8 @@ def front_return(cloud):
 
 index = 0
 blocked = False
+replan_at = None
+replanned = False
 while robot.step(step) != -1:
     t = round(robot.getTime() * 1000)
     x, y, _ = gps.getValues()
@@ -71,7 +74,7 @@ while robot.step(step) != -1:
     front_low, angle_low = front_return(scan_low)
 
     guard = [(front_main, "main"), (front_low, "low")] if use_low else [(front_main, "main")]
-    if layout == "lowobs" and not blocked:
+    if layout == "lowobs" and not blocked and not replanned:
         triggered = [(distance, source) for distance, source in guard
                      if distance is not None and distance <= CARD["stop_range_m"]]
         if triggered:
@@ -79,6 +82,20 @@ while robot.step(step) != -1:
             distance, source = min(triggered)
             bus.append("ctl_events.jsonl", {"kind": "scan_stop_latched", "t_ms": t, "source": source,
                                            "distance_m": distance, "low_scan_used": use_low})
+            if bypass and source == "low":
+                replan_at = t + 320
+    if replan_at is not None and t >= replan_at:
+        replan_at = None
+        try:
+            targets, observed_bounds = low_scan_bypass(free, goal, algorithm, pose, scan_low)
+        except ValueError as error:
+            bus.append("ctl_events.jsonl", {"kind": "scan_replan_failed", "t_ms": t, "reason": str(error)})
+        else:
+            index = 0
+            blocked = False
+            replanned = True
+            bus.append("ctl_events.jsonl", {"kind": "scan_replan_applied", "t_ms": t,
+                                           "inferred_bounds_m": observed_bounds, "targets": targets})
     if index < len(targets) and math.dist(pose[:2], targets[index]) <= CARD["target_tolerance_m"]:
         bus.append("ctl_events.jsonl", {"kind": "tracked_waypoint", "t_ms": t, "target": targets[index]})
         index += 1
