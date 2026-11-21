@@ -66,6 +66,7 @@ R3 返场 & R3 & 42.336 & 86 \\
 两车放行 & 同一专项汇总中的 two\_vehicles；\pathref{evidence/webots/e-mech-release/} & 核对清空、后车放行与进入 \\
 单车、多旋翼与规划计时 & 同一专项汇总中的 b1、uav、planner\_timing；\pathref{evidence/webots/} 下的 b-*、c-*、p-* & 对照专项汇总、真值轨迹与传感记录 \\
 Gazebo 历史整场 & \pathref{evidence/fp124-ent-ind-01/} 下的 result/ 与 result\_launch/ & 对照实体状态、通道事件与任务结果 \\
+红蓝对抗八组回合 & \pathref{evidence/adversary_20261121/} 下的 summary.json 与各回合目录 & 核对按期数、撤销时刻、阈值轨迹、伪造帧与校验和 \\
 成本、规模与通信 & \pathref{source/scenarios/}、\pathref{source/gongyu/}、\pathref{docs/course_alignment/} & 按固定图模型复算效用与逐档结果 \\
 回合索引与回放 & \pathref{docs/evidence_index.md}、\pathref{docs/reproduce.md}、\pathref{docs/demo/} & 查询 33 个回合、运行说明与整场回放 \\
 \end{longtable}
@@ -105,15 +106,13 @@ Gazebo 历史整场 & \pathref{evidence/fp124-ent-ind-01/} 下的 result/ 与 re
 \endgroup
 
 
-相同设置下三轮均达到通道互斥和按期条件。第二次启动的 B2 完成得更早，说明按期结果一致时，具体动作时序仍可发生变化。仿真窗口均为 400~s；三轮的逐项指标保存在 \pathref{evidence/course_final/specialty_results.json} 的 normal\_restarts，与主版本 normal 同配置。
+相同设置下三轮均达到通道互斥和按期条件。第二次启动的 B2 完成得更早，说明按期结果一致时，具体动作时序仍可发生变化。仿真窗口均为 400~s，逐项指标保存在 \pathref{evidence/course_final/specialty_results.json} 的 \texttt{normal\_restarts}。
 
 
-\subsection{AMAX 补验回执}\label{sec:A.3}
+\subsection{补充回合与对抗专项回执}\label{sec:A.3}
 
-\pathref{docs/webots/amax_validation_20261120.md} 列出各回合及复现命令。
+补充回合清单及复现命令见 \pathref{docs/webots/amax_validation_20261120.md}，对抗专项见 \pathref{docs/webots/adversary_validation.md}。
 
-\noindent\textbf{低箱整场} \pathref{evidence/b1_full_lowbox_20261120/}，查停车、绕行、预对准与交付。
+\noindent\textbf{补充回合}\quad \pathref{evidence/} 下的 \pathref{b1_full_lowbox_20261120/}、\pathref{rotor_course_20261120/} 与 \pathref{observation_link_20261120/} 分别对应低箱绕行、旋翼接管与断链恢复记录，并附总索引。
 
-\noindent\textbf{旋翼与接管} \pathref{evidence/rotor_course_20261120/}，查转速、飞行、像素签名、放行与交付。
-
-\noindent\textbf{断链及专项} \pathref{evidence/observation_link_20261120/} 留有超时与恢复记录。感知和资源对照见补验总索引。
+\noindent\textbf{红蓝对抗}\quad \pathref{evidence/adversary_20261121/} 下八个回合子目录含指标、事件、环境与结束状态，\pathref{summary.json} 与 \pathref{SHA256SUMS} 保存汇总与校验和；图~\ref{fig:18}、图~\ref{fig:17} 由 \pathref{figure_sources/adversary_figs.py} 读取绘制。

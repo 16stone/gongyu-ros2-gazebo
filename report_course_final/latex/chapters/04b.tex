@@ -1,0 +1,159 @@
+\clearpage
+
+\addtocontents{toc}{\protect\newpage}
+\section{红蓝对抗与仿生防卫}\label{sec:adv}
+
+前几章的回合中，两队遵守同一套通行规则，竞争只体现在谁先用到通道。靶场的“对抗”还应包括另一种情形：一方利用规则漏洞主动损害对方。本章在同一张 14 项任务卡上加入两种红方对抗行为，并为蓝方设计两种对应的防卫机制，其中一种直接采用社会性昆虫的响应阈值分工模型\cite{ref8,ref15}。全部对照在 Webots 中跑满 400~s 窗口，统计口径与第~\ref{sec:4} 章相同。
+
+\subsection{对抗设定与威胁模型}\label{sec:adv.1}
+
+对抗行为只能使用红方实体本来就有的能力：R1 能够申请通行名额，R5 能够飞行并接收公开广播的观察报告。红方不能修改裁判，也不知道蓝方的认证密钥。表~\ref{tab:adv1} 列出两种攻击及对应的防卫。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.14\tableavailable}>{\raggedright\arraybackslash}p{0.30\tableavailable}>{\raggedright\arraybackslash}p{0.27\tableavailable}>{\raggedright\arraybackslash}p{0.29\tableavailable}@{}}
+\caption{红方对抗行为与蓝方防卫机制}\label{tab:adv1}\\
+\toprule
+\textbf{类别} & \textbf{红方行为} & \textbf{利用的漏洞} & \textbf{蓝方防卫} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{类别} & \textbf{红方行为} & \textbf{利用的漏洞} & \textbf{蓝方防卫} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+通道虚占 & R2 交付后，R1 立即领取下一个通行名额，却停在入口外，直到 145~s 才动身 & 名额一经授予就由持有者独占，规则不检查是否真的在用 & 响应阈值挑战：等待车累积刺激，裁判核实持有者闲置后撤销名额 \\
+重放欺骗 & R5 返场后飞到 B3 附近，录下至少 20~s 前的相机帧；B2 请求观察时，改写采样时刻后重新注入 & 接收方只看采样时刻判断时效，不核对帧的来源 & 帧认证：B3 对发送者、采样时刻、图像特征和帧长计算 HMAC，接收方验签 \\
+\end{longtable}
+\endgroup
+
+两类行为分别作用于资源层和信息层。虚占发生在资源层，目的是让蓝方运输车误期。重放发生在信息层，目的是让 B2 用过时的观察出发。第~\ref{sec:3.3} 节的 6~s 时效检查只能挡住如实标注时刻的旧帧，挡不住改过时间戳的旧帧。
+
+\subsection{通道虚占与响应阈值撤销}\label{sec:adv.2}
+
+最直接的对策是设一个固定超时：持有者若干秒不动就收回名额。固定超时却很难取值。取短了，正在入口外对准或等待装载的车会被误收；取长了，虚占的代价又太小。社会性昆虫的分工提供了另一种做法：个体对某项任务的刺激逐渐累积，刺激越强、个体阈值越低，越可能投入这项工作\cite{ref8}。Krieger 等已在实体机器人群上用这类规则完成觅食分工\cite{ref16}。
+
+本设计把通道名额视为一项被搁置的任务，排在持有者之后的车辆是潜在响应者。裁判每 1~s 评估一次。设 $s$ 为累积刺激，$\theta$ 为响应阈值，则后车本次发起挑战的概率为
+\begin{equation}
+p(s,\theta)=\frac{s^{2}}{s^{2}+\theta^{2}}.\label{eq:threshold}
+\end{equation}
+满足闲置条件时 $s$ 每次加 1，条件一旦中断即清零。阈值随后车期限余量变化：
+\begin{equation}
+\theta(\sigma)=\theta_{\min}+(\theta_{\max}-\theta_{\min})\cdot\min\!\Bigl(1,\max\!\bigl(0,\tfrac{\sigma}{\sigma_{\mathrm{ref}}}\bigr)\Bigr),\qquad \sigma=d-t-T_{\mathrm{trip}},\label{eq:theta}
+\end{equation}
+其中 $d$ 为后车任务期限，$t$ 为当前仿真时间，$T_{\mathrm{trip}}=60$~s 为名义行程，取 $\theta_{\min}=1.0$~s、$\theta_{\max}=6.0$~s、$\sigma_{\mathrm{ref}}=300$~s。余量越少，阈值越低，后车越早发起挑战。以 85.696~s 时的 B1 为例，$\sigma=350-85.696-60=204.304$~s，代入得 $\theta=4.405$~s；$s=4$ 时 $p=0.4519$。
+
+挑战本身不能直接收回名额。裁判先用仿真真值做闲置核验，以下三项同时成立才撤销：持有者位于通道之外；没有处在站点驻留中；最近 2.0~s 内平移不超过 0.05~m、转角不超过 0.05~rad。这一步保证正在对准、装卸或缓慢入场的车辆不会被挑战挤掉。撤销后，持有者与挑战者在放行队列中互换位置，原持有者顺延到下一个名额，没有任何任务因此被取消。
+
+\subsection{空中重放欺骗与帧认证}\label{sec:adv.3}
+
+重放攻击在无人系统中有现实对应。Kerns 等在外场演示了用伪造的 GPS 信号捕获并引偏一架旋翼无人机\cite{ref17}，其共同点是接收方无法区分真实信号与改写后的复制品。本场景中，R5 在 $(12.0,\,5.0)$~m 处盘旋，与 B3 相距约 3.61~m，在 8.0~m 截获半径内；与蓝方中转泊位相距约 5.25~m，在 10.0~m 注入半径内。它挑出录下的最早一帧，把采样时刻改成当前时刻后写入观察通道。
+
+蓝方的对策是消息认证码。B3 与蓝方地面车预先共享密钥 $K$，每帧附带
+\begin{equation}
+\mathrm{tag}=\mathrm{HMAC\text{-}SHA256}_{K}\bigl(\textit{actor}\,\|\,t_{\mathrm{sample}}\,\|\,\textit{signature}\,\|\,\textit{bytes}\bigr)\label{eq:hmac}
+\end{equation}
+的前 128 位\cite{ref18}。采样时刻被纳入认证范围，因此改写时间戳会使验签失败；不改时间戳的原样重放又会被 6~s 时效检查拒收。两道检查合起来，旧帧无论改不改时刻都无法用于放行。验签失败时，观察门限记录一条 \texttt{observation\_unauthenticated} 事件并丢弃该帧，B2 继续等待 B3 的下一份合法帧。比较摘要时采用常数时间比较，避免按字节提前返回带来的时序泄露。
+
+\subsection{八组对照的设计}\label{sec:adv.4}
+
+八组回合使用同一场地、任务卡和执行方式：六辆电机驱动地面车，两架航点运动的无人机，首份观察传递时间 1.0~s。各组只改变对抗与防卫开关（表~\ref{tab:adv2}）。响应阈值含随机抽样，因此对虚占加阈值防卫跑了种子 0、1、2 三轮。为避免并行仿真争抢处理器而改变时序，每批最多同时运行两个回合。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-6\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.25\tableavailable}>{\raggedright\arraybackslash}p{0.17\tableavailable}>{\raggedright\arraybackslash}p{0.17\tableavailable}>{\raggedright\arraybackslash}p{0.41\tableavailable}@{}}
+\caption{对抗专项的八组回合}\label{tab:adv2}\\
+\toprule
+\textbf{回合} & \textbf{红方对抗} & \textbf{蓝方防卫} & \textbf{要回答的问题} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{回合} & \textbf{红方对抗} & \textbf{蓝方防卫} & \textbf{要回答的问题} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+基线回归 & — & — & 加入对抗代码后，关闭开关是否与原正常回合一致 \\
+虚占·无防卫 & 虚占 & — & 虚占能造成多大损失（负对照） \\
+虚占·阈值 s0/s1/s2 & 虚占 & 响应阈值 & 防卫能否恢复按期，触发时刻受随机种子影响多大 \\
+欺骗·无防卫 & 重放 & — & 伪造帧会不会被采信（负对照） \\
+欺骗·认证 & 重放 & 帧认证 & 伪造帧能否被拦截，正常放行是否受影响 \\
+双对抗·双防卫 & 虚占＋重放 & 阈值＋认证 & 两种防卫同时开启是否互相干扰 \\
+\end{longtable}
+\endgroup
+
+\subsection{试验结果}\label{sec:adv.5}
+
+八组回合均跑满 400~s，进程正常退出，全部回合通道占用重叠为 0。表~\ref{tab:adv3} 给出按期数与四次运输交付时刻，图~\ref{fig:18} 把同一组数据画在时间轴上。
+
+\begingroup\small
+\setlength{\tableavailable}{\dimexpr\linewidth-12\tabcolsep\relax}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\tableavailable}>{\centering\arraybackslash}p{0.09\tableavailable}>{\centering\arraybackslash}p{0.09\tableavailable}>{\centering\arraybackslash}p{0.13\tableavailable}>{\centering\arraybackslash}p{0.13\tableavailable}>{\centering\arraybackslash}p{0.13\tableavailable}>{\raggedright\arraybackslash}p{0.24\tableavailable}@{}}
+\caption{八组对抗回合的结果（带 * 者超出任务期限）}\label{tab:adv3}\\
+\toprule
+\textbf{回合} & \textbf{按期} & \textbf{进/清} & \textbf{B1 交付/s} & \textbf{R1 交付/s} & \textbf{B2 交付/s} & \textbf{对抗与防卫记录} \\
+\midrule
+\endfirsthead
+\multicolumn{7}{@{}l}{\small\color{muted}表~\thetable\quad （续）}\\
+\toprule
+\textbf{回合} & \textbf{按期} & \textbf{进/清} & \textbf{B1 交付/s} & \textbf{R1 交付/s} & \textbf{B2 交付/s} & \textbf{对抗与防卫记录} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r@{}}{\footnotesize\color{muted}续下页}\\
+\endfoot
+\bottomrule
+\endlastfoot
+基线回归 & 14/14 & 5/5 & 125.392 & 239.360 & 306.112 & 与原正常回合逐毫秒一致 \\
+虚占·无防卫 & 12/14 & 6/6 & 337.280 & 290.208* & 392.912* & R1 停驻至 145~s \\
+虚占·阈值 s0 & 14/14 & 6/6 & 128.848 & 244.976 & 296.560 & 85.696~s 撤销，$s=4$ \\
+虚占·阈值 s1 & 14/14 & 6/6 & 128.848 & 244.976 & 296.560 & 同 s0 \\
+虚占·阈值 s2 & 14/14 & 5/5 & 126.224 & 240.544 & 286.784 & 82.672~s 撤销，$s=3$ \\
+欺骗·无防卫 & 14/14 & 5/5 & 121.920 & 234.544 & 282.976 & 伪造帧被采信 \\
+欺骗·认证 & 14/14 & 5/5 & 125.392 & 239.360 & 306.112 & 拦截 1 帧伪造帧 \\
+双对抗·双防卫 & 13/14 & 5/5 & 127.776 & 251.584* & 304.752 & 83.680~s 撤销，拦截 1 帧 \\
+\end{longtable}
+\endgroup
+
+\figitem{1}{fig18.pdf}{八组对抗回合的四次运输交付时刻。竖短线为阈值撤销时刻，菱形为伪造帧被采信的放行时刻。}{18}
+
+\subsubsection*{基线回归}
+
+关闭所有开关时，14 项任务的完成时刻与第~\ref{sec:4.2} 节的正常回合逐毫秒一致，B2 同样在 240.928~s 放行。新增的对抗代码在默认状态下不改变原有行为，后面各组的差异可以归因于开关本身。
+
+\subsubsection*{通道虚占}
+
+无防卫时，R1 在约 80~s 取得名额，此时距其任务释放还有约 40~s，它却一直停到 145~s。B1 在入口外等了约 65~s，交付由 125.392~s 推迟到 337.280~s，晚了 211.888~s，仍在 350~s 期限内。损失沿放行队列向后传递：R1 动身较晚，在东口擦碰导轨，于 290.208~s 交付，自身超期；B2 直到 338.704~s 才拿到放行，392.912~s 交付，超期约 43~s。按期数降为 12/14。虚占没有引起碰撞或通道占用重叠，而是通过持有但不使用名额延误后车。
+
+开启响应阈值后，三个种子都在首次闲置评估后 2—5~s 内收回名额（图~\ref{fig:17}）。种子 0 与种子 1 的前三次抽样均未响应，第四次在 $s=4$、$p=0.4519$ 时响应，两轮轨迹完全相同；种子 2 在第三次评估、$p=0.3119$ 时即已响应。撤销后 B1 先行，三轮均为 14/14 项按期，B1 交付在 126.224—128.848~s，与基线相差不到 3.5~s。R1 顺延到 B1 之后，交付在 240.544—244.976~s，仍在 250~s 期限内。三轮的撤销时刻相差约 3~s，远小于 R1 停驻的 65~s，随机抽样引起的波动并未影响按期结果。
+
+\figitem{1}{fig17.pdf}{响应阈值防卫。(a) 式~\eqref{eq:threshold} 在三种阈值下的曲线及实测评估点；(b) 三组回合中 B1 的逐秒响应概率与撤销时刻。}{17}
+
+实测轨迹也印证了阈值自适应和闲置核验两项设计。阈值由期限余量决定：B1 在 80~s 前后还有约 200~s 余量，$\theta\approx4.4$~s，需要连续几秒的闲置证据才响应；若换成余量较少的车辆，$\theta$ 会接近 1~s，前两次评估就可能挑战。撤销前先核验闲置同样必要：三轮阈值回合中，名额随后依次交给 B1、R1 和 B2，这些持有者在入口外对准、等待观察时都处于运动或驻留中，闲置条件不成立，刺激随即清零。每轮记录中仅对 R1 触发一次撤销，没有误撤销正常车辆。
+
+\subsubsection*{重放欺骗}
+
+无防卫时，R5 在 234.624~s 注入一帧 53.440~s 采样的旧帧，并把采样时刻改成当前时刻。B2 于 235.632~s 接受该帧并获得放行，而帧内容实际已过去 182.192~s。这一轮仍为 14/14 项按期，B2 交付还提前到 282.976~s。只看按期数，这次欺骗不会显现；它破坏的是放行所依据的信息是否真实。若这段时间内出口路况已经变化，B2 就会依据超过 180~s 前的旧画面驶入。
+
+开启帧认证后，B2 于 239.424~s 收到伪造帧，验签失败，记录一次未认证帧并丢弃。240.928~s，B3 的合法签名帧到达，B2 随即放行。此后所有时刻与基线回归逐毫秒一致，帧认证拦截了伪造帧，且没有给正常放行增加延迟。
+
+\subsubsection*{双对抗与双防卫}
+
+两种攻击和两种防卫同时开启时，83.680~s 撤销 R1 的名额，251.648~s 拦截伪造帧，蓝方三项任务全部按期，两种防卫没有互相干扰。唯一的超期属于红方 R1，251.584~s 交付，超出期限 1.584~s。原因在于虚占先把 R1 排到了 B1 之后：在单独开启阈值的三轮中，R1 只剩 5.0—9.5~s 余量，本轮 R2、B1 的时序稍有不同，这点余量就被用尽。附录~\ref{sec:A} 中正常设置的三轮复跑，B2 交付也有约 16~s 的波动，几秒的时序差异在这一平台上属于正常范围。在存在阈值撤销的情况下，主动虚占使红方自身顺延到蓝方之后，从而消耗了原有的时间余量。
+
+\subsection{讨论与适用范围}\label{sec:adv.6}
+
+八组回合说明，评价对抗靶场不能只看按期数。虚占的损失直接表现为按期数下降，重放欺骗在按期数上却毫无痕迹，必须另设“放行所依据观察的真实年龄”这一指标才能发现。第~\ref{sec:1.6} 节把预测、执行、验收和审计分开记录，本章的伪造帧正是靠裁判独立记录的原帧采样时刻才被识别出来。
+
+响应阈值与固定超时相比，优势在于把“等多久才挑战”交给任务紧迫程度决定，而闲置核验保证挑战只针对确实没在使用名额的车辆。这与第~\ref{sec:6.1} 节图模型中的负结果并不矛盾：那里阈值用来过滤服务请求，阈值高于刺激带时会把必要的支援也挡掉；这里阈值只决定挑战的时机，最终是否撤销由真值核验决定，误响应的代价只是多做一次核验。
+
+结论的适用范围也需要说明。闲置核验使用仿真真值，实车需要换成车载定位与里程计的联合判断。帧认证假定密钥预先安全分发且未泄露，没有处理密钥管理与更新。重放只针对观察通道，未涉及定位信号欺骗与射频干扰。阈值防卫有三个种子，其余各组为单次回合，样本只能说明机制在该布局下有效，不足以给出统计意义上的成功率。对抗与防卫逻辑另由 6 组单元测试检验，连同原有测试共 27 项全部通过。

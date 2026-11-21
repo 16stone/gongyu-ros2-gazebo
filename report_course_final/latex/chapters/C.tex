@@ -4,7 +4,7 @@
 
 \setcounter{table}{0}
 
-以下记录用于说明车轮方向、入口对准、通道边界和信息补采怎样影响设计选型。整场检验条件和结果见第 4 章。
+以下记录用于说明车轮方向、入口对准、通道边界、信息补采和对抗调试怎样影响设计选型。整场检验条件和结果见第~\ref{sec:4} 章与第~\ref{sec:adv} 章。
 
 \subsection{姿态符号与轮轴映射}\label{sec:C.1}
 
@@ -34,7 +34,7 @@
 \endgroup
 
 
-修正后同一单车路线的通道占用由约 23.0~s 降到 7.1~s。回合为 \pathref{evidence/webots/p-att-spin-plus}、p-att-spin-minus；单车完整路线闭合见 p-motor-b1-route（D\ensuremath{\to}W\ensuremath{\to}E\ensuremath{\to}L\ensuremath{\to}O，1/1 按期、0 违例）。
+修正后同一单车路线的通道占用由约 23.0~s 降到 7.1~s。相关回合为 \pathref{evidence/webots/} 下的 \pathref{p-att-spin-plus} 与 \pathref{p-att-spin-minus}，单车完整路线闭合见 \pathref{p-motor-b1-route}（D\ensuremath{\to}W\ensuremath{\to}E\ensuremath{\to}L\ensuremath{\to}O，1/1 按期、0 违例）。
 
 \subsection{入口对准的几何检查与回退}\label{sec:C.2}
 
@@ -72,6 +72,8 @@
 资源 & 口部反复占用、5 次重叠 & 占用窗口与航点边界错位 & 车体包络判空、对准外移、驻留迟滞与脱困 & 正常回合：14/14 按期，5 进 5 清，0 重叠 \\
 信息 & 过期帧被拒收后 13/14 & 400~s 窗口内无新帧 & 加入主动补采 & 14/14，B2 于 314.240~s 交付 \\
 规则 & 后车等到固定 32~s 才放行 & 两车同场景放行时刻对照 & 按前车实际清空放行 & 少等 24.112~s 且无重叠 \\
+通信 & 红方无人机约 40~s 停止响应 & 16~ms 高频读观察文件与写入竞争 & 总线读取加共享锁，轮询改为 250~ms & 欺骗回合跑满 400~s，正常完成重放与拦截 \\
+对抗 & 虚占至 120~s 时无防卫仍为 14/14 & R1 释放后余量尚足，负对照未显露损失 & 将虚占滞留延长至 145~s & 无防卫降至 12/14，阈值防卫三轮恢复 14/14 \\
 \end{longtable}
 \endgroup
 
