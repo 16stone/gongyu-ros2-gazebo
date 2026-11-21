@@ -8,6 +8,7 @@ from controller import Robot
 
 sys.path.insert(0, os.environ.get('GONGYU_WEBOTS_COMMON', ''))
 from bus import Bus
+from adversary import ReplayAttacker, sign_frame
 
 robot = Robot()
 name = robot.getName()
@@ -16,6 +17,11 @@ run_dir = os.environ.get('GONGYU_RUN_DIR', '/tmp/gongyu_default')
 mode = os.environ.get('GONGYU_FEEDBACK_MODE', 'sensor')
 aerial_kinematic = set(os.environ.get('GONGYU_AERIAL', '').split(','))
 physical_actuation = os.environ.get('GONGYU_PHYS', '0') == '1' and name not in aerial_kinematic
+ADVERSARY = set(filter(None, os.environ.get('GONGYU_ADVERSARY', '').split(',')))
+DEFENSE = set(filter(None, os.environ.get('GONGYU_DEFENSE', '').split(',')))
+BLUE_KEY = os.environ.get('GONGYU_BLUE_KEY', '')
+attacker = (ReplayAttacker(intercept_range_m=8.0, inject_range_m=10.0, min_age_ms=20000)
+            if name == 'R5' and 'spoof' in ADVERSARY else None)
 bus = Bus(os.path.join(run_dir, 'bus'))
 
 gps = robot.getDevice('gps'); gps.enable(ts)
@@ -90,6 +96,21 @@ while robot.step(ts) != -1:
             'gyro': [round(float(v), 4) for v in w],
             'cmd_id': (cmd or {}).get('id')})
         last_log = t
+    if attacker is not None:
+        obs = bus.last('observation_B3.jsonl')
+        if obs:
+            attacker.observe((px, pz), obs)
+        req = bus.last('observation_request_B3.jsonl')
+        if req:
+            res = attacker.forge(t, (px, pz), req, req.get('requester_xy', (8.0, 1.6)))
+            if res is not None:
+                forged, original = res
+                bus.append('observation_B3.jsonl', forged)
+                bus.append('red_injections.jsonl', {
+                    't_ms': t, 'forged_t_ms': forged['t_ms'],
+                    'original_t_ms': original['t_ms'],
+                    'request_id': req.get('request_id'),
+                    'r5_xy': [round(px, 3), round(pz, 3)]})
     if t - last_obs >= 1000:
         img = cam.getImage()
         # Image-derived signature: no global object label is taken from the referee.
@@ -97,7 +118,10 @@ while robot.step(ts) != -1:
         if img:
             for i in range(0, min(len(img), 160 * 120 * 4), 397):
                 sig = (sig * 31 + img[i]) % 1000003
-        bus.append('observation_%s.jsonl' % name, {
+        rec = {
             't_ms': t, 'actor': name, 'camera_bytes': len(img) if img else 0,
-            'image_signature': sig, 'sensor_pose': [round(px, 3), round(pz, 3)]})
+            'image_signature': sig, 'sensor_pose': [round(px, 3), round(pz, 3)]}
+        if name == 'B3' and 'auth' in DEFENSE and BLUE_KEY:
+            rec = sign_frame(BLUE_KEY, rec)
+        bus.append('observation_%s.jsonl' % name, rec)
         last_obs = t

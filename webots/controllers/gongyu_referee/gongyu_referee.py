@@ -13,6 +13,7 @@ from task_metrics import summarize_tasks
 from observation_gate import ObservationGate, ObservationLink
 from physical_corridor import CARRIER_ORDER, HULL_RADIUS, STAGING, TRANSPORT_ROUTES, occupies_corridor
 from course_low_box import SCENE as LOW_BOX_SCENE
+from adversary import IdleMonitor, ResponseThreshold, verify_frame
 
 RUN = os.environ.get('GONGYU_RUN_DIR', '/tmp/gongyu_default')
 SCENE = os.environ.get('GONGYU_SCENE', 'web_medium')
@@ -72,6 +73,25 @@ if BLUE2_HANDOFF:
     # The simulated withdrawal leaves the load at the relay and clears its bay.
     NODES['blue_withdrawal_bay'] = (9.30, 1.60)
     ROUTES['B2'] = (('blue_withdrawal_bay', None),)
+
+# ---- red-team adversary and blue-team countermeasures (see common/adversary.py) ----
+ADVERSARY = set(filter(None, os.environ.get('GONGYU_ADVERSARY', '').split(',')))
+DEFENSE = set(filter(None, os.environ.get('GONGYU_DEFENSE', '').split(',')))
+BLUE_KEY = os.environ.get('GONGYU_BLUE_KEY', '')
+if not ADVERSARY <= {'hoard', 'spoof'} or not DEFENSE <= {'threshold', 'auth'}:
+    raise ValueError('unknown adversary or defense: %s / %s' % (sorted(ADVERSARY), sorted(DEFENSE)))
+if (ADVERSARY or DEFENSE) and (not PHYSICAL_STAGING or ROTOR_SCENE or BLUE2_HANDOFF
+                               or SCENE == LOW_BOX_SCENE):
+    raise ValueError('adversary trials run on the hybrid base course only')
+if 'auth' in DEFENSE and not BLUE_KEY:
+    raise ValueError('frame authentication needs GONGYU_BLUE_KEY')
+CARRIER_TASK = {'R2': 'red2', 'B1': 'blue1', 'R1': 'red1', 'B2': 'blue2'}
+NOMINAL_TRIP_S = 60.0
+if 'spoof' in ADVERSARY:
+    # after its own return the red aircraft loiters within radio range of the
+    # parked blue observer and of the blue relay bay
+    NODES['R5_listen'] = (12.0, 5.0)
+    ROUTES['R5'] = list(ROUTES['R5']) + [('R5_listen', None)]
 
 sup = Supervisor()
 ts = int(sup.getBasicTimeStep())
@@ -190,6 +210,18 @@ def send(nm, node, task=None):
 t = 0
 carrier_index = 0
 carrier_order = list(CARRIER_ORDER)
+if 'hoard' in ADVERSARY:
+    # red policy: claim the corridor turn as soon as R2 frees it, ahead of the
+    # queued blue carrier, although R1 cannot leave before its release time
+    carrier_order = ['R2', 'R1', 'B1', 'B2']
+hoard_logged = False
+threshold_rule = ResponseThreshold(theta_min_s=1.0, theta_max_s=6.0, slack_ref_s=300.0, seed=SEED)
+idle_monitor = IdleMonitor(window_ms=2000, still_m=0.05, still_rad=0.05)
+monitored_holder = None
+last_threshold_t = -1000
+adversary_log = {'revocations': [], 'threshold_trace': [], 'forged_authorized': None,
+                 'unauthenticated_frames': 0}
+request_seq = 0
 blue2_destination_owner = 'B2'
 handoff_offer = None
 for nm in actors:
@@ -211,6 +243,7 @@ course_gate = ObservationGate(
     TAU, int(os.environ.get('GONGYU_FIRST_OBSERVATION_DELAY_MS', '1000')),
     retry_on_expiry=os.environ.get('GONGYU_RETRY_OBSERVATION_ON_EXPIRY', '1') != '0',
     link=observation_link,
+    verifier=(lambda record: verify_frame(BLUE_KEY, record)) if 'auth' in DEFENSE else None,
 )
 channel_holder = None
 metrics = {'seed': SEED, 'scene': SCENE, 'mechanism': MECH, 'adapt': ADAPT,
@@ -277,6 +310,42 @@ while sup.step(ts) != -1:
             metrics['violations'].append(item)
             ev('channel_overlap', item)
         previous_overlaps = overlaps
+        if 'threshold' in DEFENSE:
+            holder = carrier_order[carrier_index]
+            if holder != monitored_holder:
+                monitored_holder = holder
+                idle_monitor.reset()
+                threshold_rule.reset()
+            _o = actors[holder].getOrientation()
+            idle_monitor.add(t, ground_positions[holder], math.atan2(_o[3], _o[0]))
+            if t - last_threshold_t >= 1000 and carrier_index + 1 < len(carrier_order):
+                last_threshold_t = t
+                challenger = carrier_order[carrier_index + 1]
+                challenger_task = TASKS[CARRIER_TASK[challenger]]
+                # stimulus only builds while the grant is verifiably unused: the holder
+                # is outside the corridor, not dwelling at a stop, and has neither
+                # travelled nor turned for the whole monitor window
+                demand = (t >= challenger_task.get('release_ms', 0)
+                          and holder not in physical_entered
+                          and state[holder]['arrive_since'] is None
+                          and idle_monitor.idle())
+                slack_s = (challenger_task['deadline_ms'] - t) / 1000.0 - NOMINAL_TRIP_S
+                respond, stimulus, theta, prob = threshold_rule.step(demand, slack_s)
+                if demand:
+                    adversary_log['threshold_trace'].append({
+                        't_ms': t, 'holder': holder, 'challenger': challenger,
+                        'stimulus': stimulus, 'theta_s': round(theta, 3),
+                        'p': round(prob, 4), 'respond': respond})
+                if respond:
+                    ev('grant_challenged', {'holder': holder, 'stimulus': stimulus,
+                                            'theta_s': round(theta, 3), 'p': round(prob, 4),
+                                            'slack_s': round(slack_s, 3)}, challenger, CARRIER_TASK[challenger])
+                    carrier_order[carrier_index], carrier_order[carrier_index + 1] = challenger, holder
+                    adversary_log['revocations'].append({'t_ms': t, 'from': holder, 'to': challenger,
+                                                         'stimulus': stimulus, 'theta_s': round(theta, 3)})
+                    ev('grant_revoked', {'from': holder, 'to': challenger,
+                                         'pos': ground_positions[holder]}, holder, CARRIER_TASK[holder])
+                    ev('carrier_granted', {'order': carrier_index, 'reason': 'idle_grant_revoked'}, challenger)
         if box is not None:
             if carrier_order[carrier_index] == 'B1' and state['R1']['target_node'] in R1_PREPOSITION_NODES:
                 gap = math.dist(ground_positions['R1'], ground_positions['B1'])
@@ -324,14 +393,34 @@ while sup.step(ts) != -1:
                 if nm != carrier_order[carrier_index] and not preposition:
                     continue
                 if nm == 'R1' and t < TASKS['red1'].get('release_ms', 0):
+                    if 'hoard' in ADVERSARY and not hoard_logged:
+                        hoard_logged = True
+                        ev('adversary_grant_hold', {'release_ms': TASKS['red1'].get('release_ms', 0),
+                                                    'queued_behind': carrier_order[carrier_index + 1:]}, nm, 'red1')
                     continue
                 observer_client = 'B1' if BLUE2_HANDOFF else 'B2'
                 if nm == observer_client == blue2_destination_owner and not course_gate.authorized:
                     update = course_gate.step(t, bus.last('observation_B3.jsonl'))
                     if update is not None:
                         ev(*update, actor=nm, task='blue2')
-                        if ROTOR_SCENE and update[0] in {'observation_requested', 'observation_expired'}:
-                            bus.append('observation_request_B3.jsonl', {'t_ms': t})
+                        if update[0] == 'observation_unauthenticated':
+                            adversary_log['unauthenticated_frames'] += 1
+                        if update[0] == 'observation_authorized':
+                            forged = [row for row in bus.read('red_injections.jsonl')
+                                      if row['forged_t_ms'] == update[1]['sample_t_ms']]
+                            adversary_log['forged_authorized'] = bool(forged)
+                            if forged:
+                                # referee-side audit only: the gate itself never sees this file
+                                ev('audit_forged_frame_authorized', {
+                                    'forged_t_ms': forged[0]['forged_t_ms'],
+                                    'original_t_ms': forged[0]['original_t_ms'],
+                                    'content_age_ms': t - forged[0]['original_t_ms']}, nm, 'blue2')
+                        if update[0] in {'observation_requested', 'observation_expired'} and (
+                                ROTOR_SCENE or ADVERSARY or DEFENSE):
+                            request_seq += 1
+                            bus.append('observation_request_B3.jsonl', {
+                                't_ms': t, 'request_id': 'req-%d' % request_seq,
+                                'requester': nm, 'requester_xy': truth(nm)[:2]})
                     if not course_gate.authorized:
                         continue
             waiting_to_land = ROTOR_SCENE and node == 'F_land' and not course_gate.authorized
@@ -505,6 +594,10 @@ on_time, total = metrics['on_time'], metrics['total']
 metrics['full_window'] = t >= END
 metrics['wall_seconds'] = round(time.time() - start_wall, 3)
 metrics['violation_count'] = len(metrics['violations'])
+if ADVERSARY or DEFENSE:
+    metrics['adversary'] = sorted(ADVERSARY)
+    metrics['defense'] = sorted(DEFENSE)
+    metrics['adversary_log'] = adversary_log
 json.dump(metrics, open(os.path.join(RUN, 'result', 'metrics.json'), 'w'), indent=1)
 json.dump({'started_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(start_wall)),
            'ended_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),

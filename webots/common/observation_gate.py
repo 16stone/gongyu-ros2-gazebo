@@ -25,7 +25,8 @@ class ObservationLink:
 
 
 class ObservationGate:
-    def __init__(self, max_age_ms, first_delay_ms, refresh_delay_ms=1000, *, retry_on_expiry=True, link=None):
+    def __init__(self, max_age_ms, first_delay_ms, refresh_delay_ms=1000, *, retry_on_expiry=True, link=None,
+                 verifier=None):
         self.max_age_ms = max_age_ms
         self.first_delay_ms = first_delay_ms
         self.refresh_delay_ms = refresh_delay_ms
@@ -36,6 +37,9 @@ class ObservationGate:
         self.retry_on_expiry = retry_on_expiry
         self.rejected = False
         self.link = link
+        # optional callable(record) -> bool; frames that fail it are dropped
+        self.verifier = verifier
+        self.forgeries = []
 
     def step(self, now, observation):
         if self.authorized or self.rejected:
@@ -76,6 +80,17 @@ class ObservationGate:
         sampled = observation["t_ms"]
         if not self.requested_at <= sampled <= now:
             return None
+        if self.verifier is not None and not self.verifier(observation):
+            key = (sampled, observation.get("image_signature"), observation.get("mac"))
+            if key in self.forgeries:
+                return None
+            self.forgeries.append(key)
+            return "observation_unauthenticated", {
+                "sample_t_ms": sampled, "seen_at_ms": now,
+                "claimed_sender": observation.get("actor"),
+                "image_signature": observation.get("image_signature"),
+                "has_mac": isinstance(observation.get("mac"), str),
+            }
         delay = self.refresh_delay_ms if self.attempts else self.first_delay_ms
         self.attempts += 1
         self.pending = {

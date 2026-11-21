@@ -36,6 +36,7 @@ fi
 printf 'run=%s\nscene=%s\nplatform=amax-cpu-webots-r2025a\n' "$RUNID" "$SCENE" > "$RUNROOT/environment.txt"
 printf 'physical_actuation=%s\nloc_mode=%s\nfeedback_mode=%s\nseed=%s\n' "${GONGYU_PHYS:-0}" "${GONGYU_LOC:-gps}" "${GONGYU_FEEDBACK_MODE:-sensor}" "${GONGYU_SEED:-0}" >> "$RUNROOT/environment.txt"
 printf 'blue2_handoff=%s\n' "${GONGYU_BLUE2_HANDOFF:-0}" >> "$RUNROOT/environment.txt"
+printf 'adversary=%s\ndefense=%s\nblue_key_set=%s\n' "${GONGYU_ADVERSARY:-}" "${GONGYU_DEFENSE:-}" "${GONGYU_BLUE_KEY:+1}" >> "$RUNROOT/environment.txt"
 printf 'observation_loss_rate=%s\nobservation_blackout_ms=%s\n'   "${GONGYU_OBSERVATION_LOSS_RATE:-0}" "${GONGYU_OBSERVATION_BLACKOUT_MS:-}" >> "$RUNROOT/environment.txt"
 printf '%s\n' "$*" >> "$RUNROOT/environment.txt"
 git -C "$REPO" rev-parse HEAD >"$RUNROOT/source.commit"
