@@ -60,7 +60,7 @@ R3 返场 & R3 & 42.336 & 86 \\
 \endfoot
 \bottomrule
 \endlastfoot
-三组 Webots 整场 & \pathref{evidence/course_final/} 下的 normal、delay、holdout 三组。指标见 \pathref{result/metrics.json}，结束状态见同级 \pathref{shutdown.json}。 & 逐轮核对任务数、仿真窗口、通道进入与清空 \\
+三组 Webots 整场 & \pathref{evidence/course_final/} 下的 normal、delay、holdout；指标见 \pathref{result/metrics.json}，结束状态见 \pathref{shutdown.json} & 逐轮核对任务数、仿真窗口、通道进入与清空 \\
 正常条件复跑 & \pathref{evidence/course_final/specialty_results.json} 中的 normal\_restarts & 核对按期数、进入及清空、B2 交付时刻 \\
 拒收与补采 & 同一专项汇总中的 observation\_refresh；\pathref{evidence/webots/d-report-expired/} & 核对收帧、拒收、补采与发车时刻 \\
 两车放行 & 同一专项汇总中的 two\_vehicles；\pathref{evidence/webots/e-mech-release/} & 核对清空、后车放行与进入 \\
@@ -113,6 +113,6 @@ Gazebo 历史整场 & \pathref{evidence/fp124-ent-ind-01/} 下的 result/ 与 re
 
 补充回合清单及复现命令见 \pathref{docs/webots/amax_validation_20261120.md}，对抗专项见 \pathref{docs/webots/adversary_validation.md}。
 
-\noindent\textbf{补充回合}\quad \pathref{evidence/} 下的 \pathref{b1_full_lowbox_20261120/}、\pathref{rotor_course_20261120/} 与 \pathref{observation_link_20261120/} 分别对应低箱绕行、旋翼接管与断链恢复记录，并附总索引。
+\noindent\textbf{补充回合}\quad \pathref{evidence/} 下的 \pathref{b1_full_lowbox_20261120/}、\pathref{rotor_course_20261120/} 与 \pathref{observation_link_20261120/} 分别对应低箱、旋翼接管与断链记录。
 
 \noindent\textbf{红蓝对抗}\quad \pathref{evidence/adversary_20261121/} 下八个回合子目录含指标、事件、环境与结束状态，\pathref{summary.json} 与 \pathref{SHA256SUMS} 保存汇总与校验和；图~\ref{fig:18}、图~\ref{fig:17} 由 \pathref{figure_sources/adversary_figs.py} 读取绘制。
