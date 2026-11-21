@@ -16,6 +16,7 @@
 | [图模型与 Gazebo 复现](docs/reproduce.md) | 离散算例与归档整机的复现步骤 |
 | [整场证据](evidence/course_final/) | normal / delay / holdout 的指标、事件、关闭回执与专项汇总 |
 | [Linux 仿真补验与复现](docs/webots/amax_validation_20261120.md) | 低箱绕行、双机旋翼、跨车接管、断链和历史专项的原始回执与入口 |
+| [红蓝对抗与仿生防卫专项](docs/webots/adversary_validation.md) | 通道虚占、空中重放欺骗与响应阈值撤销/帧认证八组实跑数据 |
 | [逐回合索引](docs/evidence_index.md) | 33 个 Webots 专项回合；[Gazebo 归档](evidence/fp124-ent-ind-01/) 单独存放 |
 | [验收状态](docs/acceptance_status.md) | 已闭合结果、执行器层诊断与开放边界 |
 
@@ -32,6 +33,7 @@
 - [低箱整场](docs/webots/course_lowbox_acceptance.md)中，B1 绕行后在 133.776 s 完成原交付，整场 14/14 按期、零碰箱。
 - [旋翼与接管整场](docs/webots/rotor_course_acceptance.md)中，B1 接手 B2 的第二批运输，并用 B3 新拍的相机帧放行，于 340.176 s 交付，整场 14/14 按期。
 - [观察链路补验](docs/webots/observation_link_validation.md)中，随机丢帧补采与暂时断链后恢复均为 14/14。持续断链时 B2 保持等待，其余 13 项按期，通道无重叠。
+- [红蓝对抗与仿生防卫专项](docs/webots/adversary_validation.md)中，红方通道虚占致 `blue1` 延后至 337.280 s、`blue2` 超期（12/14），接入响应阈值撤销后三个随机种子均恢复 14/14；红方空中重放欺骗在无认证时被 `B2` 误信放行（内容滞后 182.192 s），启用 HMAC 帧认证后拒收伪造帧并转用真帧放行；双对抗同时开启下蓝方任务全部按期且通道零重叠。
 
 ## 版本口径
 
