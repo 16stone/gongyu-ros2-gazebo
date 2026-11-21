@@ -87,6 +87,7 @@ if 'auth' in DEFENSE and not BLUE_KEY:
     raise ValueError('frame authentication needs GONGYU_BLUE_KEY')
 CARRIER_TASK = {'R2': 'red2', 'B1': 'blue1', 'R1': 'red1', 'B2': 'blue2'}
 NOMINAL_TRIP_S = 60.0
+HOARD_UNTIL_MS = int(os.environ.get('GONGYU_HOARD_UNTIL_MS', '145000'))
 if 'spoof' in ADVERSARY:
     # after its own return the red aircraft loiters within radio range of the
     # parked blue observer and of the blue relay bay
@@ -215,6 +216,7 @@ if 'hoard' in ADVERSARY:
     # queued blue carrier, although R1 cannot leave before its release time
     carrier_order = ['R2', 'R1', 'B1', 'B2']
 hoard_logged = False
+hoard_revoked = False
 threshold_rule = ResponseThreshold(theta_min_s=1.0, theta_max_s=6.0, slack_ref_s=300.0, seed=SEED)
 idle_monitor = IdleMonitor(window_ms=2000, still_m=0.05, still_rad=0.05)
 monitored_holder = None
@@ -341,6 +343,8 @@ while sup.step(ts) != -1:
                                             'theta_s': round(theta, 3), 'p': round(prob, 4),
                                             'slack_s': round(slack_s, 3)}, challenger, CARRIER_TASK[challenger])
                     carrier_order[carrier_index], carrier_order[carrier_index + 1] = challenger, holder
+                    if holder == 'R1':
+                        hoard_revoked = True
                     adversary_log['revocations'].append({'t_ms': t, 'from': holder, 'to': challenger,
                                                          'stimulus': stimulus, 'theta_s': round(theta, 3)})
                     ev('grant_revoked', {'from': holder, 'to': challenger,
@@ -392,10 +396,13 @@ while sup.step(ts) != -1:
             if PHYSICAL_STAGING and nm in CARRIER_ORDER:
                 if nm != carrier_order[carrier_index] and not preposition:
                     continue
-                if nm == 'R1' and t < TASKS['red1'].get('release_ms', 0):
+                r1_release = (HOARD_UNTIL_MS if ('hoard' in ADVERSARY and not hoard_revoked)
+                              else TASKS['red1'].get('release_ms', 0))
+                if nm == 'R1' and t < r1_release:
                     if 'hoard' in ADVERSARY and not hoard_logged:
                         hoard_logged = True
                         ev('adversary_grant_hold', {'release_ms': TASKS['red1'].get('release_ms', 0),
+                                                    'hold_until_ms': r1_release,
                                                     'queued_behind': carrier_order[carrier_index + 1:]}, nm, 'red1')
                     continue
                 observer_client = 'B1' if BLUE2_HANDOFF else 'B2'

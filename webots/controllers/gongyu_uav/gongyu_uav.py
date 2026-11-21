@@ -45,6 +45,8 @@ cmd = None
 last_read = -10**9
 last_log = -10**9
 last_obs = -10**9
+last_intercept = -10**9
+last_req_check = -10**9
 
 
 def clamp(v, a, b):
@@ -97,20 +99,24 @@ while robot.step(ts) != -1:
             'cmd_id': (cmd or {}).get('id')})
         last_log = t
     if attacker is not None:
-        obs = bus.last('observation_B3.jsonl')
-        if obs:
-            attacker.observe((px, pz), obs)
-        req = bus.last('observation_request_B3.jsonl')
-        if req:
-            res = attacker.forge(t, (px, pz), req, req.get('requester_xy', (8.0, 1.6)))
-            if res is not None:
-                forged, original = res
-                bus.append('observation_B3.jsonl', forged)
-                bus.append('red_injections.jsonl', {
-                    't_ms': t, 'forged_t_ms': forged['t_ms'],
-                    'original_t_ms': original['t_ms'],
-                    'request_id': req.get('request_id'),
-                    'r5_xy': [round(px, 3), round(pz, 3)]})
+        if t - last_intercept >= 250:
+            last_intercept = t
+            obs = bus.last('observation_B3.jsonl')
+            if obs:
+                attacker.observe((px, pz), obs)
+        if t - last_req_check >= 64:
+            last_req_check = t
+            req = bus.last('observation_request_B3.jsonl')
+            if req:
+                res = attacker.forge(t, (px, pz), req, req.get('requester_xy', (8.0, 1.6)))
+                if res is not None:
+                    forged, original = res
+                    bus.append('observation_B3.jsonl', forged)
+                    bus.append('red_injections.jsonl', {
+                        't_ms': t, 'forged_t_ms': forged['t_ms'],
+                        'original_t_ms': original['t_ms'],
+                        'request_id': req.get('request_id'),
+                        'r5_xy': [round(px, 3), round(pz, 3)]})
     if t - last_obs >= 1000:
         img = cam.getImage()
         # Image-derived signature: no global object label is taken from the referee.

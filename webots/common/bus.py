@@ -26,10 +26,18 @@ class Bus:
             return []
         out = []
         with open(p, encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    out.append(json.loads(line))
+            fcntl.flock(f, fcntl.LOCK_SH)
+            try:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        out.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        continue
+            finally:
+                fcntl.flock(f, fcntl.LOCK_UN)
         return out
 
     def last(self, name):
