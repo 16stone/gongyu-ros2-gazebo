@@ -1,0 +1,415 @@
+{
+  "regress_normal": {
+    "run": "adv20261121b-regress-normal",
+    "seed": 0,
+    "adversary": [],
+    "defense": [],
+    "on_time": 14,
+    "total": 14,
+    "full_window": true,
+    "channel_enter": 5,
+    "channel_clear": 5,
+    "overlap": 0,
+    "late_task_ids": [],
+    "missing_task_ids": [],
+    "key_tasks_ms": {
+      "red2": 80096,
+      "blue1": 125392,
+      "red1": 239360,
+      "blue2": 306112
+    },
+    "observation_authorized_ms": 240928,
+    "adversary_log": null
+  },
+  "hoard_off": {
+    "run": "adv20261121b-hoard-off",
+    "seed": 0,
+    "adversary": [
+      "hoard"
+    ],
+    "defense": [],
+    "on_time": 12,
+    "total": 14,
+    "full_window": true,
+    "channel_enter": 6,
+    "channel_clear": 6,
+    "overlap": 0,
+    "late_task_ids": [
+      "blue2",
+      "red1"
+    ],
+    "missing_task_ids": [],
+    "key_tasks_ms": {
+      "red2": 80096,
+      "blue1": 337280,
+      "red1": 290208,
+      "blue2": 392912
+    },
+    "observation_authorized_ms": 338704,
+    "adversary_log": {
+      "revocations": [],
+      "threshold_trace": [],
+      "forged_authorized": false,
+      "unauthenticated_frames": 0
+    }
+  },
+  "hoard_thresh_s0": {
+    "run": "adv20261121b-hoard-thresh-s0",
+    "seed": 0,
+    "adversary": [
+      "hoard"
+    ],
+    "defense": [
+      "threshold"
+    ],
+    "on_time": 14,
+    "total": 14,
+    "full_window": true,
+    "channel_enter": 6,
+    "channel_clear": 6,
+    "overlap": 0,
+    "late_task_ids": [],
+    "missing_task_ids": [],
+    "key_tasks_ms": {
+      "red2": 80096,
+      "blue1": 128848,
+      "red1": 244976,
+      "blue2": 296560
+    },
+    "observation_authorized_ms": 246976,
+    "adversary_log": {
+      "revocations": [
+        {
+          "t_ms": 85696,
+          "from": "R1",
+          "to": "B1",
+          "stimulus": 4.0,
+          "theta_s": 4.405
+        }
+      ],
+      "threshold_trace": [
+        {
+          "t_ms": 82672,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 1.0,
+          "theta_s": 4.455,
+          "p": 0.048,
+          "respond": false
+        },
+        {
+          "t_ms": 83680,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 2.0,
+          "theta_s": 4.439,
+          "p": 0.1688,
+          "respond": false
+        },
+        {
+          "t_ms": 84688,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 3.0,
+          "theta_s": 4.422,
+          "p": 0.3152,
+          "respond": false
+        },
+        {
+          "t_ms": 85696,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 4.0,
+          "theta_s": 4.405,
+          "p": 0.4519,
+          "respond": true
+        }
+      ],
+      "forged_authorized": false,
+      "unauthenticated_frames": 0
+    }
+  },
+  "hoard_thresh_s1": {
+    "run": "adv20261121b-hoard-thresh-s1",
+    "seed": 1,
+    "adversary": [
+      "hoard"
+    ],
+    "defense": [
+      "threshold"
+    ],
+    "on_time": 14,
+    "total": 14,
+    "full_window": true,
+    "channel_enter": 6,
+    "channel_clear": 6,
+    "overlap": 0,
+    "late_task_ids": [],
+    "missing_task_ids": [],
+    "key_tasks_ms": {
+      "red2": 80096,
+      "blue1": 128848,
+      "red1": 244976,
+      "blue2": 296560
+    },
+    "observation_authorized_ms": 246976,
+    "adversary_log": {
+      "revocations": [
+        {
+          "t_ms": 85696,
+          "from": "R1",
+          "to": "B1",
+          "stimulus": 4.0,
+          "theta_s": 4.405
+        }
+      ],
+      "threshold_trace": [
+        {
+          "t_ms": 82672,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 1.0,
+          "theta_s": 4.455,
+          "p": 0.048,
+          "respond": false
+        },
+        {
+          "t_ms": 83680,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 2.0,
+          "theta_s": 4.439,
+          "p": 0.1688,
+          "respond": false
+        },
+        {
+          "t_ms": 84688,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 3.0,
+          "theta_s": 4.422,
+          "p": 0.3152,
+          "respond": false
+        },
+        {
+          "t_ms": 85696,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 4.0,
+          "theta_s": 4.405,
+          "p": 0.4519,
+          "respond": true
+        }
+      ],
+      "forged_authorized": false,
+      "unauthenticated_frames": 0
+    }
+  },
+  "hoard_thresh_s2": {
+    "run": "adv20261121b-hoard-thresh-s2",
+    "seed": 2,
+    "adversary": [
+      "hoard"
+    ],
+    "defense": [
+      "threshold"
+    ],
+    "on_time": 14,
+    "total": 14,
+    "full_window": true,
+    "channel_enter": 5,
+    "channel_clear": 5,
+    "overlap": 0,
+    "late_task_ids": [],
+    "missing_task_ids": [],
+    "key_tasks_ms": {
+      "red2": 78352,
+      "blue1": 126224,
+      "red1": 240544,
+      "blue2": 286784
+    },
+    "observation_authorized_ms": 241936,
+    "adversary_log": {
+      "revocations": [
+        {
+          "t_ms": 82672,
+          "from": "R1",
+          "to": "B1",
+          "stimulus": 3.0,
+          "theta_s": 4.455
+        }
+      ],
+      "threshold_trace": [
+        {
+          "t_ms": 80656,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 1.0,
+          "theta_s": 4.489,
+          "p": 0.0473,
+          "respond": false
+        },
+        {
+          "t_ms": 81664,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 2.0,
+          "theta_s": 4.472,
+          "p": 0.1667,
+          "respond": false
+        },
+        {
+          "t_ms": 82672,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 3.0,
+          "theta_s": 4.455,
+          "p": 0.3119,
+          "respond": true
+        }
+      ],
+      "forged_authorized": false,
+      "unauthenticated_frames": 0
+    }
+  },
+  "spoof_off": {
+    "run": "adv20261121b-spoof-off",
+    "seed": 0,
+    "adversary": [
+      "spoof"
+    ],
+    "defense": [],
+    "on_time": 14,
+    "total": 14,
+    "full_window": true,
+    "channel_enter": 5,
+    "channel_clear": 5,
+    "overlap": 0,
+    "late_task_ids": [],
+    "missing_task_ids": [],
+    "key_tasks_ms": {
+      "red2": 80096,
+      "blue1": 121920,
+      "red1": 234544,
+      "blue2": 282976
+    },
+    "observation_authorized_ms": 235632,
+    "adversary_log": {
+      "revocations": [],
+      "threshold_trace": [],
+      "forged_authorized": true,
+      "unauthenticated_frames": 0
+    }
+  },
+  "spoof_auth": {
+    "run": "adv20261121b-spoof-auth",
+    "seed": 0,
+    "adversary": [
+      "spoof"
+    ],
+    "defense": [
+      "auth"
+    ],
+    "on_time": 14,
+    "total": 14,
+    "full_window": true,
+    "channel_enter": 5,
+    "channel_clear": 5,
+    "overlap": 0,
+    "late_task_ids": [],
+    "missing_task_ids": [],
+    "key_tasks_ms": {
+      "red2": 80096,
+      "blue1": 125392,
+      "red1": 239360,
+      "blue2": 306112
+    },
+    "observation_authorized_ms": 240928,
+    "adversary_log": {
+      "revocations": [],
+      "threshold_trace": [],
+      "forged_authorized": false,
+      "unauthenticated_frames": 1
+    }
+  },
+  "combined_def": {
+    "run": "adv20261121b-combined-def",
+    "seed": 0,
+    "adversary": [
+      "hoard",
+      "spoof"
+    ],
+    "defense": [
+      "auth",
+      "threshold"
+    ],
+    "on_time": 13,
+    "total": 14,
+    "full_window": true,
+    "channel_enter": 5,
+    "channel_clear": 5,
+    "overlap": 0,
+    "late_task_ids": [
+      "red1"
+    ],
+    "missing_task_ids": [],
+    "key_tasks_ms": {
+      "red2": 78352,
+      "blue1": 127776,
+      "red1": 251584,
+      "blue2": 304752
+    },
+    "observation_authorized_ms": 253024,
+    "adversary_log": {
+      "revocations": [
+        {
+          "t_ms": 83680,
+          "from": "R1",
+          "to": "B1",
+          "stimulus": 4.0,
+          "theta_s": 4.439
+        }
+      ],
+      "threshold_trace": [
+        {
+          "t_ms": 80656,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 1.0,
+          "theta_s": 4.489,
+          "p": 0.0473,
+          "respond": false
+        },
+        {
+          "t_ms": 81664,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 2.0,
+          "theta_s": 4.472,
+          "p": 0.1667,
+          "respond": false
+        },
+        {
+          "t_ms": 82672,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 3.0,
+          "theta_s": 4.455,
+          "p": 0.3119,
+          "respond": false
+        },
+        {
+          "t_ms": 83680,
+          "holder": "R1",
+          "challenger": "B1",
+          "stimulus": 4.0,
+          "theta_s": 4.439,
+          "p": 0.4482,
+          "respond": true
+        }
+      ],
+      "forged_authorized": false,
+      "unauthenticated_frames": 1
+    }
+  }
+}
